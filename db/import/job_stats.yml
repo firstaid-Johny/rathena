@@ -84,7 +84,121 @@ Header:
   Type: JOB_STATS
   Version: 4
 
-#Body:
+Body:
+  - Jobs:
+      Novice: true
+      Swordman: true
+      Mage: true
+      Archer: true
+      Acolyte: true
+      Merchant: true
+      Thief: true
+      Knight: true
+      Priest: true
+      Wizard: true
+      Blacksmith: true
+      Hunter: true
+      Assassin: true
+      Knight2: true
+      Crusader: true
+      Monk: true
+      Sage: true
+      Rogue: true
+      Alchemist: true
+      Bard: true
+      Dancer: true
+      Crusader2: true
+      Supernovice: true
+      Gunslinger: true
+      Ninja: true
+      Baby: true
+      Baby_Swordman: true
+      Baby_Mage: true
+      Baby_Archer: true
+      Baby_Acolyte: true
+      Baby_Merchant: true
+      Baby_Thief: true
+      Baby_Knight: true
+      Baby_Priest: true
+      Baby_Wizard: true
+      Baby_Blacksmith: true
+      Baby_Hunter: true
+      Baby_Assassin: true
+      Baby_Knight2: true
+      Baby_Crusader: true
+      Baby_Monk: true
+      Baby_Sage: true
+      Baby_Rogue: true
+      Baby_Alchemist: true
+      Baby_Bard: true
+      Baby_Dancer: true
+      Baby_Crusader2: true
+      Super_Baby: true
+      Taekwon: true
+      Star_Gladiator: true
+      Star_Gladiator2: true
+      Soul_Linker: true
+    BaseExp:     
+      - Level: 70
+        Exp: 2221238
+      - Level: 71
+        Exp: 2391087
+      - Level: 72
+        Exp: 2578392
+      - Level: 73
+        Exp: 2772533
+      - Level: 74
+        Exp: 2973510
+      - Level: 75
+        Exp: 3345170
+      - Level: 76
+        Exp: 3579243
+      - Level: 77
+        Exp: 3821126
+      - Level: 78
+        Exp: 4070817
+      - Level: 79
+        Exp: 4809240
+      - Level: 80
+        Exp: 5521536
+      - Level: 81
+        Exp: 6033708
+      - Level: 82
+        Exp: 6565536
+      - Level: 83
+        Exp: 7117020
+      - Level: 84
+        Exp: 7688160
+      - Level: 85
+        Exp: 8650908
+      - Level: 86
+        Exp: 12408000
+      - Level: 87
+        Exp: 13310928
+      - Level: 88
+        Exp: 14243328
+      - Level: 89
+        Exp: 15205200
+      - Level: 90
+        Exp: 19477440
+      - Level: 91
+        Exp: 23299920
+      - Level: 92
+        Exp: 27287040
+      - Level: 93
+        Exp: 36678600
+      - Level: 94
+        Exp: 47673600
+      - Level: 95
+        Exp: 71316000
+      - Level: 96
+        Exp: 146061000
+      - Level: 97
+        Exp: 174405000
+      - Level: 98
+        Exp: 299999994
+      - Level: 99
+        Exp: 99999999
 ###########################################################################
 #
 # Base - Pre-renewal 1000 Levels

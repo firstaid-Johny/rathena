@@ -12,3 +12,4 @@
  *	 <datatype> name;
  **/
 
+int32 mail_enable;

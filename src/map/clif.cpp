@@ -16330,6 +16330,10 @@ void clif_parse_Mail_refreshinbox(int32 fd, map_session_data *sd){
 ///		{  }*n
 // TODO: Packet description => for repeated block
 void clif_Mail_read( map_session_data *sd, int32 mail_id ){
+	
+	clif_displaymessage(fd, msg_txt(sd,298)); // Invalid bound type
+	return -1;
+	
 	int32 i, fd = sd->fd;
 
 	ARR_FIND(0, MAIL_MAX_INBOX, i, sd->mail.inbox.msg[i].id == mail_id);

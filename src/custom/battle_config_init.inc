@@ -11,3 +11,4 @@
  *	 { "name", &battle_config.<variable name>, <default value>, <minimum value>, <maximum value> },
  **/
 
+	{ "mail_enable",                        &battle_config.mail_enable,                     1,      0,      2,              },
