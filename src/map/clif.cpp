@@ -7267,8 +7267,12 @@ void clif_item_refine_list( map_session_data& sd ){
 
 	int32 refine_item[MAX_WEAPON_LEVEL];
 
+#ifdef RENEWAL
 	refine_item[0] = pc_search_inventory( &sd, ITEMID_PHRACON );
 	refine_item[1] = pc_search_inventory( &sd, ITEMID_EMVERETARCON );
+#else
+	refine_item[0] = refine_item[1] = pc_search_inventory( &sd, ITEMID_ORIDECON );
+#endif
 	refine_item[2] = refine_item[3] = pc_search_inventory( &sd, ITEMID_ORIDECON );
 #ifdef RENEWAL
 	refine_item[4] = -1;
@@ -16330,10 +16334,7 @@ void clif_parse_Mail_refreshinbox(int32 fd, map_session_data *sd){
 ///		{  }*n
 // TODO: Packet description => for repeated block
 void clif_Mail_read( map_session_data *sd, int32 mail_id ){
-	
-	clif_displaymessage(fd, msg_txt(sd,298)); // Invalid bound type
-	return -1;
-	
+		
 	int32 i, fd = sd->fd;
 
 	ARR_FIND(0, MAIL_MAX_INBOX, i, sd->mail.inbox.msg[i].id == mail_id);
@@ -17715,10 +17716,14 @@ void clif_parse_ViewPlayerEquip(int32 fd, map_session_data* sd)
 
 	if (sd->m != tsd->m)
 		return;
+	else
+		clif_viewequip_ack( *sd, *tsd );
+	/*
 	else if( tsd->status.show_equip || pc_has_permission(sd, PC_PERM_VIEW_EQUIPMENT) )
 		clif_viewequip_ack( *sd, *tsd );
 	else
 		clif_msg( *sd, MSI_OPEN_EQUIPEDITEM_REFUSED );
+	*/
 }
 
 
@@ -22765,7 +22770,11 @@ void clif_parse_refineui_refine( int32 fd, map_session_data* sd ){
 	}
 
 	// Try to refine the item
+#ifdef RENEWAL
 	if( cost->chance >= ( rnd() % 10000 ) ){
+#else
+	if( cost->chance > ( rnd() % 10000 ) ){
+#endif
 		log_pick_pc( sd, LOG_TYPE_OTHER, -1, item );
 		// Success
 		item->refine = cap_value( item->refine + 1, 0, MAX_REFINE );

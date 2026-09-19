@@ -10138,7 +10138,7 @@ int32 skill_castfix(block_list *bl, uint16 skill_id, uint16 skill_lv) {
 			if (scale > 0)	// not instant cast
 				time = time * (float)scale / battle_config.castrate_dex_scale;
 			else
-				return 0; // instant cast
+				time = 0;
 		}
 
 		// Calculate cast time reduced by item/card bonuses
@@ -10188,9 +10188,12 @@ int32 skill_castfix(block_list *bl, uint16 skill_id, uint16 skill_lv) {
 	// config cast time multiplier
 	if (battle_config.cast_rate != 100)
 		time = time * battle_config.cast_rate / 100;
+
 	// return final cast time
-	time = max((int32)time, 0);
-	//ShowInfo("Castime castfix = %f\n",time);
+	if (skill_get_cast(skill_id, skill_lv) > 0)
+		time = std::max((int32)time, 100);
+	else
+		time = std::max((int32)time, 0);
 
 	return (int32)time;
 }
@@ -10592,8 +10595,13 @@ void skill_identify(map_session_data *sd, int32 idx)
  *------------------------------------------*/
 void skill_weaponrefine( map_session_data& sd, int32 idx ){
 	static const t_itemid material[MAX_WEAPON_LEVEL] = {
+#ifdef RENEWAL
 		ITEMID_PHRACON,
 		ITEMID_EMVERETARCON,
+#else
+		ITEMID_ORIDECON,
+		ITEMID_ORIDECON,
+#endif
 		ITEMID_ORIDECON,
 		ITEMID_ORIDECON,
 #ifdef RENEWAL

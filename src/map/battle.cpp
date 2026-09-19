@@ -750,6 +750,16 @@ static int32 battle_calc_cardfix_debuff( status_change& tsc, int32 rh_ele ){
 	return ele_fix;
 }
 
+/// Cap each defensive bonus group at damage calculation time in Pre-Renewal.
+/// Keep negative resistance (damage vulnerability) and Renewal behavior intact.
+static int32 battle_cap_defense_bonus(int32 rate, int32 maximum) {
+#ifndef RENEWAL
+	return min(rate, maximum);
+#else
+	return rate;
+#endif
+}
+
 /**
  * Calculates card bonuses damage adjustments.
  * @param attack_type @see enum e_battle_flag
@@ -891,16 +901,16 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 					if (tsc != nullptr)
 						ele_fix += battle_calc_cardfix_debuff( *tsc, rh_ele );
 #endif
-					cardfix = cardfix * (100 - ele_fix) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(ele_fix, battle_config.max_subele)) / 100;
 				}
-				cardfix = cardfix * (100 - tsd->indexed_bonus.subsize[sstatus->size] - tsd->indexed_bonus.subsize[SZ_ALL]) / 100;
-				cardfix = cardfix * (100 - tsd->indexed_bonus.magic_subsize[sstatus->size] - tsd->indexed_bonus.magic_subsize[SZ_ALL]) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.subsize[sstatus->size] + tsd->indexed_bonus.subsize[SZ_ALL], battle_config.max_subsize)) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.magic_subsize[sstatus->size] + tsd->indexed_bonus.magic_subsize[SZ_ALL], battle_config.max_subsize)) / 100;
 
 				int32 race_fix = 0;
 
 				for (const auto &raceit : s_race2)
 					race_fix += tsd->indexed_bonus.subrace2[raceit];
-				cardfix = cardfix * (100 - race_fix) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
 				race_fix = tsd->indexed_bonus.subrace[sstatus->race] + tsd->indexed_bonus.subrace[RC_ALL];
 				for (const auto &it : tsd->subrace3) {
 					if (it.race != RC_ALL && it.race != sstatus->race)
@@ -911,7 +921,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 						continue;
 					race_fix += it.rate;
 				}
-				cardfix = cardfix * (100 - race_fix) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
 				cardfix = cardfix * (100 - tsd->indexed_bonus.subclass[sstatus->class_] - tsd->indexed_bonus.subclass[CLASS_ALL]) / 100;
 
 				for (const auto &it : tsd->add_mdef) {
@@ -925,7 +935,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 				if( flag&BF_SHORT )
 					cardfix = cardfix * (100 - tsd->bonus.near_attack_def_rate) / 100;
 				else if (!nk[NK_IGNORELONGCARD])
-					cardfix = cardfix * (100 - tsd->bonus.long_attack_def_rate) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->bonus.long_attack_def_rate, battle_config.max_long_attack_def)) / 100;
 #endif
 				cardfix = cardfix * (100 - tsd->bonus.magic_def_rate) / 100;
 
@@ -1099,7 +1109,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 							continue;
 						ele_fix += it.rate;
 					}
-					cardfix = cardfix * (100 - ele_fix) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(ele_fix, battle_config.max_subele)) / 100;
 
 					if( left&1 && lh_ele != rh_ele ) {
 						int32 ele_fix_lh = tsd->indexed_bonus.subele[lh_ele] + tsd->indexed_bonus.subele[ELE_ALL] + tsd->indexed_bonus.subele_script[lh_ele] + tsd->indexed_bonus.subele_script[ELE_ALL];
@@ -1113,19 +1123,19 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 								continue;
 							ele_fix_lh += it.rate;
 						}
-						cardfix = cardfix * (100 - ele_fix_lh) / 100;
+						cardfix = cardfix * (100 - battle_cap_defense_bonus(ele_fix_lh, battle_config.max_subele)) / 100;
 					}
 
-					cardfix = cardfix * (100 - tsd->indexed_bonus.subdefele[s_defele] - tsd->indexed_bonus.subdefele[ELE_ALL]) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.subdefele[s_defele] + tsd->indexed_bonus.subdefele[ELE_ALL], battle_config.max_subele)) / 100;
 				}
 
 				int32 race_fix = 0;
 
-				cardfix = cardfix * (100 - tsd->indexed_bonus.subsize[sstatus->size] - tsd->indexed_bonus.subsize[SZ_ALL]) / 100;
-				cardfix = cardfix * (100 - tsd->indexed_bonus.weapon_subsize[sstatus->size] - tsd->indexed_bonus.weapon_subsize[SZ_ALL]) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.subsize[sstatus->size] + tsd->indexed_bonus.subsize[SZ_ALL], battle_config.max_subsize)) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.weapon_subsize[sstatus->size] + tsd->indexed_bonus.weapon_subsize[SZ_ALL], battle_config.max_subsize)) / 100;
 				for (const auto &raceit : s_race2)
 					race_fix += tsd->indexed_bonus.subrace2[raceit];
-				cardfix = cardfix * (100 - race_fix) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
 				race_fix = tsd->indexed_bonus.subrace[sstatus->race] + tsd->indexed_bonus.subrace[RC_ALL];
 				for (const auto &it : tsd->subrace3) {
 					if (it.race != RC_ALL && it.race != sstatus->race)
@@ -1136,7 +1146,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 						continue;
 					race_fix += it.rate;
 				}
-				cardfix = cardfix * (100 - race_fix) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
 				cardfix = cardfix * (100 - tsd->indexed_bonus.subclass[sstatus->class_] - tsd->indexed_bonus.subclass[CLASS_ALL]) / 100;
 				for (const auto &it : tsd->add_def) {
 					if (it.id == s_class) {
@@ -1147,7 +1157,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 				if( flag&BF_SHORT )
 					cardfix = cardfix * (100 - tsd->bonus.near_attack_def_rate) / 100;
 				else if (!nk[NK_IGNORELONGCARD])	// BF_LONG (there's no other choice)
-					cardfix = cardfix * (100 - tsd->bonus.long_attack_def_rate) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->bonus.long_attack_def_rate, battle_config.max_long_attack_def)) / 100;
 				if( tsc->getSCE(SC_DEF_RATE) )
 					cardfix = cardfix * (100 - tsc->getSCE(SC_DEF_RATE)->val1) / 100;
 				APPLY_CARDFIX(damage, cardfix);
@@ -1177,7 +1187,7 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 					}
 					if (s_defele != ELE_NONE)
 						ele_fix += tsd->indexed_bonus.subdefele[s_defele] + tsd->indexed_bonus.subdefele[ELE_ALL];
-					cardfix = cardfix * (100 - ele_fix) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(ele_fix, battle_config.max_subele)) / 100;
 				}
 				int32 race_fix = tsd->indexed_bonus.subrace[sstatus->race] + tsd->indexed_bonus.subrace[RC_ALL];
 				for (const auto &it : tsd->subrace3) {
@@ -1189,18 +1199,18 @@ int32 battle_calc_cardfix(int32 attack_type, block_list *src, block_list *target
 						continue;
 					race_fix += it.rate;
 				}
-				cardfix = cardfix * (100 - race_fix) / 100;
-				cardfix = cardfix * (100 - tsd->indexed_bonus.subsize[sstatus->size] - tsd->indexed_bonus.subsize[SZ_ALL]) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->indexed_bonus.subsize[sstatus->size] + tsd->indexed_bonus.subsize[SZ_ALL], battle_config.max_subsize)) / 100;
 				race_fix = 0;
 				for (const auto &raceit : s_race2)
 					race_fix += tsd->indexed_bonus.subrace2[raceit];
-				cardfix = cardfix * (100 - race_fix) / 100;
+				cardfix = cardfix * (100 - battle_cap_defense_bonus(race_fix, battle_config.max_subrace)) / 100;
 				cardfix = cardfix * (100 - tsd->indexed_bonus.subclass[sstatus->class_] - tsd->indexed_bonus.subclass[CLASS_ALL]) / 100;
 				cardfix = cardfix * (100 - tsd->bonus.misc_def_rate) / 100;
 				if( flag&BF_SHORT )
 					cardfix = cardfix * (100 - tsd->bonus.near_attack_def_rate) / 100;
 				else if (!nk[NK_IGNORELONGCARD])	// BF_LONG (there's no other choice)
-					cardfix = cardfix * (100 - tsd->bonus.long_attack_def_rate) / 100;
+					cardfix = cardfix * (100 - battle_cap_defense_bonus(tsd->bonus.long_attack_def_rate, battle_config.max_long_attack_def)) / 100;
 				APPLY_CARDFIX(damage, cardfix);
 			}
 			// Custom on BF_MISC to follow SC_ debuff BF_MAGIC renewal behavior
@@ -3464,6 +3474,7 @@ int32 battle_get_weapon_element(const Damage& wd, const block_list& src, const b
 	const status_change* sc = status_get_sc(&src);
 	const status_data* sstatus = status_get_status_data(src);
 
+
 	//Take weapon's element
 	if( !skill_id || element == ELE_WEAPON ) {
 		if (sstatus != nullptr) {
@@ -3491,10 +3502,20 @@ int32 battle_get_weapon_element(const Damage& wd, const block_list& src, const b
 	else if( element == ELE_RANDOM ) //Use random element
 		element = rnd()%ELE_ALL;
 
+
 	// Modify the element type of skill attack
 	if (std::shared_ptr<s_skill_db> skill = skill_db.find(skill_id); skill != nullptr && skill->impl != nullptr) {
 		skill->impl->modifyElement(wd, src, target, skill_lv, element, calc_for_damage_only);
 	}
+
+#ifndef RENEWAL
+	// If arrow/ammunition is equipped on bow/gun, ignore Fireweapon/Endows/element buffs and always use the arrow element
+	if (sd != nullptr && weapon_position == EQI_HAND_R
+		&& (sd->status.weapon == W_BOW || (sd->status.weapon >= W_REVOLVER && sd->status.weapon <= W_GRENADE))
+		&& (is_skill_using_arrow(&src, skill_id) || sd->equip_index[EQI_AMMO] >= 0)) {
+		element = sd->bonus.arrow_ele;
+	}
+#endif
 
 	return element;
 }
@@ -6383,8 +6404,8 @@ struct Damage battle_calc_misc_attack(block_list *src,block_list *target,uint16 
 				md.damage = skill_lv * 20 + skill * 6 + ((sstatus->agi / 2) *2) + ((sstatus->dex / 10) *2);
 #else
 				md.damage = (sstatus->dex / 10 + sstatus->int_ / 2 + skill * 3 + 40) * 2;
-				if(mflag > 1) //Autocasted Blitz
-					nk.set(NK_SPLASHSPLIT);
+				//if(mflag > 1) //Autocasted Blitz
+					//nk.set(NK_SPLASHSPLIT);
 #endif
 				if (skill_id == SN_FALCONASSAULT) {
 					//Div fix of Blitzbeat

@@ -44,3 +44,21 @@
 Header:
   Type: STATUS_DB
   Version: 4
+
+Body:
+  - Status: Fireweapon
+    Flags:
+      NoSave: true
+      RemoveOnMapWarp: true
+  - Status: Waterweapon
+    Flags:
+      NoSave: true
+      RemoveOnMapWarp: true
+  - Status: Windweapon
+    Flags:
+      NoSave: true
+      RemoveOnMapWarp: true
+  - Status: Earthweapon
+    Flags:
+      NoSave: true
+      RemoveOnMapWarp: true

@@ -422,6 +422,7 @@ public:
 		uint32 vending : 1;
 		uint32 noks : 3; // [Zeph Kill Steal Protection]
 		uint32 changemap : 1;
+		uint32 reset_sp_on_logout : 1; // Preserve the exit decision through logout scripts and saving.
 		uint32 callshop : 1; // flag to indicate that a script used callshop; on a shop
 		int16 pmap; // Previous map on Map Change
 		uint16 autoloot;
@@ -1431,6 +1432,7 @@ enum e_setpos{
 };
 
 enum e_setpos pc_setpos(map_session_data* sd, uint16 mapindex, int32 x, int32 y, clr_type clrtype);
+bool pc_should_reset_sp_on_map_exit(const map_session_data& sd);
 enum e_setpos pc_setpos_savepoint( map_session_data& sd, clr_type clrtype = CLR_TELEPORT );
 void pc_setsavepoint(map_session_data *sd, int16 mapindex,int32 x,int32 y);
 char pc_randomwarp(map_session_data *sd,clr_type type,bool ignore_mapflag = false);

@@ -1227,6 +1227,16 @@ int32 party_send_xy_clear(struct party_data *p)
 	return 0;
 }
 
+/// Trick Dead members cannot receive party rewards in Pre-Renewal.
+static bool party_member_is_trickdead(const map_session_data& sd)
+{
+#ifndef RENEWAL
+	return sd.sc.getSCE(SC_TRICKDEAD) != nullptr;
+#else
+	return false;
+#endif
+}
+
 /** Party EXP and Zeny sharing
  * @param p Party data
  * @param src EXP source (for renewal level penalty)
@@ -1250,7 +1260,7 @@ void party_exp_share(struct party_data* p, block_list* src, t_exp base_exp, t_ex
 
 	// count the number of players eligible for exp sharing
 	for (i = c = 0; i < MAX_PARTY; i++) {
-		if( (sd[c] = p->data[i].sd) == nullptr || sd[c]->m != src->m || pc_isdead(sd[c]) || (battle_config.idle_no_share && pc_isidle_party(sd[c])) )
+		if( (sd[c] = p->data[i].sd) == nullptr || sd[c]->m != src->m || pc_isdead(sd[c]) || party_member_is_trickdead(*sd[c]) || (battle_config.idle_no_share && pc_isidle_party(sd[c])) )
 			continue;
 		c++;
 	}
@@ -1312,7 +1322,7 @@ int32 party_share_loot(struct party_data* p, map_session_data* sd, struct item* 
 				if (i >= MAX_PARTY)
 					i = 0;	// reset counter to 1st person in party so it'll stop when it reaches "itemc"
 
-				if( (psd = p->data[i].sd) == nullptr || sd->m != psd->m || pc_isdead(psd) || (battle_config.idle_no_share && pc_isidle_party(psd)) )
+				if( (psd = p->data[i].sd) == nullptr || sd->m != psd->m || pc_isdead(psd) || party_member_is_trickdead(*psd) || (battle_config.idle_no_share && pc_isidle_party(psd)) )
 					continue;
 
 				if (pc_additem(psd,item,item->amount,LOG_TYPE_PICKDROP_PLAYER))
@@ -1329,7 +1339,7 @@ int32 party_share_loot(struct party_data* p, map_session_data* sd, struct item* 
 
 			//Collect pick candidates
 			for (i = 0; i < MAX_PARTY; i++) {
-				if( (psd[count] = p->data[i].sd) == nullptr || psd[count]->m != sd->m || pc_isdead(psd[count]) || (battle_config.idle_no_share && pc_isidle_party(psd[count])) )
+				if( (psd[count] = p->data[i].sd) == nullptr || psd[count]->m != sd->m || pc_isdead(psd[count]) || party_member_is_trickdead(*psd[count]) || (battle_config.idle_no_share && pc_isidle_party(psd[count])) )
 					continue;
 
 				count++;
@@ -1350,6 +1360,11 @@ int32 party_share_loot(struct party_data* p, map_session_data* sd, struct item* 
 	}
 
 	if (!target) {
+		// Autoloot also reaches this fallback. Return failure so the item stays
+		// on the ground instead of being given to a Trick Dead party member.
+		if (p != nullptr && party_member_is_trickdead(*sd))
+			return ADDITEM_INVALID;
+
 		target = sd; //Give it to the char that picked it up
 
 		if ((i = pc_additem(sd,item,item->amount,LOG_TYPE_PICKDROP_PLAYER)))

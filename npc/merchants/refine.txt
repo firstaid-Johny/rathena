@@ -868,6 +868,9 @@ function	script	refinemain	{
 	}
 
 // New Refining Functions ========================
+	// Custom rates below 100% have no safe-refine shortcut.
+	if (getequippercentrefinery(.@part) < 100)
+		.@safe = .@refinerycnt;
 	if (.@refinerycnt < .@safe) {
 		mes "["+ .@npc_name$ +"]";
 		mes "I can refine this to the safe limit or a desired number of times. It's your choice.";

@@ -3890,6 +3890,7 @@ void pc_bonus(map_session_data *sd,int32 type,int32 val)
 					case W_GRENADE:
 						//Become weapon element.
 						status->rhw.ele=val;
+						sd->bonus.arrow_ele=val;
 						break;
 					default: //Become arrow element.
 						sd->bonus.arrow_ele=val;
@@ -6915,6 +6916,17 @@ bool pc_steal_item(map_session_data *sd,block_list *bl, uint16 skill_lv)
 	return true;
 }
 
+/// Whether leaving the current map should reset SP (independent of WoE timers).
+bool pc_should_reset_sp_on_map_exit(const map_session_data& sd)
+{
+	// A new login has no source map yet; do not inspect its default map id.
+	if (!battle_config.reset_sp_on_pvp_gvg_exit || !sd.mapindex)
+		return false;
+
+	const map_data* mapdata = map_getmapdata(sd.m);
+	return mapdata != nullptr && (mapdata->getMapFlag(MF_PVP));
+}
+
 /*==========================================
  * Set's a player position.
  * @param sd
@@ -6947,6 +6959,8 @@ enum e_setpos pc_setpos(map_session_data* sd, uint16 mapindex, int32 x, int32 y,
 	int16 m = map_mapindex2mapid(mapindex);
 	struct map_data *mapdata = map_getmapdata(m);
 	status_change *sc = status_get_sc(sd);
+
+	const bool reset_sp = sd->mapindex != mapindex && pc_should_reset_sp_on_map_exit(*sd);
 
 	sd->state.changemap = (sd->mapindex != mapindex);
 	sd->state.warping = 1;
@@ -7061,6 +7075,8 @@ enum e_setpos pc_setpos(map_session_data* sd, uint16 mapindex, int32 x, int32 y,
 		if (sd->state.buyingstore) // Stop buyingstore
 			buyingstore_close(sd);
 
+		// Keep the source-map decision even if a logout script changes maps.
+		sd->state.reset_sp_on_logout |= reset_sp;
 		npc_script_event( *sd, NPCE_LOGOUT );
 
 		//remove from map, THEN change x/y coordinates
@@ -7184,6 +7200,12 @@ enum e_setpos pc_setpos(map_session_data* sd, uint16 mapindex, int32 x, int32 y,
 		vending_update(*sd);
 	if (sd->state.buyingstore)
 		buyingstore_update(*sd);
+
+	if (reset_sp) {
+		// Assign directly so this also works when warping a dead character.
+		sd->battle_status.sp = 0;
+		clif_updatestatus(*sd, SP_SP);
+	}
 	
 	return SETPOS_OK;
 }

@@ -1072,7 +1072,11 @@ Body:
       BuyingStore: true
       DeadBranch: true
     Script: |
+      announce strcharinfo(0)+" used Dead Branch!",bc_all;
+      $@mobid[0] = 0;
       monster "this",-1,-1,"--ja--",-1-MOBG_BRANCH_OF_DEAD_TREE,1,"";
+      if ($@mobid[0])
+        setunitname $@mobid[0],strcharinfo(0)+" : "+getunitname($@mobid[0]);
   - Id: 605
     AegisName: Anodyne
     Name: Anodyne
@@ -3525,7 +3529,11 @@ Body:
       BuyingStore: true
       DeadBranch: true
     Script: |
+      announce strcharinfo(0)+" used Bloody Branch!",bc_all;
+      $@mobid[0] = 0;
       monster "this",-1,-1,"--ja--",-1-MOBG_BLOODY_DEAD_BRANCH,1,"";
+      if ($@mobid[0])
+        setunitname $@mobid[0],strcharinfo(0)+" : "+getunitname($@mobid[0]);
   - Id: 12104
     AegisName: Random_Quiver
     Name: Random Quiver

@@ -281,6 +281,12 @@ int32 chrif_save(map_session_data *sd, int32 flag) {
 
 	pc_makesavestatus(sd);
 
+	if ((flag & (CSAVE_QUIT | CSAVE_CHANGE_MAPSERV)) && sd->state.reset_sp_on_logout) {
+		// Apply after save preparation, which can restore respawn SP for dead players.
+		sd->battle_status.sp = 0;
+		sd->status.sp = 0;
+	}
+
 	if ( (flag&CSAVE_QUITTING) && sd->state.active) { //Store player data which is quitting
 		if (chrif_isconnected()) {
 			chrif_save_scdata(sd);

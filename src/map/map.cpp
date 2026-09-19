@@ -2238,6 +2238,9 @@ int32 map_quit(map_session_data *sd) {
 		return 0;
 	}
 
+	// Capture this before logout scripts or cleanup can change the source map.
+	sd->state.reset_sp_on_logout = pc_should_reset_sp_on_map_exit(*sd);
+
 	if (sd->expiration_tid != INVALID_TIMER)
 		delete_timer(sd->expiration_tid, pc_expiration_timer);
 

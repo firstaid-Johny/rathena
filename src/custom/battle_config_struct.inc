@@ -12,4 +12,9 @@
  *	 <datatype> name;
  **/
 
-int32 mail_enable;
+	int32 mail_enable;
+	int32 reset_sp_on_pvp_gvg_exit;
+	int32 max_subrace;
+	int32 max_subsize;
+	int32 max_subele;
+	int32 max_long_attack_def;

@@ -141,3 +141,40 @@
 Header:
   Type: SKILL_DB
   Version: 4
+
+Body:
+  - Id: 50   #Steal
+    Requires:
+      SpCost: 50
+  - Id: 46  #Double Staft
+    Requires:
+      SpCost: 15
+  - Id: 42  #Mammonite
+    Requires:
+      ZenyCost: 300
+  - Id: 48  #Double Attack
+    DamageFlags:
+      Critical: true
+  - Id: 13  # Soul Strike
+    Requires:
+      SpCost:
+        - Level: 1
+          Amount: 30
+        - Level: 2
+          Amount: 26
+        - Level: 3
+          Amount: 36
+        - Level: 4
+          Amount: 32
+        - Level: 5
+          Amount: 42
+        - Level: 6
+          Amount: 38
+        - Level: 7
+          Amount: 48
+        - Level: 8
+          Amount: 44
+        - Level: 9
+          Amount: 54
+        - Level: 10
+          Amount: 50

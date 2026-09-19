@@ -8837,6 +8837,15 @@ unsigned char status_calc_attack_element(const block_list* bl, const status_chan
 {
 	if(sc == nullptr || sc->empty())
 		return cap_value(element, 0, UCHAR_MAX);
+#ifndef RENEWAL
+	if (bl != nullptr && bl->type == BL_PC) {
+		const map_session_data* sd = BL_CAST(BL_PC, bl);
+		if (sd != nullptr && (sd->status.weapon == W_BOW || (sd->status.weapon >= W_REVOLVER && sd->status.weapon <= W_GRENADE))
+			&& sd->equip_index[EQI_AMMO] >= 0) {
+			return cap_value(element, 0, UCHAR_MAX);
+		}
+	}
+#endif
 	if(sc->getSCE(SC_ENCHANTARMS))
 		return sc->getSCE(SC_ENCHANTARMS)->val1;
 	if(sc->getSCE(SC_WATERWEAPON)

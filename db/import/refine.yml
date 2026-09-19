@@ -687,3 +687,521 @@ Header:
 #            Chances:
 #              - Type: Enriched
 #                Rate: 3500
+
+# Custom Pre-Renewal +1 through +10 rates. Level means the target refine level.
+# Rate is percentage x 100. Prices and refine bonuses inherit the base database.
+Body:
+  - Group: Armor
+    Levels:
+      - Level: 1
+        RefineLevels:
+          - Level: 1
+            Chances:
+              - Type: Normal
+                Rate: 9500    # 95%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 2
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 3
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 4
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 5
+            Chances:
+              - Type: Normal
+                Rate: 5000    # 50%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 6000    # 60%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 6
+            Chances:
+              - Type: Normal
+                Rate: 4000    # 40%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 5000    # 50%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 7
+            Chances:
+              - Type: Normal
+                Rate: 3000    # 30%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 4000    # 40%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 8
+            Chances:
+              - Type: Normal
+                Rate: 2000    # 20%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 3000    # 30%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 9
+            Chances:
+              - Type: Normal
+                Rate: 1500    # 15%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2500    # 25%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+          - Level: 10
+            Chances:
+              - Type: Normal
+                Rate: 1000    # 10%
+                Material: Elunium
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2000    # 20%
+                Material: Enriched_Elunium
+                BreakingRate: 10000
+  - Group: Weapon
+    Levels:
+      - Level: 1
+        RefineLevels:
+          - Level: 1
+            Chances:
+              - Type: Normal
+                Rate: 9500    # 95%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 2
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 3
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 4
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 5
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 6
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 7
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 8
+            Chances:
+              - Type: Normal
+                Rate: 5000    # 50%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 6000    # 60%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 9
+            Chances:
+              - Type: Normal
+                Rate: 3000    # 30%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 4000    # 40%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 10
+            Chances:
+              - Type: Normal
+                Rate: 2000    # 20%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 3000    # 30%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+      - Level: 2
+        RefineLevels:
+          - Level: 1
+            Chances:
+              - Type: Normal
+                Rate: 9500    # 95%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 2
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 3
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 4
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 5
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 6
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 7
+            Chances:
+              - Type: Normal
+                Rate: 4500    # 45%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 5500    # 55%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 8
+            Chances:
+              - Type: Normal
+                Rate: 3500    # 35%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 4500    # 45%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 9
+            Chances:
+              - Type: Normal
+                Rate: 2500    # 25%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 3500    # 35%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 10
+            Chances:
+              - Type: Normal
+                Rate: 1500    # 15%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2500    # 25%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+      - Level: 3
+        RefineLevels:
+          - Level: 1
+            Chances:
+              - Type: Normal
+                Rate: 9500    # 95%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 2
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 3
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 4
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 5
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 6
+            Chances:
+              - Type: Normal
+                Rate: 5000    # 50%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 6000    # 60%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 7
+            Chances:
+              - Type: Normal
+                Rate: 4000    # 40%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 5000    # 50%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 8
+            Chances:
+              - Type: Normal
+                Rate: 3000    # 30%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 4000    # 40%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 9
+            Chances:
+              - Type: Normal
+                Rate: 2000    # 20%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 3000    # 30%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 10
+            Chances:
+              - Type: Normal
+                Rate: 1000    # 10%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2000    # 20%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+      - Level: 4
+        RefineLevels:
+          - Level: 1
+            Chances:
+              - Type: Normal
+                Rate: 9500    # 95%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 2
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 3
+            Chances:
+              - Type: Normal
+                Rate: 9000    # 90%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 4
+            Chances:
+              - Type: Normal
+                Rate: 8500    # 85%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 9900    # 99%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 5
+            Chances:
+              - Type: Normal
+                Rate: 5000    # 50%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 6000    # 60%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 6
+            Chances:
+              - Type: Normal
+                Rate: 4000    # 40%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 5000    # 50%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 7
+            Chances:
+              - Type: Normal
+                Rate: 3000    # 30%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 4000    # 40%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 8
+            Chances:
+              - Type: Normal
+                Rate: 2000    # 20%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 3000    # 30%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 9
+            Chances:
+              - Type: Normal
+                Rate: 1500    # 15%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2500    # 25%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
+          - Level: 10
+            Chances:
+              - Type: Normal
+                Rate: 1000    # 10%
+                Material: Oridecon
+                BreakingRate: 10000
+              - Type: Enriched
+                Rate: 2000    # 20%
+                Material: Enriched_Oridecon
+                BreakingRate: 10000
