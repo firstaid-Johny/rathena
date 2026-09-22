@@ -1,0 +1,33 @@
+// Enable or disable mail/RODEX system server-wide.
+// Default: 1
+// 0 = Mail system is disabled for all players
+// 1 = Mail system is enabled for all players
+// 2 = Mail system is enabled for GMs only (NPC scripts can still send mail)
+mail_enable: 2
+
+// Reset SP to 0 when leaving a PvP or GvG map, including logout/disconnect.
+// Covers pvp, gvg, gvg_te, gvg_castle and gvg_te_castle, even outside WoE.
+// Applies to map changes (including return to town and map-server transfers).
+// Teleporting within the same map does not reset SP. Normal SP recovery resumes.
+// 0 = disabled, 1 = enabled. Restart the rebuilt map-server to apply the code.
+// Later setting changes can be applied with @reloadbattleconf.
+reset_sp_on_pvp_gvg_exit: 1
+
+// Pre-Renewal defense caps. Each reduction group is capped independently.
+// Existing armor DEF/MDEF cap; original exceptions and over_def_bonus apply.
+// This does not cap status effects such as Steel Body or change the DEF formulas.
+max_def: 80
+
+// New percentage caps: 0..100 (default 80). Negative bonuses remain unchanged.
+// Sum matching bonuses (specific + All + applicable conditional bonuses) first.
+// Separate multiplicative groups remain separate; total reduction can exceed 80%.
+// Race: applies separately to SubRace/conditional SubRace and SubRace2 groups.
+max_subrace: 80
+// Size: applies separately to SubSize, WeaponSubSize and MagicSubSize groups.
+max_subsize: 80
+// Element: applies to the existing SubEle and SubDefEle reduction groups.
+max_subele: 80
+// Long-range defense, including magic and misc attacks that normally use it.
+max_long_attack_def: 80
+// Reload new caps with @reloadbattleconf. For max_def changes, re-equip or relog
+// to recalculate existing characters, as required by the original max_def code.
