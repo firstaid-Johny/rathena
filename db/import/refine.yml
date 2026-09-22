@@ -700,6 +700,7 @@ Body:
               - Type: Normal
                 Rate: 9500    # 95%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -710,6 +711,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -720,6 +722,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -730,6 +733,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -740,6 +744,7 @@ Body:
               - Type: Normal
                 Rate: 5000    # 50%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 6000    # 60%
@@ -750,6 +755,7 @@ Body:
               - Type: Normal
                 Rate: 4000    # 40%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 5000    # 50%
@@ -760,6 +766,7 @@ Body:
               - Type: Normal
                 Rate: 3000    # 30%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 4000    # 40%
@@ -770,6 +777,7 @@ Body:
               - Type: Normal
                 Rate: 2000    # 20%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 3000    # 30%
@@ -780,6 +788,7 @@ Body:
               - Type: Normal
                 Rate: 1500    # 15%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2500    # 25%
@@ -790,6 +799,7 @@ Body:
               - Type: Normal
                 Rate: 1000    # 10%
                 Material: Elunium
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2000    # 20%
@@ -804,6 +814,7 @@ Body:
               - Type: Normal
                 Rate: 9500    # 95%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -814,6 +825,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -824,6 +836,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -834,6 +847,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -844,6 +858,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -854,6 +869,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -864,6 +880,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -874,6 +891,7 @@ Body:
               - Type: Normal
                 Rate: 5000    # 50%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 6000    # 60%
@@ -884,6 +902,7 @@ Body:
               - Type: Normal
                 Rate: 3000    # 30%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 4000    # 40%
@@ -894,6 +913,7 @@ Body:
               - Type: Normal
                 Rate: 2000    # 20%
                 Material: Oridecon
+                Price: 1000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 3000    # 30%
@@ -906,6 +926,7 @@ Body:
               - Type: Normal
                 Rate: 9500    # 95%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -916,6 +937,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -926,6 +948,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -936,6 +959,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -946,6 +970,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -956,6 +981,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -966,6 +992,7 @@ Body:
               - Type: Normal
                 Rate: 4500    # 45%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 5500    # 55%
@@ -976,6 +1003,7 @@ Body:
               - Type: Normal
                 Rate: 3500    # 35%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 4500    # 45%
@@ -986,6 +1014,7 @@ Body:
               - Type: Normal
                 Rate: 2500    # 25%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 3500    # 35%
@@ -996,6 +1025,7 @@ Body:
               - Type: Normal
                 Rate: 1500    # 15%
                 Material: Oridecon
+                Price: 2000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2500    # 25%
@@ -1008,6 +1038,7 @@ Body:
               - Type: Normal
                 Rate: 9500    # 95%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1018,6 +1049,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1028,6 +1060,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1038,6 +1071,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1048,6 +1082,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1058,6 +1093,7 @@ Body:
               - Type: Normal
                 Rate: 5000    # 50%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 6000    # 60%
@@ -1068,6 +1104,7 @@ Body:
               - Type: Normal
                 Rate: 4000    # 40%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 5000    # 50%
@@ -1078,6 +1115,7 @@ Body:
               - Type: Normal
                 Rate: 3000    # 30%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 4000    # 40%
@@ -1088,6 +1126,7 @@ Body:
               - Type: Normal
                 Rate: 2000    # 20%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 3000    # 30%
@@ -1098,6 +1137,7 @@ Body:
               - Type: Normal
                 Rate: 1000    # 10%
                 Material: Oridecon
+                Price: 5000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2000    # 20%
@@ -1110,6 +1150,7 @@ Body:
               - Type: Normal
                 Rate: 9500    # 95%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1120,6 +1161,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1130,6 +1172,7 @@ Body:
               - Type: Normal
                 Rate: 9000    # 90%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1140,6 +1183,7 @@ Body:
               - Type: Normal
                 Rate: 8500    # 85%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 9900    # 99%
@@ -1150,6 +1194,7 @@ Body:
               - Type: Normal
                 Rate: 5000    # 50%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 6000    # 60%
@@ -1160,6 +1205,7 @@ Body:
               - Type: Normal
                 Rate: 4000    # 40%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 5000    # 50%
@@ -1170,6 +1216,7 @@ Body:
               - Type: Normal
                 Rate: 3000    # 30%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 4000    # 40%
@@ -1180,6 +1227,7 @@ Body:
               - Type: Normal
                 Rate: 2000    # 20%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 3000    # 30%
@@ -1190,6 +1238,7 @@ Body:
               - Type: Normal
                 Rate: 1500    # 15%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2500    # 25%
@@ -1200,6 +1249,7 @@ Body:
               - Type: Normal
                 Rate: 1000    # 10%
                 Material: Oridecon
+                Price: 20000
                 BreakingRate: 10000
               - Type: Enriched
                 Rate: 2000    # 20%
