@@ -1,0 +1,42 @@
+
+Header:
+  Type: PARTY_JOB_BONUS_DB
+  Version: 1
+
+Body:
+  - Id: 1
+    Job: Novice
+    Icon: EFST_PJ_NOVICE
+    Script: |
+        bonus bAllStats,1;
+  - Id: 2
+    Job: Swordman
+    Icon: EFST_PJ_SWORDMAN
+    Script: |
+        bonus2 bDropAddRace,RC_All,3;
+  - Id: 3
+    Job: Mage
+    Icon: EFST_PJ_MAGE
+    Script: |
+        bonus bMaxSp,100;
+  - Id: 4
+    Job: Acolyte
+    Icon: EFST_PJ_ACOLYTE
+    Script: |
+        bonus bAspdRate,3;
+  - Id: 5
+    Job: Archer
+    Icon: EFST_PJ_ARCHER
+    Script: |
+        bonus bMaxHP,300;
+  - Id: 6
+    Job: Merchant
+    Icon: EFST_PJ_MERCHANT
+    Script: |
+        bonus bSPrecovRate,5;
+  - Id: 7
+    Job: Thief
+    Icon: EFST_PJ_THIEF
+    Script: |
+        bonus bBaseAtk,5;
+        bonus bMatk,5;

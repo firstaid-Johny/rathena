@@ -21,6 +21,7 @@
 #include "itemdb.hpp"
 #include "log.hpp"
 #include "npc.hpp"
+#include "party.hpp"  // Party Bonus
 #include "path.hpp"
 #include "pc.hpp"
 #include "pc_groups.hpp"
@@ -69,6 +70,10 @@ void vending_closevending(map_session_data* sd)
 		sd->vender_id = 0;
 		clif_closevendingboard( *sd, AREA_WOS, nullptr );
 		idb_remove(vending_db, sd->status.char_id);
+		if (battle_config.party_bonus_system_enable && sd->status.party_id) {
+			if (party_data* p = party_search(sd->status.party_id))
+				p->recal = true;
+		}
 	}
 }
 
@@ -390,6 +395,10 @@ int8 vending_openvending( map_session_data& sd, const char* message, const uint8
 	sd.vender_id = vending_getuid();
 	sd.vend_num = i;
 	safestrncpy(sd.message, message, MESSAGE_SIZE);
+	if (battle_config.party_bonus_system_enable && sd.status.party_id) {
+		if (party_data* p = party_search(sd.status.party_id))
+			p->recal = true;
+	}
 	
 	Sql_EscapeString( mmysql_handle, message_sql, sd.message );
 

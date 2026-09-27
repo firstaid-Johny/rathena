@@ -4502,6 +4502,7 @@ ACMD_FUNC(reloadpcdb){
 	nullpo_retr(-1, sd);
 
 	pc_readdb();
+	partybonusdb_reload();
 	clif_displaymessage(fd, msg_txt(sd,257)); // Player database has been reloaded.
 
 	return 0;
@@ -4567,6 +4568,13 @@ ACMD_FUNC(reloadbarterdb){
 	barter_db.reload();
 	clif_displaymessage(fd, msg_txt(sd, 830)); // Barter database has been reloaded.
 
+	return 0;
+}
+
+ACMD_FUNC(reloadpartybonusdb){
+	nullpo_retr(-1, sd);
+	partybonusdb_reload();
+	clif_displaymessage(fd, "Party Bonus database has been reloaded.");
 	return 0;
 }
 
@@ -11623,6 +11631,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(reloadachievementdb),
 		ACMD_DEF(reloadattendancedb),
 		ACMD_DEF(reloadbarterdb),
+		ACMD_DEF(reloadpartybonusdb),
 		ACMD_DEF(reloadlogconf),
 		ACMD_DEF(partysharelvl),
 		ACMD_DEF(mapinfo),

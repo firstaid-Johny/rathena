@@ -68,3 +68,11 @@ max_long_attack_def: 80
 // Reload new caps with @reloadbattleconf. For max_def changes, re-equip or relog
 // to recalculate existing characters, as required by the original max_def code.
 
+// Overall monster-drop effects; overrides item_db DropEffect and random-option pillars.
+// -1 = use individual item_db/rndopt settings, 0 = no pillar for this category.
+// Current Client: 1=Client, 2=Blue, 3=Yellow/Gold, 4=Purple, 5=Green, 6=Red.
+// Armor includes all armor locations, costumes and Shadow Gear.
+// Reload with @reloadbattleconf. Applies to subsequent drop-effect packets.
+drop_effect_weapon: 6
+drop_effect_armor: 4
+drop_effect_card: 3

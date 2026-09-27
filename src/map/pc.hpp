@@ -942,6 +942,7 @@ public:
 	s_macro_detect macro_detect;
 
 	std::vector<uint32> party_booking_requests;
+	bool force_remove_party_ef = false;
 
 	void update_look( _look look );
 };
