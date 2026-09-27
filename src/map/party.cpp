@@ -1339,15 +1339,14 @@ void party_exp_share(struct party_data* p, block_list* src, t_exp base_exp, t_ex
 	job_exp/=c;
 	zeny/=c;
 
-	if (battle_config.party_even_share_bonus && c > 1) {
-		double bonus = 100 + battle_config.party_even_share_bonus*(c-1);
+	if (battle_config.party_even_share_bonus && c >= 4) {
+		// Four eligible members start at two steps; each additional member adds one step.
+		double bonus = 100.0 + static_cast<double>(battle_config.party_even_share_bonus) * (c - 2);
 
 		if (base_exp)
 			base_exp = (t_exp) cap_value(base_exp * bonus/100, 0, MAX_EXP);
 		if (job_exp)
 			job_exp = (t_exp) cap_value(job_exp * bonus/100, 0, MAX_EXP);
-		if (zeny)
-			zeny = (uint32)cap_value(zeny * bonus/100, INT_MIN, INT_MAX);
 	}
 
 	for (i = 0; i < c; i++) {
