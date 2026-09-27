@@ -18,3 +18,5 @@
 	int32 max_subsize;
 	int32 max_subele;
 	int32 max_long_attack_def;
+	int32 npc_sell_price_cap[IT_MAX];
+	int32 npc_sell_overcharge_enable;

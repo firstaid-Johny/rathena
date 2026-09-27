@@ -2307,6 +2307,10 @@ void clif_selllist( const map_session_data& sd){
 		packet->items[c].index = client_index(i);
 		packet->items[c].price = price;
 		packet->items[c].overcharge = pc_modifysellvalue( &sd, price );
+		if (nd->master_nd == nullptr) {
+			packet->items[c].price = pc_npc_sellprice(sd, *sd.inventory_data[i], sd.inventory.u.items_inventory[i], false);
+			packet->items[c].overcharge = pc_npc_sellprice(sd, *sd.inventory_data[i], sd.inventory.u.items_inventory[i]);
+		}
 
 		packet->packetLength += sizeof( packet->items[0] );
 		c++;
@@ -22778,7 +22782,14 @@ void clif_parse_refineui_refine( int32 fd, map_session_data* sd ){
 		log_pick_pc( sd, LOG_TYPE_OTHER, -1, item );
 		// Success
 		item->refine = cap_value( item->refine + 1, 0, MAX_REFINE );
+
+		bool options_changed = status_apply_refine_random_options(*id, *item);
+
 		log_pick_pc( sd, LOG_TYPE_OTHER, 1, item );
+		if( options_changed ) {
+			clif_delitem(*sd, index, 1, 0);
+			clif_additem(sd, index, 1, 0);
+		}
 		clif_misceffect( *sd, NOTIFYEFFECT_REFINE_SUCCESS );
 		clif_refine( *sd, index, ITEMREFINING_SUCCESS );
 		if (info->broadcast_success) {
@@ -22816,6 +22827,8 @@ void clif_parse_refineui_refine( int32 fd, map_session_data* sd ){
 		clif_misceffect( *sd, NOTIFYEFFECT_REFINE_FAILURE );
 		achievement_update_objective( sd, AG_ENCHANT_FAIL, 1, 1 );
 	}
+	if (item->equip != 0)
+		status_calc_pc(sd, SCO_FORCE);
 #endif
 }
 

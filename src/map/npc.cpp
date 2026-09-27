@@ -3074,10 +3074,7 @@ uint8 npc_selllist(map_session_data* sd, int32 list_length, const PACKET_CZ_PC_S
 			return 1; // In official server, this illegal attempt the player will be disconnected
 		}
 
-		if (battle_config.rental_item_novalue && sd->inventory.u.items_inventory[idx].expire_time)
-			value = 0;
-		else
-			value = pc_modifysellvalue(sd, sd->inventory_data[idx]->value_sell);
+		value = pc_npc_sellprice(*sd, *sd->inventory_data[idx], sd->inventory.u.items_inventory[idx]);
 
 		z+= (double)value*amount;
 	}

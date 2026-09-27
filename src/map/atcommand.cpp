@@ -4489,6 +4489,10 @@ ACMD_FUNC(reloadstatusdb){
 	nullpo_retr(-1, sd);
 
 	status_readdb( true );
+	struct s_mapiterator* iter = mapit_getallusers();
+	for (map_session_data* player = static_cast<map_session_data*>(mapit_first(iter)); mapit_exists(iter); player = static_cast<map_session_data*>(mapit_next(iter)))
+		status_calc_pc(player, SCO_FORCE);
+	mapit_free(iter);
 	clif_displaymessage(fd, msg_txt(sd,256)); // Status database has been reloaded.
 
 	return 0;

@@ -1,3 +1,39 @@
+// MC_OVERCHARGE always increases the ordinary selling price.
+// 0 = final selling price cannot exceed the configured category ceiling.
+// 1 = Overcharge also increases the ceiling (default).
+// Example: ceiling 2000, Overcharge Lv.10 => allowed maximum 2480 when set to 1.
+// With ceiling -1, Overcharge works normally regardless of this setting.
+npc_sell_overcharge_enable: 1
+
+// NPC sale price ceiling, in Zeny PER ITEM, grouped by item_db Type.
+// -1 = disabled (original price), 0 = sell for zero Zeny, N > 0 = maximum N Zeny.
+// Overcharge can raise these ceilings only when npc_sell_overcharge_enable is 1.
+// Healing: HP/SP recovery items, potions, food classified as Healing.
+npc_sell_cap_healing: -1
+// Usable: ordinary consumables classified as Usable.
+npc_sell_cap_usable: -1
+// Etc: materials, loot and miscellaneous items.
+npc_sell_cap_etc: -1
+// Armor: headgear, armor, shields, garments, shoes and accessories.
+npc_sell_cap_armor: 2000
+// Weapon: all weapon types and weapon levels.
+npc_sell_cap_weapon: 2000
+// Card: cards and other items classified as Card.
+npc_sell_cap_card: 1
+// Petegg / Petarmor: pet eggs and pet equipment.
+npc_sell_cap_petegg: -1
+npc_sell_cap_petarmor: -1
+// Ammo: arrows, bullets and all other ammunition subtypes.
+npc_sell_cap_ammo: -1
+// Delayconsume: consumables used after target selection.
+npc_sell_cap_delayconsume: -1
+// Shadowgear: shadow equipment.
+npc_sell_cap_shadowgear: -1
+// Cash: items classified as Cash; this does not mean every cash-shop purchase.
+npc_sell_cap_cash: 0
+// Unknown: reserved or unrecognized item types.
+npc_sell_cap_unknown: -1
+
 // Enable or disable mail/RODEX system server-wide.
 // Default: 1
 // 0 = Mail system is disabled for all players
@@ -31,3 +67,4 @@ max_subele: 80
 max_long_attack_def: 80
 // Reload new caps with @reloadbattleconf. For max_def changes, re-equip or relog
 // to recalculate existing characters, as required by the original max_def code.
+

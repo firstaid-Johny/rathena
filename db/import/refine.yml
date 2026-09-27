@@ -705,6 +705,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 2
             Chances:
@@ -716,6 +717,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 3
             Chances:
@@ -727,6 +729,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 4
             Chances:
@@ -738,6 +741,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 5
             Chances:
@@ -749,6 +753,7 @@ Body:
               - Type: Enriched
                 Rate: 6000    # 60%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 6
             Chances:
@@ -760,6 +765,7 @@ Body:
               - Type: Enriched
                 Rate: 5000    # 50%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 7
             Chances:
@@ -771,6 +777,7 @@ Body:
               - Type: Enriched
                 Rate: 4000    # 40%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 8
             Chances:
@@ -782,6 +789,7 @@ Body:
               - Type: Enriched
                 Rate: 3000    # 30%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 9
             Chances:
@@ -793,6 +801,7 @@ Body:
               - Type: Enriched
                 Rate: 2500    # 25%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
           - Level: 10
             Chances:
@@ -804,6 +813,7 @@ Body:
               - Type: Enriched
                 Rate: 2000    # 20%
                 Material: Enriched_Elunium
+                Price: 10000
                 BreakingRate: 10000
   - Group: Weapon
     Levels:
@@ -819,6 +829,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 2
             Chances:
@@ -830,6 +841,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 3
             Chances:
@@ -841,6 +853,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 4
             Chances:
@@ -852,6 +865,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 5
             Chances:
@@ -863,6 +877,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 6
             Chances:
@@ -874,6 +889,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 7
             Chances:
@@ -885,6 +901,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 8
             Chances:
@@ -896,6 +913,7 @@ Body:
               - Type: Enriched
                 Rate: 6000    # 60%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 9
             Chances:
@@ -907,6 +925,7 @@ Body:
               - Type: Enriched
                 Rate: 4000    # 40%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
           - Level: 10
             Chances:
@@ -918,6 +937,7 @@ Body:
               - Type: Enriched
                 Rate: 3000    # 30%
                 Material: Enriched_Oridecon
+                Price: 2000
                 BreakingRate: 10000
       - Level: 2
         RefineLevels:
@@ -931,6 +951,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 2
             Chances:
@@ -942,6 +963,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 3
             Chances:
@@ -953,6 +975,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 4
             Chances:
@@ -964,6 +987,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 5
             Chances:
@@ -975,6 +999,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 6
             Chances:
@@ -986,6 +1011,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 7
             Chances:
@@ -997,6 +1023,7 @@ Body:
               - Type: Enriched
                 Rate: 5500    # 55%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 8
             Chances:
@@ -1008,6 +1035,7 @@ Body:
               - Type: Enriched
                 Rate: 4500    # 45%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 9
             Chances:
@@ -1019,6 +1047,7 @@ Body:
               - Type: Enriched
                 Rate: 3500    # 35%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
           - Level: 10
             Chances:
@@ -1030,6 +1059,7 @@ Body:
               - Type: Enriched
                 Rate: 2500    # 25%
                 Material: Enriched_Oridecon
+                Price: 4000
                 BreakingRate: 10000
       - Level: 3
         RefineLevels:
@@ -1043,6 +1073,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 2
             Chances:
@@ -1054,6 +1085,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 3
             Chances:
@@ -1065,6 +1097,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 4
             Chances:
@@ -1076,6 +1109,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 5
             Chances:
@@ -1087,6 +1121,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 6
             Chances:
@@ -1098,6 +1133,7 @@ Body:
               - Type: Enriched
                 Rate: 6000    # 60%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 7
             Chances:
@@ -1109,6 +1145,7 @@ Body:
               - Type: Enriched
                 Rate: 5000    # 50%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 8
             Chances:
@@ -1120,6 +1157,7 @@ Body:
               - Type: Enriched
                 Rate: 4000    # 40%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 9
             Chances:
@@ -1131,6 +1169,7 @@ Body:
               - Type: Enriched
                 Rate: 3000    # 30%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
           - Level: 10
             Chances:
@@ -1142,6 +1181,7 @@ Body:
               - Type: Enriched
                 Rate: 2000    # 20%
                 Material: Enriched_Oridecon
+                Price: 10000
                 BreakingRate: 10000
       - Level: 4
         RefineLevels:
@@ -1155,6 +1195,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 2
             Chances:
@@ -1166,6 +1207,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 3
             Chances:
@@ -1177,6 +1219,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 4
             Chances:
@@ -1188,6 +1231,7 @@ Body:
               - Type: Enriched
                 Rate: 9900    # 99%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 5
             Chances:
@@ -1199,6 +1243,7 @@ Body:
               - Type: Enriched
                 Rate: 6000    # 60%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 6
             Chances:
@@ -1210,6 +1255,7 @@ Body:
               - Type: Enriched
                 Rate: 5000    # 50%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 7
             Chances:
@@ -1221,6 +1267,7 @@ Body:
               - Type: Enriched
                 Rate: 4000    # 40%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 8
             Chances:
@@ -1232,6 +1279,7 @@ Body:
               - Type: Enriched
                 Rate: 3000    # 30%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 9
             Chances:
@@ -1243,6 +1291,7 @@ Body:
               - Type: Enriched
                 Rate: 2500    # 25%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000
           - Level: 10
             Chances:
@@ -1254,4 +1303,5 @@ Body:
               - Type: Enriched
                 Rate: 2000    # 20%
                 Material: Enriched_Oridecon
+                Price: 40000
                 BreakingRate: 10000

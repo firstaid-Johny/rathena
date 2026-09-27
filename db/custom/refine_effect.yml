@@ -1,0 +1,9 @@
+# Refine position combos. Version 2 replaces the single-position patch format.
+# Local configuration and the four-position example are in db/import/refine_effect.yml.
+Header:
+  Type: REFINE_EFFECT_DB
+  Version: 2
+
+Footer:
+  Imports:
+    - Path: db/import/refine_effect.yml

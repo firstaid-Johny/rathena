@@ -489,6 +489,280 @@ bool RefineDatabase::calculate_refine_info( const struct item_data& data, e_refi
 
 RefineDatabase refine_db;
 
+RefineRandomOptionDatabase refine_randomopt_db;
+
+void RefineRandomOptionDatabase::clear() {
+	TypesafeYamlDatabase::clear();
+	this->next_id = 0;
+}
+
+const std::string RefineRandomOptionDatabase::getDefaultLocation() {
+	return std::string(db_path) + "/refine_randomopt.yml";
+}
+
+uint64 RefineRandomOptionDatabase::parseBodyNode(const ryml::NodeRef& node) {
+	bool has_equip = this->nodeExists(node, "Equip");
+	bool has_weapon = this->nodeExists(node, "WeaponSubtype");
+	bool has_weapons = this->nodeExists(node, "WeaponSubtypes");
+
+	if( static_cast<uint8>(has_equip) + static_cast<uint8>(has_weapon) + static_cast<uint8>(has_weapons) != 1 ) {
+		this->invalidWarning(node, "Exactly one of Equip, WeaponSubtype or WeaponSubtypes is required.\n");
+		return 0;
+	}
+	if( !this->nodeExists(node, "RefineLevels") )
+		return 0;
+	if( !node["RefineLevels"].is_map() || (has_weapons && !node["WeaponSubtypes"].is_seq()) ) {
+		this->invalidWarning(node, "RefineLevels must be a mapping and WeaponSubtypes must be a sequence.\n");
+		return 0;
+	}
+
+	std::shared_ptr<s_refine_randomopt_map> entry = std::make_shared<s_refine_randomopt_map>();
+
+	if( has_equip ) {
+		std::string equip_name;
+		int64 equip_mask = 0;
+		if( !this->asString(node, "Equip", equip_name) )
+			return 0;
+
+		// EQP_HELM and EQP_SHIELD are canonical aliases in pc.hpp, but they
+		// are not exported to the script constant table used by YAML parsers.
+		if( equip_name == "EQP_HELM" )
+			equip_mask = EQP_HELM;
+		else if( equip_name == "EQP_SHIELD" )
+			equip_mask = EQP_SHIELD;
+		else if( !script_get_constant(equip_name.c_str(), &equip_mask) )
+			equip_mask = 0;
+
+		if( equip_name.compare(0, 4, "EQP_") != 0 || equip_mask <= 0 || equip_mask > UINT32_MAX ) {
+			this->invalidWarning(node["Equip"], "Unknown equipment mask %s.\n", equip_name.c_str());
+			return 0;
+		}
+		entry->equip_mask = static_cast<uint32>(equip_mask);
+	}
+
+	auto add_weapon = [this, &entry](const ryml::NodeRef& value_node, const std::string& weapon_name) -> bool {
+		int64 subtype;
+		if( weapon_name.compare(0, 2, "W_") != 0 || !script_get_constant(weapon_name.c_str(), &subtype) || subtype <= W_FIST || subtype >= MAX_WEAPON_TYPE ) {
+			this->invalidWarning(value_node, "Unknown weapon subtype %s.\n", weapon_name.c_str());
+			return false;
+		}
+		uint8 value = static_cast<uint8>(subtype);
+		if( !util::vector_exists(entry->weapon_subtypes, value) )
+			entry->weapon_subtypes.push_back(value);
+		return true;
+	};
+
+	if( has_weapon ) {
+		std::string weapon_name;
+		if( !this->asString(node, "WeaponSubtype", weapon_name) || !add_weapon(node["WeaponSubtype"], weapon_name) )
+			return 0;
+	}
+
+	if( has_weapons ) {
+		const ryml::NodeRef& weapons = node["WeaponSubtypes"];
+		for( const ryml::NodeRef& weapon_node : weapons ) {
+			std::string weapon_name;
+			if( !this->asString(weapon_node, "Type", weapon_name) || !add_weapon(weapon_node["Type"], weapon_name) )
+				return 0;
+		}
+		if( entry->weapon_subtypes.empty() )
+			return 0;
+	}
+
+	bool has_item = this->nodeExists(node, "ItemId");
+	bool has_items = this->nodeExists(node, "ItemIds");
+	if (has_item && has_items) {
+		this->invalidWarning(node, "Use either ItemId or ItemIds, not both.\n");
+		return 0;
+	}
+	auto add_item = [this, &entry](const ryml::NodeRef& item_node, const char* key) {
+		uint32 id;
+		if (!this->asUInt32(item_node, key, id))
+			return false;
+		auto data = item_db.find(id);
+		if (id == 0 || data == nullptr || util::vector_exists(entry->item_ids, id)) {
+			this->invalidWarning(item_node, "Unknown or duplicate refine item ID %u.\n", id);
+			return false;
+		}
+		bool matches = data->type == IT_WEAPON ? util::vector_exists(entry->weapon_subtypes, data->subtype)
+			: data->type == IT_ARMOR && (data->equip & entry->equip_mask) != 0;
+		if (!matches) {
+			this->invalidWarning(item_node, "Refine item ID %u does not match the configured equipment category.\n", id);
+			return false;
+		}
+		entry->item_ids.push_back(id);
+		return true;
+	};
+	if (has_item && !add_item(node, "ItemId"))
+		return 0;
+	if (has_items) {
+		const auto& items = node["ItemIds"];
+		if (!items.is_seq() || items.num_children() == 0) {
+			this->invalidWarning(items, "ItemIds must be a nonempty sequence of Id entries.\n");
+			return 0;
+		}
+		for (const auto& item_node : items) {
+			if (!add_item(item_node, "Id"))
+				return 0;
+		}
+	}
+
+	const ryml::NodeRef& levels = node["RefineLevels"];
+	for( const ryml::NodeRef& level_node : levels ) {
+		uint16 level = 0;
+		if( !c4::from_chars(level_node.key(), &level) || level == 0 || level > MAX_REFINE ) {
+			this->invalidWarning(level_node, "Invalid refine level %hu.\n", level);
+			return 0;
+		}
+
+		uint16 group_id;
+		if( !this->asUInt16(levels, std::to_string(level), group_id) || group_id == 0 ) {
+			this->invalidWarning(level_node, "Random option group ID must be greater than zero.\n");
+			return 0;
+		}
+		entry->refine_groups[static_cast<uint8>(level)] = group_id;
+	}
+
+	if( entry->refine_groups.empty() )
+		return 0;
+
+	this->put(this->next_id++, entry);
+	return 1;
+}
+
+void RefineRandomOptionDatabase::loadingFinished() {
+	std::vector<uint16> missing_groups;
+	for( const auto& pair : *this ) {
+		for( const auto& level : pair.second->refine_groups ) {
+			if( random_option_group.find(level.second) == nullptr && !util::vector_exists(missing_groups, level.second) )
+				missing_groups.push_back(level.second);
+		}
+	}
+	if( !missing_groups.empty() )
+		ShowWarning("Refine random option map references %zu undefined random option groups.\n", missing_groups.size());
+
+	TypesafeYamlDatabase::loadingFinished();
+}
+
+uint16 RefineRandomOptionDatabase::findGroup(const item_data& data, uint8 refine) {
+	uint16 result = 0;
+	uint32 last_id = 0;
+	bool result_specific = false;
+	for( const auto& pair : *this ) {
+		const std::shared_ptr<s_refine_randomopt_map>& entry = pair.second;
+		bool matches = false;
+
+		if( data.type == IT_WEAPON )
+			matches = util::vector_exists(entry->weapon_subtypes, data.subtype);
+		else if( data.type == IT_ARMOR && entry->equip_mask != 0 )
+			matches = (data.equip & entry->equip_mask) != 0;
+
+		bool specific = !entry->item_ids.empty();
+		if( !matches || (specific && !util::vector_exists(entry->item_ids, data.nameid)) )
+			continue;
+
+		auto level = entry->refine_groups.find(refine);
+		// Item-specific mappings take priority; ties use the last loaded row.
+		if( level != entry->refine_groups.end() && (result == 0 || (specific && !result_specific)
+			|| (specific == result_specific && pair.first > last_id)) ) {
+			result = level->second;
+			last_id = pair.first;
+			result_specific = specific;
+		}
+	}
+	return result;
+}
+
+bool status_apply_refine_random_options(const item_data& data, item& target) {
+	uint16 group_id = refine_randomopt_db.findGroup(data, target.refine);
+	if (group_id == 0)
+		return false;
+	auto group = random_option_group.find(group_id);
+	if (group == nullptr)
+		return false;
+	group->apply(target);
+	return true;
+}
+
+RefineEffectDatabase refine_effect_db;
+
+s_refine_effect_script::~s_refine_effect_script() {
+	if (script != nullptr)
+		script_free_code(script);
+}
+
+const std::string RefineEffectDatabase::getDefaultLocation() {
+	return std::string(db_path) + "/custom/refine_effect.yml";
+}
+
+uint64 RefineEffectDatabase::parseBodyNode(const ryml::NodeRef& node) {
+	uint32 id;
+	if (!nodesExist(node, {"Id", "Positions", "RefineLevels"}) || !asUInt32(node, "Id", id) || id == 0)
+		return 0;
+	auto entry = std::make_shared<s_refine_effect>();
+	if (!node["Positions"].is_seq() || !node["RefineLevels"].is_seq()) {
+		invalidWarning(node, "Positions and RefineLevels must be sequences.\n");
+		return 0;
+	}
+	for (const auto& position : node["Positions"]) {
+		std::string name;
+		int64 slot;
+		if (!asString(position, "Position", name))
+			return 0;
+		if (name.compare(0, 4, "EQI_") != 0 || !script_get_constant(name.c_str(), &slot) || slot < 0 || slot >= EQI_MAX
+			|| util::vector_exists(entry->positions, static_cast<uint16>(slot))) {
+			invalidWarning(position, "Invalid or duplicate equipment position %s.\n", name.c_str());
+			return 0;
+		}
+		entry->positions.push_back(static_cast<uint16>(slot));
+	}
+	for (const auto& level : node["RefineLevels"]) {
+		uint16 refine;
+		std::string script;
+		if (!asUInt16(level, "Level", refine) || !asString(level, "Script", script))
+			return 0;
+		if (refine == 0 || refine > MAX_REFINE || entry->levels.count(refine) != 0) {
+			invalidWarning(level, "Invalid or duplicate refine level %hu.\n", refine);
+			return 0;
+		}
+		auto bonus = std::make_shared<s_refine_effect_script>();
+		bonus->script = parse_script(script.c_str(), getCurrentFile().c_str(), getLineNumber(level["Script"]), SCRIPT_IGNORE_EXTERNAL_BRACKETS);
+		if (bonus->script == nullptr)
+			return 0;
+		entry->levels.emplace(refine, bonus);
+	}
+	if (entry->positions.empty() || entry->levels.empty()) {
+		invalidWarning(node, "A refine combo needs positions and refine levels.\n");
+		return 0;
+	}
+	// Replace the whole combo only after every position and script has passed validation.
+	put(id, entry);
+	return 1;
+}
+
+static std::shared_ptr<s_refine_effect_script> status_refine_combo_script(map_session_data& sd, const s_refine_effect& combo, uint32& positions) {
+	uint16 minimum = MAX_REFINE;
+	positions = 0;
+	if (combo.positions.empty())
+		return nullptr;
+	for (uint16 slot : combo.positions) {
+		if (slot >= EQI_MAX)
+			return nullptr;
+		int16 index = sd.equip_index[slot];
+		if (index < 0 || index >= MAX_INVENTORY || sd.inventory_data[index] == nullptr)
+			return nullptr;
+		const auto& equipped = sd.inventory.u.items_inventory[index];
+		if (equipped.nameid == 0 || equipped.attribute != 0 || (equipped.equip & equip_bitmask[slot]) == 0
+			|| (!pc_has_permission(&sd, PC_PERM_USE_ALL_EQUIPMENT) && itemdb_isNoEquip(sd.inventory_data[index], sd.m)))
+			return nullptr;
+		minimum = std::min<uint16>(minimum, equipped.refine);
+		positions |= equip_bitmask[slot];
+	}
+	// Exact tier only: never stack or fall back to lower refine scripts.
+	auto level = combo.levels.find(minimum);
+	return level == combo.levels.end() ? nullptr : level->second;
+}
+
 const std::string SizeFixDatabase::getDefaultLocation() {
 	return std::string(db_path) + "/size_fix.yml";
 }
@@ -4087,6 +4361,21 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 			if (!calculating) // Abort, run_script retriggered this
 				return 1;
 		}
+	}
+
+	// Snapshot entries in ID order so scripts/reloads cannot invalidate iteration.
+	std::map<uint32, std::shared_ptr<s_refine_effect>> refine_combos(refine_effect_db.begin(), refine_effect_db.end());
+	for (const auto& row : refine_combos) {
+		uint32 positions;
+		auto bonus = status_refine_combo_script(*sd, *row.second, positions);
+		if (bonus == nullptr)
+			continue;
+		current_equip_item_index = -1;
+		current_equip_combo_pos = positions;
+		sd->state.lr_flag = LR_FLAG_NONE;
+		run_script(bonus->script, 0, sd->id, 0);
+		if (!calculating)
+			return 1;
 	}
 
 	// Store equipment script bonuses
@@ -16481,11 +16770,15 @@ void status_readdb( bool reload ){
 	if( reload ){
 		size_fix_db.reload();
 		refine_db.reload();
+		refine_randomopt_db.reload();
+		refine_effect_db.reload();
 		status_db.reload();
 		enchantgrade_db.reload();
 	}else{
 		size_fix_db.load();
 		refine_db.load();
+		refine_randomopt_db.load();
+		refine_effect_db.load();
 		status_db.load();
 		enchantgrade_db.load();
 	}
@@ -16514,6 +16807,8 @@ void do_final_status(void) {
 	enchantgrade_db.clear();
 	size_fix_db.clear();
 	refine_db.clear();
+	refine_randomopt_db.clear();
+	refine_effect_db.clear();
 	status_db.clear();
 	elemental_attribute_db.clear();
 	delay_status.clear();

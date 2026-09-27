@@ -10662,6 +10662,7 @@ void skill_weaponrefine( map_session_data& sd, int32 idx ){
 				int32 ep=0;
 				log_pick_pc(&sd, LOG_TYPE_OTHER, -1, item);
 				item->refine++;
+				status_apply_refine_random_options(*ditem, *item);
 				log_pick_pc(&sd, LOG_TYPE_OTHER,  1, item);
 				if(item->equip) {
 					ep = item->equip;

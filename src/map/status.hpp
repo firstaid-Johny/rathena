@@ -138,6 +138,50 @@ public:
 
 extern RefineDatabase refine_db;
 
+struct s_refine_randomopt_map {
+	uint32 equip_mask = 0;
+	std::vector<uint8> weapon_subtypes;
+	std::vector<t_itemid> item_ids;
+	std::unordered_map<uint8, uint16> refine_groups;
+};
+
+class RefineRandomOptionDatabase : public TypesafeYamlDatabase<uint32, s_refine_randomopt_map> {
+private:
+	uint32 next_id = 0;
+
+public:
+	RefineRandomOptionDatabase() : TypesafeYamlDatabase("REFINE_RANDOMOPT_GROUP_MAP", 1) {
+	}
+
+	void clear() override;
+	const std::string getDefaultLocation() override;
+	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+	void loadingFinished() override;
+	uint16 findGroup(const item_data& data, uint8 refine);
+};
+
+extern RefineRandomOptionDatabase refine_randomopt_db;
+bool status_apply_refine_random_options(const item_data& data, item& target);
+
+struct s_refine_effect_script {
+	script_code* script = nullptr;
+	~s_refine_effect_script();
+};
+
+struct s_refine_effect {
+	std::vector<uint16> positions;
+	std::unordered_map<uint16, std::shared_ptr<s_refine_effect_script>> levels;
+};
+
+class RefineEffectDatabase : public TypesafeYamlDatabase<uint32, s_refine_effect> {
+public:
+	RefineEffectDatabase() : TypesafeYamlDatabase("REFINE_EFFECT_DB", 2) {}
+	const std::string getDefaultLocation() override;
+	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+};
+
+extern RefineEffectDatabase refine_effect_db;
+
 /// Weapon attack modification for size
 struct s_sizefix_db {
 	uint16 small, medium, large;

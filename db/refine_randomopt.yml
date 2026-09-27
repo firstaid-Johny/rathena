@@ -1,0 +1,76 @@
+###########################################################################
+# Refine Random Option Settings
+###########################################################################
+# - Equip               Equipment mask สำหรับ Type: Armor เช่น EQP_ARMOR
+#   WeaponSubtype       Weapon type เดียว เช่น W_DAGGER, W_BOW
+#   WeaponSubtypes:     รายการ Weapon type หลายประเภท
+#     - Type            Weapon type เช่น W_DAGGER, W_1HSWORD
+#   RefineLevels:       จับคู่ระดับหลังตีบวกสำเร็จกับ Random Option Group ID
+#     <Refine>: <Id>    เช่น 7: 1003 หมายถึงสำเร็จเป็น +7 แล้วสุ่มกลุ่ม 1003
+#
+# แต่ละแถวเลือกเพียงหนึ่งแบบ: Equip / WeaponSubtype / WeaponSubtypes
+# Refine: 1..MAX_REFINE, Id: Group ID มากกว่า 0 จาก item_randomopt_group.yml
+# Group ID ไม่ใช่ Item ID และไม่ใช่ Option ID จาก enumvar.lub
+# ใส่ mapping ใต้ Body: ใน db/import/refine_randomopt.yml
+# แถวที่โหลดทีหลังและตรงประเภท/ระดับเดียวกันจะมีผล
+#
+# Equipment masks: EQP_HELM (หมวกทุกช่อง), EQP_HEAD_TOP, EQP_HEAD_MID,
+# EQP_HEAD_LOW, EQP_ARMOR, EQP_SHIELD, EQP_GARMENT, EQP_SHOES, EQP_ACC_RL
+# Weapon types: W_DAGGER, W_1HSWORD, W_2HSWORD, W_1HSPEAR, W_2HSPEAR,
+# W_1HAXE, W_2HAXE, W_MACE, W_2HMACE, W_STAFF, W_2HSTAFF, W_BOW,
+# W_KNUCKLE, W_MUSICAL, W_WHIP, W_BOOK, W_KATAR, W_REVOLVER, W_RIFLE,
+# W_GATLING, W_SHOTGUN, W_GRENADE, W_HUUMA
+#
+# สุ่มเมื่อตีบวกสำเร็จผ่าน Refine UI, NPC successrefitem และ Weapon Refine
+# แทนที่ Random Option เดิมทุกช่อง ไม่ใช่เพิ่มต่อท้าย
+# ระดับที่ไม่มี mapping หรือไม่พบกลุ่มจะคง Option เดิม ไม่ย้อนใช้ระดับต่ำกว่า
+###########################################################################
+# Example mapping: ใส่ใต้ Body: ใน db/import/refine_randomopt.yml
+###########################################################################
+#   - WeaponSubtypes:
+#       - Type: W_DAGGER
+#       - Type: W_1HSWORD
+#     RefineLevels:
+#       1: 1001
+#       6: 1002
+#       7: 1003
+#
+#   - Equip: EQP_ARMOR
+#     RefineLevels:
+#       5: 1001
+###########################################################################
+# Example group: ใส่ใต้ Body: ใน db/import/item_randomopt_group.yml
+###########################################################################
+#   - Id: 1001
+#     Group: WEP_DAGGER_P1
+#     Slots:                     # ต้องเป็น Slots (พหูพจน์)
+#       - Slot: 1                # หมายเลขช่องเริ่มที่ 1 ไม่ใช่ 0
+#         Options:
+#           - Option: VAR_MAXHPAMOUNT
+#             MinValue: 50
+#             MaxValue: 150
+#             Chance: 10000      # 1 = 0.01%, 10000 = 100%
+#
+# Slots รับประกันว่าจะได้ Option ในช่องนั้น; Chance ไม่ใช่โอกาสตีบวกสำเร็จ
+# หากมี Group ID นี้อยู่แล้ว ให้แก้แถวเดิม ไม่เพิ่มตัวอย่างทับโดยไม่ตั้งใจ
+###########################################################################
+# Example option: ใส่ใต้ Body: ใน db/import/item_randomopt_db.yml
+###########################################################################
+#   - Id: 1                      # ต้องตรงกับ enumvar.lub ฝั่ง Client
+#     Option: VAR_MAXHPAMOUNT
+#     Script: |
+#       bonus bMaxHP,getrandomoptinfo(ROA_VALUE);
+#
+# ใช้ชื่อ Option ที่มีนิยามอยู่แล้วได้เลย ไม่ต้องเพิ่มนิยามซ้ำ
+# แก้กลุ่ม/นิยาม Option: @reloaditemdb แล้ว @reloadstatusdb
+# แก้เฉพาะ mapping: @reloadstatusdb
+# Reload ไม่สุ่มย้อนหลังให้ไอเทมเดิม ต้องตีบวกสำเร็จอีกครั้ง
+###########################################################################
+
+Header:
+  Type: REFINE_RANDOMOPT_GROUP_MAP
+  Version: 1
+
+Footer:
+  Imports:
+    - Path: db/import/refine_randomopt.yml

@@ -1,0 +1,82 @@
+# Each Id defines one independent combo. Reusing an Id replaces the whole combo.
+# Every listed position must contain an equipped, unbroken, permitted item.
+# Use EQI_* slot constants, not EQP_* equipment masks.
+# A multi-slot item may satisfy every slot it actually occupies.
+# Only the exact MINIMUM refine's Script runs, once per combo.
+# There is no stacking or fallback to lower levels when the exact level is absent.
+# Example: Armor +8, Shoes +8, Right hand +7, Left hand +8 => Level 7 only.
+# Add more Level entries as needed. With this example, minimum +8 has no bonus.
+# Use bonus scripts as in item_db. Reload with @reloadstatusdb.
+Header:
+  Type: REFINE_EFFECT_DB
+  Version: 2
+
+Body:
+  - Id: 1
+    Positions:
+      - Position: EQI_GARMENT
+      - Position: EQI_ARMOR
+      - Position: EQI_SHOES
+      - Position: EQI_HAND_R
+    RefineLevels:
+      - Level: 5
+        Script: |
+          bonus2 bDropAddRace,RC_All,3;
+          bonus2 bExpAddRace,RC_All,3;
+      - Level: 6
+        Script: |
+          bonus2 bDropAddRace,RC_All,4;
+          bonus2 bExpAddRace,RC_All,6;
+          bonus bBaseAtk,5;
+          bonus bMatk,5;
+      - Level: 7
+        Script: |
+          bonus2 bDropAddRace,RC_All,5;
+          bonus2 bExpAddRace,RC_All,7;
+          bonus bBaseAtk,10;
+          bonus bMatk,10;
+          bonus2 bAddRace,RC_DemiHuman,5;
+          bonus2 bMagicAddRace,RC_DemiHuman,5;
+          bonus2 bSubRace,RC_DemiHuman,1;
+          bonus2 bAddRace,RC_Player,5;
+          bonus2 bMagicAddRace,RC_Player,5;
+          bonus2 bSubRace,RC_Player,1;
+      - Level: 8
+        Script: |
+          bonus2 bDropAddRace,RC_All,6;
+          bonus2 bExpAddRace,RC_All,8;
+          bonus bBaseAtk,10;
+          bonus bMatk,10;
+          bonus2 bAddRace,RC_DemiHuman,7;
+          bonus2 bMagicAddRace,RC_DemiHuman,7;
+          bonus2 bSubRace,RC_DemiHuman,3;
+          bonus2 bAddRace,RC_Player,7;
+          bonus2 bMagicAddRace,RC_Player,7;
+          bonus2 bSubRace,RC_Player,2;
+      - Level: 9
+        Script: |
+          bonus2 bDropAddRace,RC_All,6;
+          bonus2 bExpAddRace,RC_All,8;
+          bonus bBaseAtk,10;
+          bonus bMatk,10;
+          bonus2 bAddRace,RC_DemiHuman,9;
+          bonus2 bMagicAddRace,RC_DemiHuman,9;
+          bonus2 bSubRace,RC_DemiHuman,3;
+          bonus2 bAddRace,RC_Player,9;
+          bonus2 bMagicAddRace,RC_Player,9;
+          bonus2 bSubRace,RC_Player,3;
+          hateffect HAT_EF_C_OVER_CLOUD, true;
+      - Level: 10
+        Script: |
+          bonus2 bDropAddRace,RC_All,8;
+          bonus2 bExpAddRace,RC_All,10;
+          bonus bBaseAtk,10;
+          bonus bMatk,10;
+          bonus2 bAddRace,RC_DemiHuman,12;
+          bonus2 bMagicAddRace,RC_DemiHuman,12;
+          bonus2 bSubRace,RC_DemiHuman,5;
+          bonus2 bAddRace,RC_Player,12;
+          bonus2 bMagicAddRace,RC_Player,12;
+          bonus2 bSubRace,RC_Player,5;
+          bonus bAllStats,2;
+          hateffect HAT_EF_C_AURORA_ON_CLOUDS, true;

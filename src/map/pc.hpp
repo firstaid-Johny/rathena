@@ -1501,6 +1501,7 @@ bool pc_steal_item(map_session_data *sd,block_list *bl, uint16 skill_lv);
 
 int32 pc_modifybuyvalue( const map_session_data*, int32 orig_value );
 int32 pc_modifysellvalue( const map_session_data*,int32 orig_value );
+int32 pc_npc_sellprice(const map_session_data& sd, const item_data& data, const item& sold, bool overcharge = true);
 
 int32 pc_follow(map_session_data*, int32); // [MouseJstr]
 int32 pc_stop_following(map_session_data*);

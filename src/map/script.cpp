@@ -9755,6 +9755,8 @@ BUILDIN_FUNC(successrefitem) {
 
 		sd->inventory.u.items_inventory[i].refine += up;
 		sd->inventory.u.items_inventory[i].refine = cap_value( sd->inventory.u.items_inventory[i].refine, 0, MAX_REFINE);
+		if (up > 0)
+			status_apply_refine_random_options(*sd->inventory_data[i], sd->inventory.u.items_inventory[i]);
 		pc_unequipitem(sd,i,2); // status calc will happen in pc_equipitem() below
 
 		clif_refine( *sd, i, ITEMREFINING_SUCCESS );

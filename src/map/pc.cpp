@@ -5719,6 +5719,40 @@ int32 pc_modifysellvalue( const map_session_data* sd, int32 orig_value )
 	return val;
 }
 
+// One pricing path for the ordinary NPC sell window and the actual payout.
+int32 pc_npc_sellprice(const map_session_data& sd, const item_data& data, const item& sold, bool overcharge) {
+	if (battle_config.rental_item_novalue && sold.expire_time != 0)
+		return 0;
+	int32 category;
+	switch (data.type) {
+		case IT_HEALING: case IT_USABLE: case IT_ETC: case IT_ARMOR:
+		case IT_WEAPON: case IT_CARD: case IT_PETEGG: case IT_PETARMOR:
+		case IT_AMMO: case IT_DELAYCONSUME: case IT_SHADOWGEAR: case IT_CASH:
+			category = data.type;
+			break;
+		default:
+			category = IT_UNKNOWN;
+			break;
+	}
+	int32 rate = 100;
+	if (overcharge) {
+		int32 skill = pc_checkskill(&sd, MC_OVERCHARGE);
+		if (skill > 0)
+			rate += 5 + skill * 2 - (skill == 10 ? 1 : 0);
+	}
+	// Overcharge always works normally. The setting only controls its effect on the ceiling.
+	int64 price = static_cast<int64>(data.value_sell) * rate / 100;
+	if (overcharge)
+		price = std::max<int64>(price, battle_config.min_shop_sell);
+	int64 ceiling = battle_config.npc_sell_price_cap[category];
+	if (ceiling >= 0) {
+		if (battle_config.npc_sell_overcharge_enable)
+			ceiling = ceiling * rate / 100;
+		price = std::min(price, ceiling);
+	}
+	return static_cast<int32>(std::min<int64>(price, INT_MAX));
+}
+
 /*==========================================
  * Checking if we have enough place on inventory for new item
  * Make sure to take 30k as limit (for client I guess)
