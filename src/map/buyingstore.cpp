@@ -19,6 +19,7 @@
 #include "clif.hpp"  // clif_buyingstore_*
 #include "log.hpp"  // log_pick_pc, log_zeny
 #include "npc.hpp"
+#include "party.hpp"  // Party Bonus
 #include "pc.hpp"  // map_session_data
 
 //Autotrader
@@ -165,7 +166,7 @@ int8 buyingstore_create( map_session_data* sd, int32 zenylimit, unsigned char re
 		std::shared_ptr<item_data> id = item_db.find(item->itemId);
 
 		// invalid input
-		if( id == nullptr || item->amount == 0 ){	
+		if( id == nullptr || item->amount == 0 ){
 			break;
 		}
 
@@ -175,7 +176,7 @@ int8 buyingstore_create( map_session_data* sd, int32 zenylimit, unsigned char re
 		}
 
 		// restrictions: allowed and no character-bound items
-		if( !id->flag.buyingstore || !itemdb_cantrade_sub( id.get(), pc_get_group_level( sd ), pc_get_group_level( sd ) ) ){ 
+		if( !id->flag.buyingstore || !itemdb_cantrade_sub( id.get(), pc_get_group_level( sd ), pc_get_group_level( sd ) ) ){
 			break;
 		}
 
@@ -229,6 +230,12 @@ int8 buyingstore_create( map_session_data* sd, int32 zenylimit, unsigned char re
 	sd->buyingstore.slots = i;  // store actual amount of items
 	safestrncpy(sd->message, storename, sizeof(sd->message));
 
+	// Party Bonus
+	if( battle_config.party_bonus_system_enable && sd->status.party_id){
+		struct party_data *p = party_search(sd->status.party_id);
+		if( p )	p->recal = true;
+	}
+
 	Sql_EscapeString( mmysql_handle, message_sql, sd->message );
 
 	if( Sql_Query( mmysql_handle, "INSERT INTO `%s`(`id`, `account_id`, `char_id`, `sex`, `map`, `x`, `y`, `title`, `limit`, `autotrade`, `body_direction`, `head_direction`, `sit`) "
@@ -262,7 +269,7 @@ void buyingstore_close(map_session_data* sd) {
 	nullpo_retv(sd);
 
 	if( sd->state.buyingstore ) {
-		if( 
+		if(
 			Sql_Query( mmysql_handle, "DELETE FROM `%s` WHERE buyingstore_id = %d;", buyingstore_items_table, sd->buyer_id ) != SQL_SUCCESS ||
 			Sql_Query( mmysql_handle, "DELETE FROM `%s` WHERE `id` = %d;", buyingstores_table, sd->buyer_id ) != SQL_SUCCESS
 		) {
@@ -276,6 +283,12 @@ void buyingstore_close(map_session_data* sd) {
 
 		// notify other players
 		clif_buyingstore_disappear_entry( *sd );
+
+		// Party Bonus
+		if( battle_config.party_bonus_system_enable && sd->status.party_id){
+			struct party_data *p = party_search(sd->status.party_id);
+			if( p )	p->recal = true;
+		}
 	}
 }
 
@@ -474,7 +487,7 @@ void buyingstore_trade( map_session_data* sd, uint32 account_id, uint32 buyer_id
 		chrif_save(sd, CSAVE_NORMAL|CSAVE_INVENTORY);
 		chrif_save(pl_sd, CSAVE_NORMAL|CSAVE_INVENTORY);
 	}
-	
+
 	// check whether or not there is still something to buy
 	int32 i;
 	ARR_FIND( 0, pl_sd->buyingstore.slots, i, pl_sd->buyingstore.items[i].amount != 0 );
@@ -713,7 +726,7 @@ void do_init_buyingstore_autotrade( void ) {
 				uidb_put(buyingstore_autotrader_db, at->char_id, at);
 			}
 			Sql_FreeResult(mmysql_handle);
-			
+
 			// Init items for each autotraders
 			iter = db_iterator(buyingstore_autotrader_db);
 			for (at = (struct s_autotrader *)dbi_first(iter); dbi_exists(iter); at = (struct s_autotrader *)dbi_next(iter)) {
@@ -735,7 +748,7 @@ void do_init_buyingstore_autotrade( void ) {
 					buyingstore_autotrader_remove(at, true);
 					continue;
 				}
-			
+
 				//Init the list
 				CREATE(at->entries, struct s_autotrade_entry *,at->count);
 

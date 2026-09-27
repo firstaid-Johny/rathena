@@ -11,7 +11,12 @@
  *	 { "name", &battle_config.<variable name>, <default value>, <minimum value>, <maximum value> },
  **/
 
+	{ "drop_effect_weapon", &battle_config.drop_effect_weapon, -1, -1, DROPEFFECT_MAX - 1 },
+	{ "drop_effect_armor", &battle_config.drop_effect_armor, -1, -1, DROPEFFECT_MAX - 1 },
+	{ "drop_effect_card", &battle_config.drop_effect_card, -1, -1, DROPEFFECT_MAX - 1 },
+
 	{ "npc_sell_overcharge_enable", &battle_config.npc_sell_overcharge_enable, 1, 0, 1 },
+	{ "vip_weight_increase", &battle_config.vip_weight_increase, 300, 0, INT_MAX },
 
 	{ "mail_enable",						&battle_config.mail_enable,                    		1,      	0,      	2,              },
 	{ "reset_sp_on_pvp_gvg_exit",			&battle_config.reset_sp_on_pvp_gvg_exit,       		0,      	0,      	1,              },
@@ -32,3 +37,5 @@
 	{ "npc_sell_cap_shadowgear",			&battle_config.npc_sell_price_cap[IT_SHADOWGEAR], 	-1, 		-1, 		MAX_ZENY 		},
 	{ "npc_sell_cap_cash",					&battle_config.npc_sell_price_cap[IT_CASH], 		-1, 		-1, 		MAX_ZENY 		},
 	{ "npc_sell_cap_unknown",				&battle_config.npc_sell_price_cap[IT_UNKNOWN], 		-1, 		-1, 		MAX_ZENY 		},
+{ "party_bonus_system_enable", &battle_config.party_bonus_system_enable, 0, 0, 1 },
+{ "party_bonus_same_map_minimum", &battle_config.party_bonus_same_map_minimum, 1, 1, MAX_PARTY },

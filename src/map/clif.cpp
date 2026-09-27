@@ -858,6 +858,16 @@ void clif_charselectok(int32 id, uint8 ok)
 	clif_send( &packet, sizeof( packet ), sd, SELF );
 }
 
+static int32 clif_overall_drop_effect(item_types type) {
+	switch (type) {
+		case IT_WEAPON: return battle_config.drop_effect_weapon;
+		case IT_ARMOR:
+		case IT_SHADOWGEAR: return battle_config.drop_effect_armor;
+		case IT_CARD: return battle_config.drop_effect_card;
+		default: return -1;
+	}
+}
+
 /// Makes an item appear on the ground.
 /// 009E <id>.L <name id>.W <identified>.B <x>.W <y>.W <subX>.B <subY>.B <amount>.W (ZC_ITEM_FALL_ENTRY)
 /// 084B <id>.L <name id>.W <type>.W <identified>.B <x>.W <y>.W <subX>.B <subY>.B <amount>.W (ZC_ITEM_FALL_ENTRY4)
@@ -885,12 +895,14 @@ void clif_dropflooritem( const flooritem_data* fitem, bool canShowEffect ){
 	p.count = fitem->item.amount;
 #if defined(PACKETVER_ZERO) || PACKETVER >= 20180418
 	if( canShowEffect ){
-		uint8 dropEffect = itemdb_dropeffect( fitem->item.nameid );
+		const auto* data = itemdb_search(fitem->item.nameid);
+		int32 overall = clif_overall_drop_effect(data->type);
+		int32 dropEffect = overall >= 0 ? overall : data->flag.dropEffect;
 
 		if( dropEffect > 0 ){
 			p.showdropeffect = 1;
 			p.dropeffectmode = dropEffect - 1;
-		}else if (battle_config.rndopt_drop_pillar != 0){
+		}else if (overall < 0 && battle_config.rndopt_drop_pillar != 0){
 			uint8 optionCount = 0;
 
 			for (uint8 i = 0; i < MAX_ITEM_RDM_OPT; i++) {
@@ -10829,6 +10841,11 @@ void clif_parse_LoadEndAck(int32 fd,map_session_data *sd)
 	if(sd->status.party_id) {
 		party_send_movemap(sd);
 		clif_party_hp( *sd ); // Show hp after displacement [LuzZza]
+		// Party Bonus
+		if( battle_config.party_bonus_system_enable ){
+			party_data* p = party_search( sd->status.party_id );
+			if( p )	p->recal = true;
+		}
 	}
 
 	if( sd->bg_id ) clif_bg_hp(sd); // BattleGround System

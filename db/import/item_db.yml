@@ -90,6 +90,30 @@ Header:
 
 Body:
 
+  - Id: 985
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 984
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 756
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 757
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 617
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 603
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 616
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 644
+    Flags:
+      DropEffect: GREEN_PILLAR
   - Id: 656
     Jobs:
       Acolyte: true
