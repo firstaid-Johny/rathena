@@ -682,6 +682,22 @@ attribute: 0 = not broken, 1 = broken
 
 ---------------------------------------
 
+@item3 <item ID> <amount> <identify> <refine> <attribute> <card1> <card2> <card3> <card4> [<option ID> <value> <param>]...
+@item4 "<item name>" <amount> <identify> <refine> <attribute> <card1> <card2> <card3> <card4> <grade> [<option ID> <value> <param>]...
+
+Creates an item with up to five random option sets. @item4 also sets its enchant grade
+(0 = none; Renewal supports 1 = D, 2 = C, 3 = B, 4 = A). In pre-Renewal, only grade 0 is supported.
+Separate arguments with spaces or commas. After card4 (or grade for @item4),
+add zero to five sets of three numbers: option ID, value, and param.
+Omitted option sets default to 0. Each supplied set must have all three numbers.
+
+Examples:
+	@item3 1201 1 1 10 0 4104 0 0 4102
+	@item3 1201 1 1 10 0 4104 0 0 4102 5 1 0 4 12 0
+	@item4 "Knife" 1 1 7 0 0 0 0 0 0 5 1 0
+
+---------------------------------------
+
 @itembound <item name/ID>{:<item name/ID>:...} <amount> <bound type>
 @itembound2 <item name/ID> <quantity> <identify_flag> <refine> <attribute> <card1> <card2> <card3> <card4> <bound type>
 

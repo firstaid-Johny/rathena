@@ -4,7 +4,10 @@
 #include "atcommand.hpp"
 
 #include <cmath>
+#include <charconv>
+#include <cctype>
 #include <cstdlib>
+#include <limits>
 #include <set>
 #include <unordered_map>
 
@@ -1638,6 +1641,168 @@ ACMD_FUNC(item2)
 	}
 
 	return 0;
+}
+
+// Split @item3/@item4 arguments on commas or whitespace outside quoted names.
+static std::string atcommand_item_trim( const std::string& value ) {
+	size_t first = 0, last = value.size();
+	while (first < last && std::isspace(static_cast<unsigned char>(value[first])))
+		++first;
+	while (last > first && std::isspace(static_cast<unsigned char>(value[last - 1])))
+		--last;
+	return value.substr(first, last - first);
+}
+
+static bool atcommand_item_split( const char* message, std::vector<std::string>& arguments ) {
+	if (message == nullptr)
+		return false;
+
+	std::string argument;
+	bool quoted = false;
+	for (const char* cursor = message; *cursor != '\0'; ++cursor) {
+		const char ch = *cursor;
+		if (ch == '"')
+			quoted = !quoted;
+
+		if (!quoted && (ch == ',' || std::isspace(static_cast<unsigned char>(ch)))) {
+			if (!argument.empty()) {
+				arguments.push_back(atcommand_item_trim(argument));
+				argument.clear();
+			}
+		} else {
+			argument += ch;
+		}
+	}
+	if (quoted)
+		return false;
+	if (!argument.empty())
+		arguments.push_back(atcommand_item_trim(argument));
+	return true;
+}
+
+static bool atcommand_item_number( const std::string& argument, int32& value ) {
+	if (argument.empty())
+		return false;
+	const char* begin = argument.data();
+	const char* end = begin + argument.size();
+	const auto result = std::from_chars(begin, end, value);
+	return result.ec == std::errc{} && result.ptr == end;
+}
+
+static int32 atcommand_item_with_options( const int32 fd, map_session_data* sd, const char* message, bool with_grade ) {
+	std::vector<std::string> arguments;
+	const size_t required = with_grade ? 10 : 9;
+	if (!atcommand_item_split(message, arguments) || arguments.size() < required || arguments.size() > required + 3 * MAX_ITEM_RDM_OPT || (arguments.size() - required) % 3 != 0) {
+		clif_displaymessage(fd, with_grade ? "Usage: @item4 \"item name\" amount identify refine attribute card1 card2 card3 card4 grade [ID value param]... (up to 5 sets)" :
+			"Usage: @item3 item_id amount identify refine attribute card1 card2 card3 card4 [ID value param]... (up to 5 sets)");
+		return -1;
+	}
+
+	std::shared_ptr<item_data> item_data;
+	if (with_grade) {
+		std::string item_name = arguments[0];
+		if (item_name.size() >= 2 && item_name.front() == '"' && item_name.back() == '"')
+			item_name = item_name.substr(1, item_name.size() - 2);
+		item_data = item_db.searchname(item_name.c_str());
+	} else {
+		int32 item_id = 0;
+		if (atcommand_item_number(arguments[0], item_id) && item_id > 0)
+			item_data = item_db.find(static_cast<t_itemid>(item_id));
+	}
+	if (item_data == nullptr) {
+		clif_displaymessage(fd, msg_txt(sd, 19)); // Invalid item ID or name.
+		return -1;
+	}
+
+	int32 fields[9] = {};
+	for (size_t i = 1; i < required; ++i) {
+		if (!atcommand_item_number(arguments[i], fields[i - 1])) {
+			clif_displaymessage(fd, "Invalid item parameter: use decimal numbers for amount, flags, cards, and grade.");
+			return -1;
+		}
+	}
+	const int32 amount = fields[0];
+	if (amount <= 0) {
+		clif_displaymessage(fd, "Amount must be greater than zero.");
+		return -1;
+	}
+	if (with_grade && (fields[8] < ENCHANTGRADE_NONE || fields[8] > MAX_ENCHANTGRADE)) {
+		clif_displaymessage(fd, "Invalid enchant grade.");
+		return -1;
+	}
+	for (size_t i = 4; i < 8; ++i) {
+		if (fields[i] < 0) {
+			clif_displaymessage(fd, "Card IDs must be zero or greater.");
+			return -1;
+		}
+	}
+
+	int32 options[3][MAX_ITEM_RDM_OPT] = {};
+	for (size_t i = 0; i < (arguments.size() - required) / 3; ++i) {
+		for (size_t field = 0; field < 3; ++field) {
+			if (!atcommand_item_number(arguments[required + i * 3 + field], options[field][i])) {
+				clif_displaymessage(fd, "Invalid random option: each set must contain numeric ID value param.");
+				return -1;
+			}
+		}
+	}
+	for (size_t i = 0; i < MAX_ITEM_RDM_OPT; ++i) {
+		if (options[0][i] < 0 || options[0][i] > std::numeric_limits<int16>::max() ||
+			options[1][i] < std::numeric_limits<int16>::min() || options[1][i] > std::numeric_limits<int16>::max() ||
+			options[2][i] < std::numeric_limits<signed char>::min() || options[2][i] > std::numeric_limits<signed char>::max()) {
+			clif_displaymessage(fd, "Random option ID, value, or param is out of range.");
+			return -1;
+		}
+	}
+
+	item item_tmp = {};
+	item_tmp.nameid = item_data->nameid;
+	item_tmp.identify = fields[1];
+	item_tmp.refine = fields[2];
+	item_tmp.attribute = fields[3];
+	for (size_t i = 0; i < MAX_SLOTS; ++i)
+		item_tmp.card[i] = static_cast<t_itemid>(fields[4 + i]);
+	if (with_grade)
+		item_tmp.enchantgrade = static_cast<uint8>(fields[8]);
+	for (size_t i = 0; i < MAX_ITEM_RDM_OPT; ++i) {
+		item_tmp.option[i].id = static_cast<int16>(options[0][i]);
+		item_tmp.option[i].value = static_cast<int16>(options[1][i]);
+		item_tmp.option[i].param = static_cast<char>(options[2][i]);
+	}
+
+	if (item_data->type == IT_WEAPON || item_data->type == IT_ARMOR || item_data->type == IT_SHADOWGEAR)
+		item_tmp.refine = cap_value(fields[2], 0, MAX_REFINE);
+	else if (item_data->type == IT_PETEGG) {
+		item_tmp.identify = 1;
+		item_tmp.refine = 0;
+	} else {
+		item_tmp.identify = 1;
+		item_tmp.refine = 0;
+		item_tmp.attribute = 0;
+	}
+
+	const int32 get_count = itemdb_isstackable2(item_data.get()) ? amount : 1;
+	for (int32 i = 0; i < amount; i += get_count) {
+		if (pet_create_egg(sd, item_tmp.nameid))
+			continue;
+		const e_additem_result result = pc_additem(sd, &item_tmp, get_count, LOG_TYPE_COMMAND);
+		if (result != ADDITEM_SUCCESS) {
+			clif_additem(sd, 0, 0, result);
+			return -1;
+		}
+	}
+	clif_displaymessage(fd, msg_txt(sd, 18)); // Item created.
+	return 0;
+}
+
+ACMD_FUNC(item3) {
+	nullpo_retr(-1, sd);
+	return atcommand_item_with_options(fd, sd, message, false);
+}
+
+ACMD_FUNC(item4) {
+	nullpo_retr(-1, sd);
+	return atcommand_item_with_options(fd, sd, message, true);
 }
 
 /*==========================================
@@ -11542,6 +11707,8 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(healap),
 		ACMD_DEF(item),
 		ACMD_DEF(item2),
+		ACMD_DEF(item3),
+		ACMD_DEF(item4),
 		ACMD_DEF2("itembound",item),
 		ACMD_DEF2("itembound2",item2),
 		ACMD_DEF(itemreset),
