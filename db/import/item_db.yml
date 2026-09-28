@@ -89,7 +89,6 @@ Header:
   Version: 3
 
 Body:
-
   - Id: 985
     Flags:
       DropEffect: BLUE_PILLAR
@@ -114,6 +113,21 @@ Body:
   - Id: 644
     Flags:
       DropEffect: GREEN_PILLAR
+  - Id: 603
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 617
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 616
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 749
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 748
+    Flags:
+      DropEffect: GREEN_PILLAR
   - Id: 656
     Jobs:
       Acolyte: true
@@ -131,6 +145,7 @@ Body:
     Flags:
       BuyingStore: true
       DeadBranch: true
+      DropEffect: GREEN_PILLAR
     Script: |
       $@mobid[0] = 0;
       monster "this",-1,-1,"--ja--",-1-MOBG_BRANCH_OF_DEAD_TREE,1,"";
@@ -146,6 +161,7 @@ Body:
     Flags:
       BuyingStore: true
       DeadBranch: true
+      DropEffect: GREEN_PILLAR
     Script: |
       $@mobid[0] = 0;
       monster "this",-1,-1,"--ja--",-1-MOBG_BLOODY_DEAD_BRANCH,1,"";
