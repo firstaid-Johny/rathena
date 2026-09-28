@@ -90,6 +90,7 @@ void log_feeding( const map_session_data* sd, e_log_feeding_type type, t_itemid 
 /// old, but useful logs
 void log_branch( map_session_data* sd );
 void log_mvpdrop( const map_session_data* sd, int32 monster_id, t_itemid nameid, t_exp exp );
+void log_card_drop( const map_session_data* sd, const mob_data* md, t_itemid nameid, uint32 rate, uint32 denominator );
 
 int32 log_config_read( const char* cfgName );
 

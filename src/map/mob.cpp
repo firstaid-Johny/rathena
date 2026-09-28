@@ -2579,7 +2579,23 @@ static TIMER_FUNC(mob_delay_item_drop) {
  * rate is the drop-rate of the item, required for autoloot.
  * flag : Killed only by homunculus/mercenary?
  *------------------------------------------*/
-static void mob_item_drop(mob_data *md, std::shared_ptr<s_item_drop_list>& dlist, std::shared_ptr<s_item_drop>& ditem, int32 loot, int32 drop_rate, bool flag)
+static void mob_announce_card_drop( const map_session_data* sd, const mob_data* md, t_itemid nameid, uint32 rate, uint32 denominator )
+{
+	const item_data* item = itemdb_search(nameid);
+
+	if (item->type != IT_CARD || denominator == 0)
+		return;
+
+	rate = min(rate, denominator);
+	char message[512];
+	safesnprintf(message, sizeof(message), msg_txt(nullptr, 835),
+		sd != nullptr ? sd->status.name : "Unknown", item->ename.c_str(),
+		map_mapid2mapname(md->m), 100.0 * rate / denominator);
+	intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+	log_card_drop(sd, md, nameid, rate, denominator);
+}
+
+static void mob_item_drop(mob_data *md, std::shared_ptr<s_item_drop_list>& dlist, std::shared_ptr<s_item_drop>& ditem, int32 loot, int32 drop_rate, bool flag, uint32 card_rate, uint32 card_denominator)
 {
 	TBL_PC* sd;
 	bool test_autoloot;
@@ -2589,6 +2605,8 @@ static void mob_item_drop(mob_data *md, std::shared_ptr<s_item_drop_list>& dlist
 	sd = map_charid2sd(dlist->first_charid);
 	if( sd == nullptr ) sd = map_charid2sd(dlist->second_charid);
 	if( sd == nullptr ) sd = map_charid2sd(dlist->third_charid);
+	if (!loot)
+		mob_announce_card_drop(sd, md, ditem->item_data.nameid, card_rate, card_denominator);
 	test_autoloot = sd 
 		&& (drop_rate <= sd->state.autoloot || pc_isautolooting(sd, ditem->item_data.nameid))
 		&& (flag ? ((battle_config.homunculus_autoloot ? (battle_config.hom_idle_no_share == 0 || !pc_isidle_hom(sd)) : 0) || (battle_config.mercenary_autoloot ? (battle_config.mer_idle_no_share == 0 || !pc_isidle_mer(sd)) : 0)) :
@@ -2600,7 +2618,8 @@ static void mob_item_drop(mob_data *md, std::shared_ptr<s_item_drop_list>& dlist
 	if( test_autoloot ) {	//Autoloot.
 		struct party_data *p = party_search(sd->status.party_id);
 
-		if ((itemdb_search(ditem->item_data.nameid))->flag.broadcast &&
+		if ((itemdb_search(ditem->item_data.nameid))->type != IT_CARD &&
+			(itemdb_search(ditem->item_data.nameid))->flag.broadcast &&
 			(!p || !(p->party.item & 2)) // Somehow, if party's pickup distribution is 'Even Share', no announcemet
 			)
 			intif_broadcast_obtain_special_item(sd, ditem->item_data.nameid, md->mob_id, ITEMOBTAIN_TYPE_MONSTER_ITEM);
@@ -3244,7 +3263,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 	if (md->lootitems) {
 		for (i = 0; i < md->lootitem_count; i++) {
 			std::shared_ptr<s_item_drop> ditem = mob_setlootitem(md->lootitems[i], md->mob_id);
-			mob_item_drop(md, lootlist, ditem, 1, 10000, homkillonly || merckillonly);
+			mob_item_drop(md, lootlist, ditem, 1, 10000, homkillonly || merckillonly, 10000, 10000);
 		}
 	}
 
@@ -3307,7 +3326,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 
 					std::shared_ptr<s_item_drop> ditem = mob_setdropitem(mobdrop, 1, md->mob_id);
 
-					mob_item_drop(md, dlist, ditem, 0, mobdrop->rate, homkillonly || merckillonly);
+					mob_item_drop(md, dlist, ditem, 0, mobdrop->rate, homkillonly || merckillonly, mobdrop->rate, 10000);
 				}
 			}
 
@@ -3343,7 +3362,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 			std::shared_ptr<s_item_drop> ditem = mob_setdropitem(entry, 1, md->mob_id);
 
 			//A Rare Drop Global Announce by Lupus
-			if (first_sd != nullptr && entry->rate <= battle_config.rare_drop_announce) {
+			if (first_sd != nullptr && it->type != IT_CARD && entry->rate <= battle_config.rare_drop_announce) {
 				char message[128];
 				sprintf(message, msg_txt(nullptr, 541), first_sd->status.name, md->name, it->ename.c_str(), (float)drop_rate / 100);
 				//MSG: "'%s' won %s's %s (chance: %0.02f%%)"
@@ -3351,7 +3370,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 			}
 			// Announce first, or else ditem will be freed. [Lance]
 			// By popular demand, use base drop rate for autoloot code. [Skotlex]
-			mob_item_drop(md, dlist, ditem, 0, battle_config.autoloot_adjust ? drop_rate : entry->rate, homkillonly || merckillonly);
+			mob_item_drop(md, dlist, ditem, 0, battle_config.autoloot_adjust ? drop_rate : entry->rate, homkillonly || merckillonly, drop_rate, 10000);
 		}
 
 		// Ore Discovery (triggers if owner has loot priority, does not require to be the killer)
@@ -3365,7 +3384,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 
 				std::shared_ptr<s_item_drop> ditem = mob_setdropitem(mobdrop, 1, md->mob_id);
 
-				mob_item_drop(md, dlist, ditem, 0, mobdrop->rate, homkillonly || merckillonly);
+				mob_item_drop(md, dlist, ditem, 0, mobdrop->rate, homkillonly || merckillonly, mobdrop->rate, 10000);
 			}
 		}
 
@@ -3394,7 +3413,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 					// 'Cheat' for autoloot command: rate is changed from n/100000 to n/10000
 					int32 map_drops_rate = max(1, (final_rate / 10));
 					std::shared_ptr<s_item_drop> ditem = mob_setdropitem( it.second, 1, md->mob_id );
-					mob_item_drop( md, dlist, ditem, 0, map_drops_rate, homkillonly || merckillonly );
+					mob_item_drop( md, dlist, ditem, 0, map_drops_rate, homkillonly || merckillonly, final_rate, 100000 );
 				}
 			}
 
@@ -3415,7 +3434,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 						// 'Cheat' for autoloot command: rate is changed from n/100000 to n/10000
 						int32 map_drops_rate = max(1, (final_rate / 10));
 						std::shared_ptr<s_item_drop> ditem = mob_setdropitem( it.second, 1, md->mob_id );
-						mob_item_drop( md, dlist, ditem, 0, map_drops_rate, homkillonly || merckillonly );
+						mob_item_drop( md, dlist, ditem, 0, map_drops_rate, homkillonly || merckillonly, final_rate, 100000 );
 					}
 				}
 			}
@@ -3508,7 +3527,9 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 				log_mvp_nameid = item.nameid;
 
 				//A Rare MVP Drop Global Announce by Lupus
-				if(temp<=battle_config.rare_drop_announce) {
+				if (i_data->type == IT_CARD)
+					mob_announce_card_drop(mvp_sd, md, item.nameid, temp, 10000);
+				else if(temp<=battle_config.rare_drop_announce) {
 					char message[128];
 					sprintf (message, msg_txt(nullptr,541), mvp_sd->status.name, md->name, i_data->ename.c_str(), temp/100.);
 					//MSG: "'%s' won %s's %s (chance: %0.02f%%)"
@@ -3522,7 +3543,7 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 					map_addflooritem(&item,1,mvp_sd->m,mvp_sd->x,mvp_sd->y,mvp_sd->status.char_id,(second_sd?second_sd->status.char_id:0),(third_sd?third_sd->status.char_id:0),1,0,true,DIR_CENTER);
 				}
 
-				if (i_data->flag.broadcast)
+				if (i_data->type != IT_CARD && i_data->flag.broadcast)
 					intif_broadcast_obtain_special_item(mvp_sd, item.nameid, md->mob_id, ITEMOBTAIN_TYPE_MONSTER_ITEM);
 
 				//Logs items, MVP prizes [Lupus]

@@ -272,6 +272,28 @@ void log_pick_mob( const mob_data* md, e_log_pick_type type, int32 amount, const
 	log_pick(md->mob_id, md->m, type, amount, itm);
 }
 
+/// Records every newly generated monster Card drop independently of picklog filters.
+void log_card_drop( const map_session_data* sd, const mob_data* md, t_itemid nameid, uint32 rate, uint32 denominator )
+{
+	if (md == nullptr || denominator == 0 || mmysql_handle == nullptr)
+		return;
+
+	const item_data* item = itemdb_search(nameid);
+	const char* char_name = sd != nullptr ? sd->status.name : "Unknown";
+	const char* item_name = item->ename.c_str();
+	const char* map_name = map_mapid2mapname(md->m);
+	const double chance = 100.0 * rate / denominator;
+	SqlStmt stmt{ *mmysql_handle };
+
+	if (SQL_SUCCESS != stmt.Prepare("INSERT INTO `card_drop_log` (`time`, `char_id`, `char_name`, `monster_id`, `item_id`, `item_name`, `map`, `rate`, `denominator`, `chance_percent`) VALUES (NOW(), '%u', ?, '%u', '%u', ?, ?, '%u', '%u', '%.4f')",
+		sd != nullptr ? sd->status.char_id : 0, md->mob_id, nameid, rate, denominator, chance)
+		|| SQL_SUCCESS != stmt.BindParam(0, SQLDT_STRING, const_cast<char*>(char_name), strlen(char_name))
+		|| SQL_SUCCESS != stmt.BindParam(1, SQLDT_STRING, const_cast<char*>(item_name), strlen(item_name))
+		|| SQL_SUCCESS != stmt.BindParam(2, SQLDT_STRING, const_cast<char*>(map_name), strlen(map_name))
+		|| SQL_SUCCESS != stmt.Execute())
+		SqlStmt_ShowDebug(stmt);
+}
+
 /// logs zeny transactions
 // ids are char_ids
 void log_zeny( const map_session_data &target_sd, e_log_pick_type type, uint32 src_id, int32 amount )
