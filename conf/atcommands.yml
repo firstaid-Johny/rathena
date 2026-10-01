@@ -1513,6 +1513,15 @@ Body:
     Help: |
       Params: <amount> - Gives you desired amount of Zeny.
 
+  - Command: bonus
+    Help: |
+      Params: [page|all] [filter]
+      Displays your live bonuses from equipment, cards, Collection, scripts and active statuses.
+      @bonus: first page (20 rows). @bonus all: every row.
+      @bonus race: filter names. @bonus 2 race: filtered page 2.
+      Values are current server modifiers; combat formulas/caps apply separately.
+      Total stats already include the displayed script/equipment components.
+
 Footer:
   Imports:
     - Path: conf/import/atcommands.yml

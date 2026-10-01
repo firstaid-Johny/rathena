@@ -56,3 +56,20 @@ Header.Type: COLLECTION_DB
 Header.Version: 1
 Body[].Id: Existing item ID (required).
 Body[].Script: Non-empty valid bonus script (required).
+
+Collection bonus summary
+- NPC menu shows totals of bonus calls executed by currently deposited Collection scripts.
+- Conditions are evaluated during real status calculation; equipment and other bonuses are excluded.
+- AllStats is combined with STR/AGI/VIT/INT/DEX/LUK; identical bonus parameters are summed.
+- Values are script contributions before final status formulas and configured reduction caps.
+- Pages contain up to 12 bonus rows. getcollectionbonuslist() returns the row count
+  and fills @collection_bonus_lines$; -1 means account Collection data is still loading.
+
+Collection summary labels
+- Thai labels are emitted as CP874 bytes for the current Thai client.
+- Broadcast BC_* constants are excluded from b* bonus-name lookup.
+- Race/element/size/effect prefixes are omitted from displayed parameter names.
+- Class_All physical attack displays as ATK%; Normal/Boss/All defense has separate labels.
+- bCastrate and bVariableCastrate are combined for the same global/skill parameter.
+- Cast/delay reductions are displayed as positive reduction percentages.
+- NPC summary and @bonus group order: Base Stats, ATK/MATK, DEF/FLEE/Critical, Size, Race, Element, EXP, Drop; other bonuses follow.

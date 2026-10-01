@@ -6,6 +6,7 @@
 
 #include <bitset>
 #include <memory>
+#include <map>
 #include <vector>
 
 #include <common/cbasetypes.hpp>
@@ -944,6 +945,8 @@ public:
 
 	std::vector<uint32> party_booking_requests;
 	std::vector<t_itemid> collection_list;
+	bool collection_bonus_recording = false;
+	std::map<std::vector<int32>, int64> collection_bonus_totals;
 	std::vector<t_itemid> collection_preview_ids; // Client-only rows; never persisted.
 	bool force_remove_party_ef = false;
 

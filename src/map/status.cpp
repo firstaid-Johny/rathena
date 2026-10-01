@@ -4525,11 +4525,14 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 	current_equip_item_index = -1;
 	current_equip_card_id = 0;
 	current_equip_combo_pos = 0;
+	sd->collection_bonus_totals.clear();
 	const auto collection_ids = sd->collection_list;
 	for (t_itemid id : collection_ids) {
 		std::shared_ptr<s_collection_entry> entry = collection_db.find(id);
 		if (entry != nullptr && entry->script != nullptr) {
+			sd->collection_bonus_recording = true;
 			run_script(entry->script, 0, sd->id, 0);
+			sd->collection_bonus_recording = false;
 			if (!calculating)
 				return 1;
 		}

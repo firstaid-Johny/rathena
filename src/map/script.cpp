@@ -2287,6 +2287,9 @@ const char* script_get_constant_str( const char* prefix, int64 value ){
 		// Look up the actual string
 		name = get_str(i);
 
+		// Bonus names are lowercase b*: BC_* broadcast flags are a different namespace.
+		if (strcmp(prefix, "b") == 0 && name[0] != 'b')
+			continue;
 		// Compare the prefix
 		if( !strncasecmp( name, prefix, strlen(prefix) ) ){
 			// We found a match
@@ -10124,6 +10127,192 @@ BUILDIN_FUNC(bonus)
 			break;
 	}
 
+	if (sd->collection_bonus_recording) {
+		const int32 count = script_lastdata(st) - 2;
+		if (count >= 1 && count <= 5) {
+			const int32 values[] = { val1, val2, val3, val4, val5 };
+			if (count == 1 && type == SP_ALL_STATS) {
+				for (int32 stat : { SP_STR, SP_AGI, SP_VIT, SP_INT, SP_DEX, SP_LUK })
+					sd->collection_bonus_totals[{ stat }] += val1;
+			} else {
+				std::vector<int32> key{ type };
+				key.insert(key.end(), values, values + count - 1);
+				sd->collection_bonus_totals[key] += values[count - 1];
+			}
+		}
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
+// Summary of the bonus calls executed by Collection scripts during status calculation.
+BUILDIN_FUNC(getcollectionbonuslist)
+{
+	map_session_data* sd;
+	if (!script_rid2sd(sd))
+		return SCRIPT_CMD_FAILURE;
+	if (sd->state.collection_flag & PCCOLLECTION_LOAD) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_SUCCESS;
+	}
+	static const std::map<std::string, std::string> labels = {
+		{ "bStr", "STR" },
+		{ "bAgi", "AGI" },
+		{ "bVit", "VIT" },
+		{ "bInt", "INT" },
+		{ "bDex", "DEX" },
+		{ "bLuk", "LUK" },
+		{ "bBaseAtk", "\x41\x54\x4B" }, // ATK
+		{ "bMatk", "MATK" },
+		{ "bDef", "DEF" },
+		{ "bMdef", "MDEF" },
+		{ "bHit", "HIT" },
+		{ "bFlee", "FLEE" },
+		{ "bFlee2", "Perfect dodge" },
+		{ "bCritical", "Critical" },
+		{ "bMaxHP", "Max HP" },
+		{ "bMaxSP", "Max SP" },
+		{ "bAddMaxWeight", "Max weight" },
+		{ "bMaxHPrate", "Max HP" },
+		{ "bMaxSPrate", "Max SP" },
+		{ "bAspdRate", "ASPD" },
+		{ "bCastrate", "\xC5\xB4\xC3\xD0\xC2\xD0\xE0\xC7\xC5\xD2\xC3\xE8\xD2\xC2" }, // ลดระยะเวลาร่าย
+		{ "bVariableCastrate", "\xC5\xB4\xC3\xD0\xC2\xD0\xE0\xC7\xC5\xD2\xC3\xE8\xD2\xC2" }, // ลดระยะเวลาร่าย
+		{ "bDelayrate", "\xC5\xB4\xB4\xD5\xE0\xC5\xC2\xEC\xCA\xA1\xD4\xC5" }, // ลดดีเลย์สกิล
+		{ "bHPrecovRate", "\xCD\xD1\xB5\xC3\xD2\xC3\xD5\xE0\xA8\xB9\x20\x48\x50" }, // อัตรารีเจน HP
+		{ "bSPrecovRate", "\xCD\xD1\xB5\xC3\xD2\xC3\xD5\xE0\xA8\xB9\x20\x53\x50" }, // อัตรารีเจน SP
+		{ "bHealPower", "\xCE\xD5\xC5\xE1\xC3\xA7\xA2\xD6\xE9\xB9" }, // ฮีลแรงขึ้น
+		{ "bLongAtkRate", "\xE2\xA8\xC1\xB5\xD5\xC3\xD0\xC2\xD0\xE4\xA1\xC5" }, // โจมตีระยะไกล
+		{ "bLongAtkDef", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xA1\xD2\xC3\xE2\xA8\xC1\xB5\xD5\xC3\xD0\xC2\xD0\xE4\xA1\xC5" }, // ป้องกันการโจมตีระยะไกล
+		{ "bCritAtkRate", "\xA4\xC7\xD2\xC1\xE0\xCA\xD5\xC2\xCB\xD2\xC2\xA4\xC3\xD4\xB5\xD4\xA4\xCD\xC5" }, // ความเสียหายคริติคอล
+		{ "bAddClass", "\xE2\xA8\xC1\xB5\xD5\xC1\xCD\xB9\xCA\xE0\xB5\xCD\xC3\xEC" }, // โจมตีมอนสเตอร์
+		{ "bSubClass", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xC1\xCD\xB9\xCA\xE0\xB5\xCD\xC3\xEC" }, // ป้องกันมอนสเตอร์
+		{ "bAddRace", "\xE2\xA8\xC1\xB5\xD5\xE0\xBC\xE8\xD2" }, // โจมตีเผ่า
+		{ "bSubRace", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xE0\xBC\xE8\xD2" }, // ป้องกันเผ่า
+		{ "bMagicAddRace", "\xE2\xA8\xC1\xB5\xD5\xE0\xC7\xB7\xC2\xEC\xC1\xB9\xB5\xEC\xE0\xBC\xE8\xD2" }, // โจมตีเวทย์มนต์เผ่า
+		{ "bExpAddRace", "\xE0\xBE\xD4\xE8\xC1\x20\x45\x58\x50" }, // เพิ่ม EXP
+		{ "bDropAddRace", "\xE0\xBE\xD4\xE8\xC1\x20\x44\x72\x6F\x70" }, // เพิ่ม Drop
+		{ "bAddEle", "\xE2\xA8\xC1\xB5\xD5\xE0\xBB\xE9\xD2\xCB\xC1\xD2\xC2\xB8\xD2\xB5\xD8" }, // โจมตีเป้าหมายธาตุ
+		{ "bSubEle", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xB8\xD2\xB5\xD8" }, // ป้องกันธาตุ
+		{ "bSubDefEle", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xE0\xBB\xE9\xD2\xCB\xC1\xD2\xC2\xB8\xD2\xB5\xD8" }, // ป้องกันเป้าหมายธาตุ
+		{ "bMagicSubDefEle", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xE0\xC7\xB7\xC2\xEC\xC1\xB9\xB5\xEC\xE0\xBB\xE9\xD2\xCB\xC1\xD2\xC2\xB8\xD2\xB5\xD8" }, // ป้องกันเวทย์มนต์เป้าหมายธาตุ
+		{ "bAddSize", "\xE2\xA8\xC1\xB5\xD5\xA2\xB9\xD2\xB4" }, // โจมตีขนาด
+		{ "bSubSize", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xA2\xB9\xD2\xB4" }, // ป้องกันขนาด
+		{ "bResEff", "\xBB\xE9\xCD\xA7\xA1\xD1\xB9\xCA\xB6\xD2\xB9\xD0" }, // ป้องกันสถานะ
+		{ "bSkillAtk", "\xE0\xBE\xD4\xE8\xC1\xB4\xD2\xE0\xC1\xA8\xCA\xA1\xD4\xC5" }, // เพิ่มดาเมจสกิล
+		{ "bSkillHeal", "\xCA\xA1\xD4\xC5\x20\x48\x65\x61\x6C\x20\xE1\xC3\xA7\xA2\xD6\xE9\xB9" }, // สกิล Heal แรงขึ้น
+	};
+	// Both cast-rate bonuses share the same calculation in Pre-Renewal.
+	// Combine only identical parameters, so skill-specific modifiers stay separate.
+	std::map<std::vector<int32>, int64> totals;
+	for (const auto& row : sd->collection_bonus_totals) {
+		auto key = row.first;
+		if (key[0] == SP_VARCASTRATE) key[0] = SP_CASTRATE;
+		totals[key] += row.second;
+	}
+	// Presentation order is independent of numeric bonus constant IDs.
+	auto display_order = [](const std::string& name) {
+		static const std::map<std::string, int32> order = {
+			{ "bStr", 0 },
+			{ "bAgi", 1 },
+			{ "bVit", 2 },
+			{ "bInt", 3 },
+			{ "bDex", 4 },
+			{ "bLuk", 5 },
+			{ "bMaxHP", 6 },
+			{ "bMaxHPrate", 7 },
+			{ "bMaxSP", 8 },
+			{ "bMaxSPrate", 9 },
+			{ "bAspdRate", 10 },
+			{ "bAddMaxWeight", 11 },
+			{ "bBaseAtk", 100 },
+			{ "bAtk", 101 },
+			{ "bAddClass", 102 },
+			{ "bMatk", 103 },
+			{ "bMatkRate", 104 },
+			{ "bDef", 200 },
+			{ "bDef2", 201 },
+			{ "bMdef", 202 },
+			{ "bMdef2", 203 },
+			{ "bSubClass", 204 },
+			{ "bFlee", 205 },
+			{ "bFlee2", 206 },
+			{ "bHit", 207 },
+			{ "bCritical", 208 },
+			{ "bCritAtkRate", 209 },
+			{ "bAddSize", 300 },
+			{ "bSubSize", 301 },
+			{ "bAddRace", 400 },
+			{ "bMagicAddRace", 401 },
+			{ "bSubRace", 402 },
+			{ "bAddEle", 500 },
+			{ "bSubEle", 501 },
+			{ "bSubDefEle", 502 },
+			{ "bMagicSubDefEle", 503 },
+			{ "bExpAddRace", 600 },
+			{ "bExpAddClass", 601 },
+			{ "bDropAddRace", 700 },
+			{ "bDropAddClass", 701 },
+		};
+		auto it = order.find(name);
+		return it != order.end() ? it->second : 800;
+	};
+	std::vector<std::pair<int32, std::string>> display_lines;
+	for (const auto& row : totals) {
+		if (row.second == 0)
+			continue;
+		const auto& key = row.first;
+		const char* constant = script_get_constant_str("b", key[0]);
+		const std::string name = constant ? constant : std::to_string(key[0]);
+		auto label = labels.find(name);
+		std::string text = label != labels.end() ? label->second : name;
+		const bool all_class_atk = name == "bAddClass" && key.size() == 2 && key[1] == CLASS_ALL;
+		if (all_class_atk) text = "ATK";
+		for (size_t i = 1; i < key.size(); ++i) {
+			if (all_class_atk) continue;
+			const char* parameter = nullptr;
+			if (name == "bSkillAtk" || name == "bSkillHeal" || (name == "bCastrate" && key.size() == 2))
+				parameter = skill_get_desc(key[i]);
+			else {
+				const char* prefix = "";
+				if (name.find("Race") != std::string::npos) prefix = "RC_";
+				else if (name.find("Ele") != std::string::npos) prefix = "Ele_";
+				else if (name.find("Size") != std::string::npos) prefix = "Size_";
+				else if (name.find("Class") != std::string::npos) prefix = "Class_";
+				else if (name == "bResEff") prefix = "Eff_";
+				if (*prefix) parameter = script_get_constant_str(prefix, key[i]);
+			}
+			std::string detail = parameter ? parameter : std::to_string(key[i]);
+			if (name == "bAddClass" || name == "bSubClass") {
+				switch (key[i]) {
+					case CLASS_NORMAL: detail = "\xBB\xA1\xB5\xD4"; break; // ปกติ
+					case CLASS_BOSS: detail = "\xBB\xC3\xD0\xE0\xC0\xB7\xBA\xCD\xCA"; break; // ประเภทบอส
+					case CLASS_ALL: detail = "\xB7\xD8\xA1\xBB\xC3\xD0\xE0\xC0\xB7"; break; // ทุกประเภท
+				}
+			}
+			for (const char* prefix : { "RC_", "Ele_", "Size_", "Eff_" }) {
+				if (detail.compare(0, strlen(prefix), prefix) == 0) {
+					detail.erase(0, strlen(prefix));
+					break;
+				}
+			}
+			text += " " + detail;
+		}
+		const bool flat = name == "bAddMaxWeight" || name == "bAgi" || name == "bBaseAtk" || name == "bCritical" || name == "bDef" || name == "bDex" || name == "bFlee" || name == "bFlee2" || name == "bHit" || name == "bInt" || name == "bLuk" || name == "bMatk" || name == "bMaxHP" || name == "bMaxSP" || name == "bMdef" || name == "bStr" || name == "bVit";
+		const double divisor = name == "bResEff" ? 100.0 : name == "bAddMaxWeight" ? 10.0 : 1.0;
+		char value[64];
+		const int64 display_value = (name == "bCastrate" || name == "bDelayrate") ? -row.second : row.second;
+		snprintf(value, sizeof(value), "%+.2f%s", static_cast<double>(display_value) / divisor,
+			label != labels.end() && !flat ? "%" : "");
+		text += ": " + std::string(value);
+		display_lines.emplace_back(display_order(name), std::move(text));
+	}
+	std::stable_sort(display_lines.begin(), display_lines.end(), [](const auto& lhs, const auto& rhs) {
+		return lhs.first < rhs.first;
+	});
+	int32 index = 0;
+	for (const auto& line : display_lines)
+		setd_sub_str(st, sd, "@collection_bonus_lines$", index++, line.second.c_str(), nullptr);
+	script_pushint(st, index);
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -28529,6 +28718,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(needed_trait_point, "ii?"),
 	BUILDIN_DEF(jobcanentermap,"s?"),
 	BUILDIN_DEF(openstorage2,"i??"),
+	BUILDIN_DEF(getcollectionbonuslist,""),
 	BUILDIN_DEF(unloadnpc, "s"),
 	BUILDIN_DEF(duplicate, "ssii?????"),
 	BUILDIN_DEF(duplicate_dynamic, "s?"),

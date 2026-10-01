@@ -1,13 +1,34 @@
 // Account Collection using the original client Storage window.
 // Transaction fees are configured in conf/import/battle_conf.txt.
-prontera,157,181,4	script	Collection Storage	105,{
+-	script	Collection Storage	-,{
 	mes "[Collection Storage]";
 	mes "ค่าฝาก: " + getbattleflag("collection_deposit_fee") + " Zeny ต่อชิ้น.";
 	mes "ค่าถอน: " + getbattleflag("collection_withdraw_fee") + " Zeny ต่อชิ้น.";
 	mes "คลังฝากและคลังถอน แยกจากกันชัดเจน";
 	next;
-	.@choice = select("ฝาก Collection:ถอน Collection:Cancel");
-	if (.@choice == 3) close;
+	.@choice = select("ฝาก Collection:ถอน Collection:ค่าสถานะจาก Collection ทั้งหมด:Cancel");
+	if (.@choice == 4) close;
+	if (.@choice == 3) {
+		.@count = getcollectionbonuslist();
+		if (.@count < 0) {
+			mes "[Collection Storage]";
+			mes "กำลังโหลดข้อมูล Collection กรุณาลองใหม่อีกครั้ง";
+			close;
+		}
+		setdialogsize(400,500);
+		mes "[ค่าสถานะจาก Collection ทั้งหมด]";
+		mes "โบนัสรวมจากไอเทมที่ฝากในคลังร่วมบัญชี";
+		mes "แสดงค่าโบนัสจากสคริปต์ ก่อนใช้เพดานและสูตรคำนวณสถานะ";
+		if (!.@count) mes "ยังไม่มีโบนัสจาก Collection";
+		next;
+		mes "[ค่าสถานะจาก Collection ทั้งหมด]";
+		for (.@i = 0; .@i < .@count; ++.@i) {
+			//if (.@i && .@i % 12 == 0) {
+			//}
+			mes @collection_bonus_lines$[.@i];
+		}
+		close;
+	}
 	close2;
 	if (!openstorage2(1, .@choice == 1 ? STOR_MODE_PUT : STOR_MODE_GET))
 		dispbottom "ไม่สามารถเปิดคลัง Collection ได้ กรุณาแจ้งทีมงานเพื่อแก้ไข";

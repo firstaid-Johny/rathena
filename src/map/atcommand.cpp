@@ -9042,6 +9042,424 @@ ACMD_FUNC(mutearea)
 }
 
 
+// Read-only live bonus report. Values come from the calculated character data,
+// rather than re-running scripts or adding contributions that may have been capped.
+static int32 pc_bonus_display_order(std::string name)
+{
+	for (char& c : name) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+	auto contains = [&name](const char* part) { return name.find(part) != std::string::npos; };
+	auto starts = [&name](const char* part) { return name.compare(0, strlen(part), part) == 0; };
+	if (starts("active ") || starts("autospell") || starts("addeffect") || starts("autobonus")) return 800;
+	// Specific target categories take precedence over generic ATK/DEF names.
+	if (contains("expadd")) return 600;
+	if (contains("drop")) return 700;
+	if (contains("size")) return 300;
+	if (contains("race")) return 400;
+	if (contains("element") || contains("addele") || contains("subele") || contains("subdefele") || contains("atk_ele") || contains("_def_ele") || contains("_atk_ele")) return 500;
+	const char* stats[] = { "str", "agi", "vit", "int", "dex", "luk", "pow", "sta", "wis", "spl", "con", "crt" };
+	for (int32 i = 0; i < 12; ++i) {
+		const std::string stat = stats[i];
+		if (starts(("total " + stat + " bonus").c_str()) || starts(("script " + stat + ":").c_str()) || starts(("equipment " + stat + ":").c_str())) return i;
+	}
+	if (starts("current max hp") || starts("max hp") || starts("max sp") || starts("current max sp") || starts("max weight") || starts("bonus.hp:") || starts("bonus.sp:")) return 20;
+	if (contains("critical") || contains("crit_") || contains("arrow_cri")) return 230;
+	if (contains("matk")) return 110;
+	if (contains("atk") || contains("attack damage") || starts("bonus.eatk") || contains(".addclass")) return 100;
+	if (contains("mdef")) return 210;
+	if (contains("def") || contains("resistance") || contains("subclass")) return 200;
+	if (contains("flee") || contains("perfect dodge")) return 220;
+	if (contains("hit")) return 225;
+	if (contains("critical") || contains("crit_") || contains("arrow_cri")) return 230;
+	return 800;
+}
+
+static std::vector<std::string> pc_live_bonus_report(const map_session_data& sd)
+{
+	std::vector<std::string> lines;
+	auto add = [&lines](const std::string& name, int64 value, const char* unit = "", double divisor = 1.0) {
+		if (value == 0) return;
+		char number[64];
+		snprintf(number, sizeof(number), "%+.2f%s", static_cast<double>(value) / divisor, unit);
+		lines.push_back(name + ": " + number);
+	};
+	auto constant = [](const char* prefix, int32 value) {
+		if (!*prefix) return std::to_string(value);
+		const char* name = script_get_constant_str(prefix, value);
+		return name ? std::string(name) : std::to_string(value);
+	};
+	auto array = [&add, &constant](const char* name, const auto& values, const char* prefix, const char* unit = "%") {
+		for (size_t i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+			add(std::string(name) + " [" + constant(prefix, static_cast<int32>(i)) + "]", values[i], unit);
+	};
+	// Final values include modifiers applied directly by status formulas/passive skills.
+	add("Current Max HP", sd.battle_status.max_hp);
+	add("Current Max SP", sd.battle_status.max_sp);
+	add("Current Base ATK", sd.battle_status.batk);
+	add("Current MATK min", sd.battle_status.matk_min);
+	add("Current MATK max", sd.battle_status.matk_max);
+	add("Current HARD DEF", sd.battle_status.def);
+	add("Current SOFT DEF", sd.battle_status.def2);
+	add("Current HARD MDEF", sd.battle_status.mdef);
+	add("Current SOFT MDEF", sd.battle_status.mdef2);
+	add("Current HIT", sd.battle_status.hit);
+	add("Current FLEE", sd.battle_status.flee);
+	add("Current Critical", sd.battle_status.cri, "", 10.0);
+	add("Current Perfect dodge", sd.battle_status.flee2, "", 10.0);
+	add("Current Attack motion", sd.battle_status.amotion, "ms");
+	add("Current Movement delay", sd.battle_status.speed, "ms");
+	add("Current Right hand ATK", sd.battle_status.rhw.atk);
+	add("Current Right hand refine ATK", sd.battle_status.rhw.atk2);
+	add("Current Left hand ATK", sd.battle_status.lhw.atk);
+	add("Current Left hand refine ATK", sd.battle_status.lhw.atk2);
+	lines.push_back("Current Right hand element: " + constant("Ele_", sd.battle_status.rhw.ele));
+	lines.push_back("Current Armor element: " + constant("Ele_", sd.battle_status.def_ele) + " Lv." + std::to_string(sd.battle_status.ele_lv));
+	const char* stats[] = { "STR", "AGI", "VIT", "INT", "DEX", "LUK", "POW", "STA", "WIS", "SPL", "CON", "CRT" };
+	const int64 current[] = { sd.battle_status.str, sd.battle_status.agi, sd.battle_status.vit, sd.battle_status.int_, sd.battle_status.dex, sd.battle_status.luk,
+		sd.battle_status.pow, sd.battle_status.sta, sd.battle_status.wis, sd.battle_status.spl, sd.battle_status.con, sd.battle_status.crt };
+	const int64 allocated[] = { sd.status.str, sd.status.agi, sd.status.vit, sd.status.int_, sd.status.dex, sd.status.luk,
+		sd.status.pow, sd.status.sta, sd.status.wis, sd.status.spl, sd.status.con, sd.status.crt };
+	for (size_t i = 0; i < sizeof(stats) / sizeof(stats[0]); ++i) {
+		add(std::string("Total ") + stats[i] + " bonus (current - allocated)", current[i] - allocated[i]);
+		add(std::string("Script ") + stats[i], sd.indexed_bonus.param_bonus[i]);
+		add(std::string("Equipment ") + stats[i], sd.indexed_bonus.param_equip[i]);
+	}
+	add("Max HP flat", sd.bonus.hp, "");
+	add("Max SP flat", sd.bonus.sp, "");
+	add("bonus.ap", sd.bonus.ap, "");
+	add("ATK rate", sd.bonus.atk_rate, "%");
+	add("Arrow ATK", sd.bonus.arrow_atk, "");
+	if (sd.bonus.arrow_ele != ELE_NEUTRAL) lines.push_back("Arrow element: " + constant("Ele_", sd.bonus.arrow_ele));
+	add("Arrow critical (x10 units)", sd.bonus.arrow_cri, "");
+	add("Arrow HIT", sd.bonus.arrow_hit, "");
+	add("bonus.nsshealhp", sd.bonus.nsshealhp, "");
+	add("bonus.nsshealsp", sd.bonus.nsshealsp, "");
+	add("bonus.critical_def", sd.bonus.critical_def, "%");
+	add("bonus.double_rate", sd.bonus.double_rate, "%");
+	add("bonus.short_attack_atk_rate", sd.bonus.short_attack_atk_rate, "%");
+	add("Long-range attack damage", sd.bonus.long_attack_atk_rate, "%");
+	add("Melee damage resistance", sd.bonus.near_attack_def_rate, "%");
+	add("Long-range damage resistance", sd.bonus.long_attack_def_rate, "%");
+	add("Magic damage resistance", sd.bonus.magic_def_rate, "%");
+	add("Misc damage resistance", sd.bonus.misc_def_rate, "%");
+	add("bonus.ignore_mdef_ele", sd.bonus.ignore_mdef_ele, "");
+	add("bonus.ignore_mdef_race", sd.bonus.ignore_mdef_race, "");
+	add("bonus.ignore_mdef_class", sd.bonus.ignore_mdef_class, "");
+	add("bonus.perfect_hit", sd.bonus.perfect_hit, "%");
+	add("bonus.perfect_hit_add", sd.bonus.perfect_hit_add, "%");
+	add("bonus.get_zeny_rate", sd.bonus.get_zeny_rate, "");
+	add("bonus.get_zeny_num", sd.bonus.get_zeny_num, "");
+	add("bonus.double_add_rate", sd.bonus.double_add_rate, "%");
+	add("bonus.short_weapon_damage_return", sd.bonus.short_weapon_damage_return, "%");
+	add("bonus.long_weapon_damage_return", sd.bonus.long_weapon_damage_return, "%");
+	add("bonus.reduce_damage_return", sd.bonus.reduce_damage_return, "%");
+	add("bonus.magic_damage_return", sd.bonus.magic_damage_return, "%");
+	add("bonus.break_weapon_rate", sd.bonus.break_weapon_rate, "");
+	add("bonus.break_armor_rate", sd.bonus.break_armor_rate, "");
+	add("Critical damage", sd.bonus.crit_atk_rate, "%");
+	add("bonus.non_crit_atk_rate", sd.bonus.non_crit_atk_rate, "%");
+	add("bonus.crit_def_rate", sd.bonus.crit_def_rate, "%");
+	add("bonus.classchange", sd.bonus.classchange, "");
+	add("bonus.speed_rate", sd.bonus.speed_rate, "%");
+	add("bonus.speed_add_rate", sd.bonus.speed_add_rate, "%");
+	add("bonus.aspd_add", sd.bonus.aspd_add, "ms");
+	add("bonus.itemhealrate2", sd.bonus.itemhealrate2, "%");
+	add("bonus.itemsphealrate2", sd.bonus.itemsphealrate2, "%");
+	add("bonus.shieldmdef", sd.bonus.shieldmdef, "");
+	add("bonus.splash_range", sd.bonus.splash_range, "");
+	add("bonus.splash_add_range", sd.bonus.splash_add_range, "");
+	add("bonus.add_steal_rate", sd.bonus.add_steal_rate, "");
+	add("bonus.add_heal_rate", sd.bonus.add_heal_rate, "%");
+	add("bonus.add_heal2_rate", sd.bonus.add_heal2_rate, "%");
+	add("bonus.sp_gain_value", sd.bonus.sp_gain_value, "");
+	add("bonus.hp_gain_value", sd.bonus.hp_gain_value, "");
+	add("bonus.magic_sp_gain_value", sd.bonus.magic_sp_gain_value, "");
+	add("bonus.magic_hp_gain_value", sd.bonus.magic_hp_gain_value, "");
+	add("bonus.long_sp_gain_value", sd.bonus.long_sp_gain_value, "");
+	add("bonus.long_hp_gain_value", sd.bonus.long_hp_gain_value, "");
+	add("bonus.unbreakable", sd.bonus.unbreakable, "");
+	add("bonus.unbreakable_equip", sd.bonus.unbreakable_equip, "");
+	add("bonus.unstripable_equip", sd.bonus.unstripable_equip, "");
+	add("Fixed cast-time modifier", sd.bonus.fixcastrate, "%");
+	add("Variable cast-time modifier (internal sign)", sd.bonus.varcastrate, "%");
+	add("Skill delay modifier", sd.bonus.delayrate, "%");
+	add("bonus.add_fixcast", sd.bonus.add_fixcast, "ms");
+	add("bonus.add_varcast", sd.bonus.add_varcast, "ms");
+	add("Equipment MATK", sd.bonus.ematk, "");
+	add("bonus.ematk_hidden", sd.bonus.ematk_hidden, "");
+	add("Equipment ATK", sd.bonus.eatk, "");
+	add("bonus.absorb_dmg_maxhp", sd.bonus.absorb_dmg_maxhp, "%");
+	add("bonus.absorb_dmg_maxhp2", sd.bonus.absorb_dmg_maxhp2, "%");
+	add("bonus.critical_rangeatk", sd.bonus.critical_rangeatk, "");
+	add("bonus.weapon_atk_rate", sd.bonus.weapon_atk_rate, "%");
+	add("bonus.weapon_matk_rate", sd.bonus.weapon_matk_rate, "%");
+	add("bonus.skill_ratio", sd.bonus.skill_ratio, "%");
+	add("Cast time rate", static_cast<int64>(sd.castrate) - 100, "%");
+	add("Max HP rate", static_cast<int64>(sd.hprate) - 100, "%");
+	add("Max SP rate", static_cast<int64>(sd.sprate) - 100, "%");
+	add("aprate", static_cast<int64>(sd.aprate) - 100, "%");
+	add("dsprate", static_cast<int64>(sd.dsprate) - 100, "%");
+	add("hprecov_rate", static_cast<int64>(sd.hprecov_rate) - 100, "%");
+	add("sprecov_rate", static_cast<int64>(sd.sprecov_rate) - 100, "%");
+	add("MATK rate", static_cast<int64>(sd.matk_rate) - 100, "%");
+	add("critical_rate", static_cast<int64>(sd.critical_rate) - 100, "%");
+	add("hit_rate", static_cast<int64>(sd.hit_rate) - 100, "%");
+	add("flee_rate", static_cast<int64>(sd.flee_rate) - 100, "%");
+	add("flee2_rate", static_cast<int64>(sd.flee2_rate) - 100, "%");
+	add("def_rate", static_cast<int64>(sd.def_rate) - 100, "%");
+	add("def2_rate", static_cast<int64>(sd.def2_rate) - 100, "%");
+	add("mdef_rate", static_cast<int64>(sd.mdef_rate) - 100, "%");
+	add("mdef2_rate", static_cast<int64>(sd.mdef2_rate) - 100, "%");
+	add("patk_rate", static_cast<int64>(sd.patk_rate) - 100, "%");
+	add("smatk_rate", static_cast<int64>(sd.smatk_rate) - 100, "%");
+	add("res_rate", static_cast<int64>(sd.res_rate) - 100, "%");
+	add("mres_rate", static_cast<int64>(sd.mres_rate) - 100, "%");
+	add("hplus_rate", static_cast<int64>(sd.hplus_rate) - 100, "%");
+	add("crate_rate", static_cast<int64>(sd.crate_rate) - 100, "%");
+	add("Max weight bonus", sd.add_max_weight, "", 10.0);
+	array("subele", sd.indexed_bonus.subele, "Ele_", "%");
+	array("subele_script", sd.indexed_bonus.subele_script, "Ele_", "%");
+	array("subdefele", sd.indexed_bonus.subdefele, "Ele_", "%");
+	array("subrace", sd.indexed_bonus.subrace, "RC_", "%");
+	array("subclass", sd.indexed_bonus.subclass, "Class_", "%");
+	array("subrace2", sd.indexed_bonus.subrace2, "RC2_", "%");
+	array("subsize", sd.indexed_bonus.subsize, "Size_", "%");
+	array("coma_class", sd.indexed_bonus.coma_class, "Class_", "");
+	array("coma_race", sd.indexed_bonus.coma_race, "RC_", "");
+	array("weapon_coma_ele", sd.indexed_bonus.weapon_coma_ele, "Ele_", "");
+	array("weapon_coma_race", sd.indexed_bonus.weapon_coma_race, "RC_", "");
+	array("weapon_coma_class", sd.indexed_bonus.weapon_coma_class, "Class_", "");
+	array("weapon_atk", sd.indexed_bonus.weapon_atk, "W_", "");
+	array("weapon_damage_rate", sd.indexed_bonus.weapon_damage_rate, "W_", "%");
+	array("arrow_addele", sd.indexed_bonus.arrow_addele, "Ele_", "%");
+	array("arrow_addrace", sd.indexed_bonus.arrow_addrace, "RC_", "%");
+	array("arrow_addclass", sd.indexed_bonus.arrow_addclass, "Class_", "%");
+	array("arrow_addsize", sd.indexed_bonus.arrow_addsize, "Size_", "%");
+	array("magic_addele", sd.indexed_bonus.magic_addele, "Ele_", "%");
+	array("magic_addele_script", sd.indexed_bonus.magic_addele_script, "Ele_", "%");
+	array("magic_addrace", sd.indexed_bonus.magic_addrace, "RC_", "%");
+	array("magic_addclass", sd.indexed_bonus.magic_addclass, "Class_", "%");
+	array("magic_addsize", sd.indexed_bonus.magic_addsize, "Size_", "%");
+	array("magic_atk_ele", sd.indexed_bonus.magic_atk_ele, "Ele_", "%");
+	array("weapon_subsize", sd.indexed_bonus.weapon_subsize, "Size_", "%");
+	array("magic_subsize", sd.indexed_bonus.magic_subsize, "Size_", "%");
+	array("critaddrace", sd.indexed_bonus.critaddrace, "RC_", "%");
+	array("expaddrace", sd.indexed_bonus.expaddrace, "RC_", "%");
+	array("expaddclass", sd.indexed_bonus.expaddclass, "Class_", "%");
+	array("ignore_mdef_by_race", sd.indexed_bonus.ignore_mdef_by_race, "RC_", "%");
+	array("ignore_mdef_by_class", sd.indexed_bonus.ignore_mdef_by_class, "Class_", "%");
+	array("ignore_def_by_race", sd.indexed_bonus.ignore_def_by_race, "RC_", "%");
+	array("ignore_def_by_class", sd.indexed_bonus.ignore_def_by_class, "Class_", "%");
+	array("sp_gain_race", sd.indexed_bonus.sp_gain_race, "RC_", "");
+	array("magic_addrace2", sd.indexed_bonus.magic_addrace2, "RC2_", "%");
+	array("ignore_mdef_by_race2", sd.indexed_bonus.ignore_mdef_by_race2, "RC2_", "%");
+	array("dropaddrace", sd.indexed_bonus.dropaddrace, "RC_", "%");
+	array("dropaddclass", sd.indexed_bonus.dropaddclass, "Class_", "%");
+	array("magic_subdefele", sd.indexed_bonus.magic_subdefele, "Ele_", "%");
+	array("ignore_res_by_race", sd.indexed_bonus.ignore_res_by_race, "RC_", "%");
+	array("ignore_mres_by_race", sd.indexed_bonus.ignore_mres_by_race, "RC_", "%");
+	auto item_bonus = [&add, &constant](const char* name, const auto& values, const char* prefix, const char* unit = "%", double divisor = 1.0) {
+		for (const auto& value : values)
+			add(std::string(name) + " [" + constant(prefix, value.id) + "]", value.val, unit, divisor);
+	};
+	for (const auto& value : sd.skillatk) add(std::string("skillatk [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillusesprate) add(std::string("skillusesprate [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillusesp) add(std::string("skillusesp [") + skill_get_desc(value.id) + "]", value.val, "");
+	for (const auto& value : sd.skillheal) add(std::string("skillheal [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillheal2) add(std::string("skillheal2 [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillblown) add(std::string("skillblown [") + skill_get_desc(value.id) + "]", value.val, "");
+	for (const auto& value : sd.skillcastrate) add(std::string("skillcastrate [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillfixcastrate) add(std::string("skillfixcastrate [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.subskill) add(std::string("subskill [") + skill_get_desc(value.id) + "]", value.val, "%");
+	for (const auto& value : sd.skillcooldown) add(std::string("skillcooldown [") + skill_get_desc(value.id) + "]", value.val, "ms");
+	for (const auto& value : sd.skillfixcast) add(std::string("skillfixcast [") + skill_get_desc(value.id) + "]", value.val, "ms");
+	for (const auto& value : sd.skillvarcast) add(std::string("skillvarcast [") + skill_get_desc(value.id) + "]", value.val, "ms");
+	for (const auto& value : sd.skilldelay) add(std::string("skilldelay [") + skill_get_desc(value.id) + "]", value.val, "ms");
+	item_bonus("itemhealrate", sd.itemhealrate, "", "%", 1.0);
+	item_bonus("add_def", sd.add_def, "", "", 1.0);
+	item_bonus("add_mdef", sd.add_mdef, "", "", 1.0);
+	item_bonus("add_mdmg", sd.add_mdmg, "", "", 1.0);
+	item_bonus("reseff", sd.reseff, "Eff_", "%", 100.0);
+	item_bonus("itemgrouphealrate", sd.itemgrouphealrate, "IG_", "%", 1.0);
+	item_bonus("itemsphealrate", sd.itemsphealrate, "", "%", 1.0);
+	item_bonus("itemgroupsphealrate", sd.itemgroupsphealrate, "IG_", "%", 1.0);
+	auto weapon = [&](const char* hand, const weapon_data& w) {
+		add(std::string(hand) + ".overrefine", w.overrefine);
+		add(std::string(hand) + ".star", w.star);
+		add(std::string(hand) + ".ignore_def_ele", w.ignore_def_ele);
+		add(std::string(hand) + ".ignore_def_race", w.ignore_def_race);
+		add(std::string(hand) + ".ignore_def_class", w.ignore_def_class);
+		add(std::string(hand) + ".def_ratio_atk_ele", w.def_ratio_atk_ele);
+		add(std::string(hand) + ".def_ratio_atk_race", w.def_ratio_atk_race);
+		add(std::string(hand) + ".def_ratio_atk_class", w.def_ratio_atk_class);
+		array((std::string(hand) + ".addele").c_str(), w.addele, "Ele_");
+		array((std::string(hand) + ".addrace").c_str(), w.addrace, "RC_");
+		array((std::string(hand) + ".addclass").c_str(), w.addclass, "Class_");
+		array((std::string(hand) + ".addrace2").c_str(), w.addrace2, "RC2_");
+		array((std::string(hand) + ".addsize").c_str(), w.addsize, "Size_");
+		array((std::string(hand) + ".hp_drain_race").c_str(), w.hp_drain_race, "RC_", "");
+		array((std::string(hand) + ".sp_drain_race").c_str(), w.sp_drain_race, "RC_", "");
+		array((std::string(hand) + ".hp_drain_class").c_str(), w.hp_drain_class, "Class_", "");
+		array((std::string(hand) + ".sp_drain_class").c_str(), w.sp_drain_class, "Class_", "");
+		add(std::string(hand) + ".HP drain chance", w.hp_drain_rate.rate, "%", 10.0);
+		add(std::string(hand) + ".HP drain amount", w.hp_drain_rate.per, "%");
+		add(std::string(hand) + ".SP drain chance", w.sp_drain_rate.rate, "%", 10.0);
+		add(std::string(hand) + ".SP drain amount", w.sp_drain_rate.per, "%");
+		item_bonus((std::string(hand) + ".add_dmg").c_str(), w.add_dmg, "");
+		for (const auto& value : w.addele2)
+			add(std::string(hand) + ".addele2 [" + constant("Ele_", value.ele) + ", flags=" + std::to_string(value.flag) + "]", value.rate, "%");
+		for (const auto& value : w.addrace3)
+			add(std::string(hand) + ".addrace3 [" + constant("RC_", value.race) + ", flags=" + std::to_string(value.flag) + "]", value.rate, "%");
+	};
+	weapon("Right hand", sd.right_weapon);
+	weapon("Left hand", sd.left_weapon);
+	add("special.restart_full_recover", sd.special_state.restart_full_recover);
+	add("special.no_castcancel", sd.special_state.no_castcancel);
+	add("special.no_castcancel2", sd.special_state.no_castcancel2);
+	add("special.no_sizefix", sd.special_state.no_sizefix);
+	add("special.no_gemstone", sd.special_state.no_gemstone);
+	add("special.intravision", sd.special_state.intravision);
+	add("special.perfect_hiding", sd.special_state.perfect_hiding);
+	add("special.no_knockback", sd.special_state.no_knockback);
+	add("special.bonus_coma", sd.special_state.bonus_coma);
+	add("special.no_mado_fuel", sd.special_state.no_mado_fuel);
+	add("special.no_walk_delay", sd.special_state.no_walk_delay);
+	add("special.no_weapon_damage", sd.special_state.no_weapon_damage);
+	add("special.no_magic_damage", sd.special_state.no_magic_damage);
+	add("special.no_misc_damage", sd.special_state.no_misc_damage);
+	for (const auto& entry : sd.sc) {
+		const auto& value = entry.second;
+		lines.push_back("Active " + constant("SC_", entry.first) + " [val1=" + std::to_string(value.val1) + ", val2=" + std::to_string(value.val2)
+			+ ", val3=" + std::to_string(value.val3) + ", val4=" + std::to_string(value.val4) + "]");
+	}
+	auto autospell = [&lines](const char* name, const auto& values) {
+		for (const auto& value : values) {
+			char text[240];
+			snprintf(text, sizeof(text), "%s [%s Lv.%u]: %.2f%%, trigger=%u, battle_flags=%d, flags=%u",
+				name, skill_get_desc(value.id), value.lv, value.rate / 10.0, value.trigger_skill, value.battle_flag, value.flag);
+			lines.push_back(text);
+		}
+	};
+	autospell("AutoSpell", sd.autospell);
+	autospell("AutoSpell when hit", sd.autospell2);
+	autospell("AutoSpell on skill", sd.autospell3);
+	auto effect = [&lines, &constant](const char* name, const auto& values) {
+		for (const auto& value : values) {
+			char text[240];
+			snprintf(text, sizeof(text), "%s [%s]: %.2f%%, arrow=%.2f%%, flags=%u, duration=%ums", name,
+				constant("SC_", value.sc).c_str(), value.rate / 100.0, value.arrow_rate / 100.0, value.flag, value.duration);
+			lines.push_back(text);
+		}
+	};
+	effect("AddEffect", sd.addeff);
+	effect("AddEffect when hit", sd.addeff_atked);
+	for (const auto& value : sd.addeff_onskill)
+		lines.push_back("AddEffect on " + std::string(skill_get_desc(value.skill_id)) + " [" + constant("SC_", value.sc) + "]: rate="
+			+ std::to_string(value.rate) + "/10000, target=" + std::to_string(value.target) + ", duration=" + std::to_string(value.duration) + "ms");
+	for (const auto& value : sd.add_drop)
+		lines.push_back("Add drop: item=" + std::to_string(value.nameid) + ", group=" + std::to_string(value.group) + ", rate=" + std::to_string(value.rate)
+			+ ", race=" + std::to_string(value.race) + ", class=" + std::to_string(value.class_));
+	for (const auto& value : sd.subele2)
+		add("subele2 [" + constant("Ele_", value.ele) + ", flags=" + std::to_string(value.flag) + "]", value.rate, "%");
+	for (const auto& value : sd.subrace3)
+		add("subrace3 [" + constant("RC_", value.race) + ", flags=" + std::to_string(value.flag) + "]", value.rate, "%");
+	auto vanish = [&lines](const char* name, const auto& values) {
+		for (const auto& value : values)
+			lines.push_back(std::string(name) + ": chance=" + std::to_string(value.rate) + "/1000, amount=" + std::to_string(value.per) + "%, flags=" + std::to_string(value.flag));
+	};
+	vanish("HP vanish", sd.hp_vanish);
+	vanish("SP vanish", sd.sp_vanish);
+	auto regen = [&lines](const char* name, const auto& values) {
+		for (const auto& value : values)
+			lines.push_back(std::string(name) + ": value=" + std::to_string(value.value) + ", rate=" + std::to_string(value.rate) + ", interval=" + std::to_string(value.tick) + "ms");
+	};
+	regen("HP loss", sd.hp_loss); regen("SP loss", sd.sp_loss);
+	regen("HP regen", sd.hp_regen); regen("SP regen", sd.sp_regen);
+	regen("HP regen percent", sd.percent_hp_regen); regen("SP regen percent", sd.percent_sp_regen);
+	for (int32 i = 0; i < RC_MAX; ++i) {
+		const std::string race = " [" + constant("RC_", i) + "]";
+		if (sd.def_set_race[i].rate)
+			lines.push_back("DEF set" + race + ": value=" + std::to_string(sd.def_set_race[i].value) + ", rate=" + std::to_string(sd.def_set_race[i].rate) + ", duration=" + std::to_string(sd.def_set_race[i].tick));
+		if (sd.mdef_set_race[i].rate)
+			lines.push_back("MDEF set" + race + ": value=" + std::to_string(sd.mdef_set_race[i].value) + ", rate=" + std::to_string(sd.mdef_set_race[i].rate) + ", duration=" + std::to_string(sd.mdef_set_race[i].tick));
+		if (sd.norecover_state_race[i].rate)
+			lines.push_back("No recovery" + race + ": value=" + std::to_string(sd.norecover_state_race[i].value) + ", rate=" + std::to_string(sd.norecover_state_race[i].rate) + ", duration=" + std::to_string(sd.norecover_state_race[i].tick));
+		if (sd.hp_vanish_race[i].rate)
+			lines.push_back("HP vanish" + race + ": chance=" + std::to_string(sd.hp_vanish_race[i].rate) + "/1000, amount=" + std::to_string(sd.hp_vanish_race[i].per) + "%");
+		if (sd.sp_vanish_race[i].rate)
+			lines.push_back("SP vanish" + race + ": chance=" + std::to_string(sd.sp_vanish_race[i].rate) + "/1000, amount=" + std::to_string(sd.sp_vanish_race[i].per) + "%");
+	}
+	auto autobonus = [&lines](const char* name, const auto& values) {
+		for (const auto& value : values) {
+			if (!value) continue;
+			lines.push_back(std::string(name) + ": chance=" + std::to_string(value->rate) + "/1000, duration=" + std::to_string(value->duration)
+				+ "ms, active=" + std::to_string(value->active != INVALID_TIMER) + ", position=" + std::to_string(value->pos) + ", flags=" + std::to_string(value->atk_type));
+		}
+	};
+	autobonus("AutoBonus", sd.autobonus);
+	autobonus("AutoBonus when hit", sd.autobonus2);
+	autobonus("AutoBonus on skill", sd.autobonus3);
+	// Unordered status storage must not change page order between invocations.
+	std::sort(lines.begin(), lines.end(), [](const auto& lhs, const auto& rhs) {
+		const int32 left = pc_bonus_display_order(lhs), right = pc_bonus_display_order(rhs);
+		return left != right ? left < right : lhs < rhs;
+	});
+	return lines;
+}
+
+ACMD_FUNC(bonus)
+{
+	nullpo_ret(sd);
+	std::string input = message ? message : "";
+	const auto first = input.find_first_not_of(" \t");
+	input = first == std::string::npos ? "" : input.substr(first);
+	const auto space = input.find_first_of(" \t");
+	const std::string token = input.substr(0, space);
+	std::string filter;
+	size_t page = 1;
+	bool all = token == "all";
+	if (!token.empty() && (all || std::isdigit(static_cast<unsigned char>(token[0])))) {
+		if (!all) {
+			const auto result = std::from_chars(token.data(), token.data() + token.size(), page);
+			if (result.ec != std::errc() || result.ptr != token.data() + token.size() || page == 0) {
+				clif_displaymessage(fd, "Usage: @bonus [page|all] [filter] (example: @bonus 2 race)");
+				return -1;
+			}
+		}
+		if (space != std::string::npos) filter = input.substr(space + 1);
+	} else filter = input;
+	const auto filter_start = filter.find_first_not_of(" \t");
+	filter = filter_start == std::string::npos ? "" : filter.substr(filter_start);
+	const auto filter_end = filter.find_last_not_of(" \t");
+	if (filter_end != std::string::npos) filter.resize(filter_end + 1);
+	auto lower = [](std::string text) {
+		for (char& c : text) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		return text;
+	};
+	filter = lower(filter);
+	const auto report = pc_live_bonus_report(*sd);
+	std::vector<std::string> lines;
+	for (const auto& line : report)
+		if (filter.empty() || lower(line).find(filter) != std::string::npos) lines.push_back(line);
+	if (lines.empty()) {
+		clif_displaymessage(fd, "No active bonuses match the requested filter.");
+		return 0;
+	}
+	constexpr size_t page_size = 20;
+	const size_t pages = (lines.size() + page_size - 1) / page_size;
+	if (!all && page > pages) {
+		clif_displaymessage(fd, ("Invalid page. Available pages: 1-" + std::to_string(pages)).c_str());
+		return -1;
+	}
+	clif_displaymessage(fd, "Current character bonuses (live server values; combat caps/formulas apply separately).");
+	clif_displaymessage(fd, "Total stats include job/passive/buff bonuses. Script/equipment rows are components, not additional bonuses.");
+	const size_t start = all ? 0 : (page - 1) * page_size;
+	const size_t end = all ? lines.size() : std::min(start + page_size, lines.size());
+	for (size_t i = start; i < end; ++i) clif_displaymessage(fd, lines[i].c_str());
+	clif_displaymessage(fd, ("Bonus report: " + std::to_string(lines.size()) + " rows, " + (all ? std::string("all pages") : "page " + std::to_string(page) + "/" + std::to_string(pages))
+		+ ". Use @bonus all or @bonus <page> [filter].").c_str());
+	return 0;
+}
+
 ACMD_FUNC(rates)
 {
 	char buf[CHAT_SIZE_MAX];
@@ -11907,6 +12325,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(exp),
 		ACMD_DEF(version),
 		ACMD_DEF(mutearea),
+		ACMD_DEF(bonus),
 		ACMD_DEF(rates),
 		ACMD_DEF(iteminfo),
 		ACMD_DEF(whodrops),
