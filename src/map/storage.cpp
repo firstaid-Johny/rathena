@@ -201,6 +201,23 @@ static enum e_storage_add storage_canAddItem(struct s_storage *stor, int32 idx, 
 
 	if (!stor->state.put)
 		return STORAGE_ADD_NOACCESS;
+	if (stor->stor_id == COLLECTION_STORAGE) {
+		map_session_data* sd = map_id2sd(stor->id);
+		if (sd == nullptr)
+			return STORAGE_ADD_INVALID;
+		if (collection_db.find(items[idx].nameid) == nullptr) {
+			clif_displaymessage(sd->fd, "This item is not registered in the collection database.");
+			sd->state.collection_flag |= PCCOLLECTION_RELOAD;
+			return STORAGE_ADD_INVALID;
+		}
+		for (int32 i = 0; i < stor->max_amount; ++i) {
+			if (stor->u.items_storage[i].nameid == items[idx].nameid) {
+				clif_displaymessage(sd->fd, "This item is already in your collection.");
+				sd->state.collection_flag |= PCCOLLECTION_RELOAD;
+				return STORAGE_ADD_INVALID;
+			}
+		}
+	}
 
 	return STORAGE_ADD_OK;
 }
@@ -230,6 +247,94 @@ static enum e_storage_add storage_canGetItem(struct s_storage *stor, int32 idx, 
 	return STORAGE_ADD_OK;
 }
 
+// Deposit previews exist only in packets, never in the persistent storage cache.
+static bool collection_deposit_view(const s_storage& stor) {
+	return stor.stor_id == COLLECTION_STORAGE && stor.state.put && !stor.state.get;
+}
+
+static void storage_collection_refresh(map_session_data& sd, bool opening = false) {
+	s_storage& stor = sd.premiumStorage;
+	if (collection_deposit_view(stor)) {
+		std::vector<t_itemid> ids;
+		for (const auto& entry : collection_db) {
+			if (item_db.find(entry.first) == nullptr)
+				continue;
+			bool deposited = false;
+			for (const item& it : stor.u.items_storage)
+				if (it.nameid == entry.first && it.amount > 0) { deposited = true; break; }
+			if (!deposited)
+				ids.push_back(entry.first);
+		}
+		std::sort(ids.begin(), ids.end());
+		if (opening) {
+			sd.collection_preview_ids = ids;
+			std::vector<item> previews;
+			for (t_itemid id : ids) {
+				item preview{};
+				preview.nameid = id;
+				preview.amount = 1;
+				preview.identify = 1;
+				previews.push_back(preview);
+			}
+			clif_storagelist(&sd, previews.data(), static_cast<int32>(previews.size()), "Collection - Deposit");
+		} else {
+			// The Client adds repeated storage lists to existing rows instead of replacing them.
+			// Keep indices stable and send only changed rows after a successful deposit.
+			for (size_t i = 0; i < sd.collection_preview_ids.size(); ++i) {
+				t_itemid& id = sd.collection_preview_ids[i];
+				if (id != 0 && !std::binary_search(ids.begin(), ids.end(), id)) {
+					clif_storageitemremoved(sd, static_cast<uint16>(i), 1);
+					id = 0;
+				}
+			}
+			for (t_itemid id : ids) {
+				if (std::find(sd.collection_preview_ids.begin(), sd.collection_preview_ids.end(), id) != sd.collection_preview_ids.end())
+					continue;
+				auto free = std::find(sd.collection_preview_ids.begin(), sd.collection_preview_ids.end(), 0);
+				const size_t index = free - sd.collection_preview_ids.begin();
+				if (free == sd.collection_preview_ids.end())
+					sd.collection_preview_ids.push_back(id);
+				else
+					*free = id;
+				item preview{};
+				preview.nameid = id;
+				preview.amount = 1;
+				preview.identify = 1;
+				clif_storageitemadded(&sd, &preview, static_cast<int32>(index), 1);
+			}
+		}
+	} else {
+		sd.collection_preview_ids.clear();
+		clif_storagelist(&sd, stor.u.items_storage, ARRAYLENGTH(stor.u.items_storage),
+			stor.stor_id == COLLECTION_STORAGE && !stor.state.put ? "Collection - Withdraw" : storage_getName(stor.stor_id));
+	}
+	clif_updatestorageamount(sd, stor.amount, stor.max_amount);
+}
+
+static bool storage_collection_fee(map_session_data& sd, const s_storage& stor, int32 amount, bool deposit, bool charge = false) {
+	if (stor.stor_id != COLLECTION_STORAGE)
+		return true;
+	const int64 cost = static_cast<int64>(deposit ? battle_config.collection_deposit_fee : battle_config.collection_withdraw_fee) * amount;
+	if (!chrif_isconnected() || cost < 0 || cost > MAX_ZENY || sd.status.zeny < cost) {
+		clif_displaymessage(sd.fd, "Collection unavailable or not enough Zeny for the transaction fee.");
+		return false;
+	}
+	if (charge && cost > 0)
+		return pc_payzeny(&sd, static_cast<int32>(cost), LOG_TYPE_NPC) == 0;
+	return true;
+}
+
+static void storage_collection_finished(map_session_data& sd, s_storage& stor, int32 amount, bool deposit) {
+	if (stor.stor_id != COLLECTION_STORAGE)
+		return;
+	storage_collection_fee(sd, stor, amount, deposit, true);
+	sd.state.collection_flag |= PCCOLLECTION_RECAL;
+	pc_collection_update(&stor, sd);
+	if (collection_deposit_view(stor))
+		storage_collection_refresh(sd);
+	chrif_save(&sd, CSAVE_INVENTORY | CSAVE_CART);
+}
+
 /**
  * Make a player add an item to his storage
  * @param sd : player
@@ -242,6 +347,7 @@ static int32 storage_additem(map_session_data* sd, struct s_storage *stor, struc
 {
 	struct item_data *data;
 	int32 i;
+	const bool notify = !collection_deposit_view(*stor);
 
 	if( it->nameid == 0 || amount <= 0 )
 		return 1;
@@ -269,7 +375,8 @@ static int32 storage_additem(map_session_data* sd, struct s_storage *stor, struc
 
 				stor->u.items_storage[i].amount += amount;
 				stor->dirty = true;
-				clif_storageitemadded(sd,&stor->u.items_storage[i],i,amount);
+				if (notify)
+					clif_storageitemadded(sd,&stor->u.items_storage[i],i,amount);
 
 				return 0;
 			}
@@ -289,8 +396,12 @@ static int32 storage_additem(map_session_data* sd, struct s_storage *stor, struc
 	stor->amount++;
 	stor->u.items_storage[i].amount = amount;
 	stor->dirty = true;
-	clif_storageitemadded(sd,&stor->u.items_storage[i],i,amount);
-	clif_updatestorageamount(*sd, stor->amount, stor->max_amount);
+	if (notify) {
+		clif_storageitemadded(sd,&stor->u.items_storage[i],i,amount);
+		clif_updatestorageamount(*sd, stor->amount, stor->max_amount);
+	}
+	if (stor->stor_id == COLLECTION_STORAGE)
+		sd->state.collection_flag |= PCCOLLECTION_RECAL;
 
 	return 0;
 }
@@ -311,6 +422,8 @@ int32 storage_delitem(map_session_data* sd, struct s_storage *stor, int32 index,
 	stor->dirty = true;
 
 	if( stor->u.items_storage[index].amount == 0 ) {
+		if (stor->stor_id == COLLECTION_STORAGE)
+			sd->state.collection_flag |= PCCOLLECTION_RECAL;
 		memset(&stor->u.items_storage[index],0,sizeof(stor->u.items_storage[0]));
 		stor->amount--;
 		if( sd->state.storage_flag == 1 || sd->state.storage_flag == 3 )
@@ -337,13 +450,18 @@ void storage_storageadd(map_session_data* sd, struct s_storage *stor, int32 inde
 
 	nullpo_retv(sd);
 
+	if (stor->stor_id == COLLECTION_STORAGE && amount > 1)
+		amount = 1;
 	result = storage_canAddItem(stor, index, sd->inventory.u.items_inventory, amount, MAX_INVENTORY);
 	if (result == STORAGE_ADD_INVALID)
 		return;
 	else if (result == STORAGE_ADD_OK) {
+		if (!storage_collection_fee(*sd, *stor, amount, true))
+			return;
 		switch( storage_additem(sd, stor, &sd->inventory.u.items_inventory[index], amount) ){
 			case 0:
 				pc_delitem(sd,index,amount,0,4,LOG_TYPE_STORAGE);
+				storage_collection_finished(*sd, *stor, amount, true);
 				return;
 			case 1:
 				break;
@@ -374,9 +492,13 @@ void storage_storageget(map_session_data *sd, struct s_storage *stor, int32 inde
 	result = storage_canGetItem(stor, index, amount);
 	if (result != STORAGE_ADD_OK)
 		return;
+	if (!storage_collection_fee(*sd, *stor, amount, false))
+		return;
 
-	if ((flag = pc_additem(sd,&stor->u.items_storage[index],amount,LOG_TYPE_STORAGE, favorite)) == ADDITEM_SUCCESS)
+	if ((flag = pc_additem(sd,&stor->u.items_storage[index],amount,LOG_TYPE_STORAGE, favorite)) == ADDITEM_SUCCESS) {
 		storage_delitem(sd,stor,index,amount);
+		storage_collection_finished(*sd, *stor, amount, false);
+	}
 	else {
 		clif_storageitemremoved( *sd, index, 0 );
 		clif_additem(sd,0,0,flag);
@@ -400,13 +522,18 @@ void storage_storageaddfromcart(map_session_data *sd, struct s_storage *stor, in
 		return;
 	}
 
+	if (stor->stor_id == COLLECTION_STORAGE && amount > 1)
+		amount = 1;
 	result = storage_canAddItem(stor, index, sd->cart.u.items_cart, amount, MAX_CART);
 	if (result == STORAGE_ADD_INVALID)
 		return;
 	else if (result == STORAGE_ADD_OK) {
+		if (!storage_collection_fee(*sd, *stor, amount, true))
+			return;
 		switch( storage_additem(sd, stor, &sd->cart.u.items_cart[index], amount) ){
 			case 0:
 				pc_cart_delitem(sd,index,amount,0,LOG_TYPE_STORAGE);
+				storage_collection_finished(*sd, *stor, amount, true);
 				return;
 			case 1:
 				break;
@@ -442,9 +569,13 @@ void storage_storagegettocart(map_session_data* sd, struct s_storage *stor, int3
 	result = storage_canGetItem(stor, index, amount);
 	if (result != STORAGE_ADD_OK)
 		return;
+	if (!storage_collection_fee(*sd, *stor, amount, false))
+		return;
 
-	if ((flag = pc_cart_additem(sd,&stor->u.items_storage[index],amount,LOG_TYPE_STORAGE)) == 0)
+	if ((flag = pc_cart_additem(sd,&stor->u.items_storage[index],amount,LOG_TYPE_STORAGE)) == 0) {
 		storage_delitem(sd,stor,index,amount);
+		storage_collection_finished(*sd, *stor, amount, false);
+	}
 	else {
 		clif_storageitemremoved( *sd, index, 0 );
 		if (flag == ADDITEM_INVALID)
@@ -1120,8 +1251,7 @@ void storage_premiumStorage_open(map_session_data *sd) {
 
 	sd->state.storage_flag = 3;
 	storage_sortitem(sd->premiumStorage.u.items_storage, ARRAYLENGTH(sd->premiumStorage.u.items_storage));
-	clif_storagelist(sd, sd->premiumStorage.u.items_storage, ARRAYLENGTH(sd->premiumStorage.u.items_storage), storage_getName(sd->premiumStorage.stor_id));
-	clif_updatestorageamount(*sd, sd->premiumStorage.amount, sd->premiumStorage.max_amount);
+	storage_collection_refresh(*sd, true);
 }
 
 /**
@@ -1149,8 +1279,13 @@ bool storage_premiumStorage_load(map_session_data *sd, uint8 num, uint8 mode) {
 		return 0;
 	}
 
-	if (sd->premiumStorage.stor_id != num)
+	if (num == COLLECTION_STORAGE && (sd->state.collection_flag & PCCOLLECTION_LOAD))
+		return 0;
+	if (sd->premiumStorage.stor_id != num) {
+		if (sd->premiumStorage.dirty)
+			return 0;
 		return intif_storage_request(sd, TABLE_STORAGE, num, mode);
+	}
 	else {
 		sd->premiumStorage.state.put = (mode&STOR_MODE_PUT) ? 1 : 0;
 		sd->premiumStorage.state.get = (mode&STOR_MODE_GET) ? 1 : 0;
@@ -1187,8 +1322,11 @@ void storage_premiumStorage_close(map_session_data *sd) {
 
 	if( sd->state.storage_flag == 3 ){
 		sd->state.storage_flag = 0;
+		sd->collection_preview_ids.clear();
 		clif_storageclose( *sd );
 	}
+	if (sd->state.collection_flag & (PCCOLLECTION_RELOAD | PCCOLLECTION_RECAL))
+		pc_collection_update(&sd->premiumStorage, *sd);
 }
 
 /**

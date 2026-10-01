@@ -272,3 +272,66 @@ Body:
     Sell: 500
   - Id: 993    # Green Live
     Sell: 500
+
+  - Id: 27126
+    AegisName: Boitata_Card
+    Name: Boitata Card
+    Type: Card
+    Buy: 20
+    Weight: 10
+    Locations:
+      Armor: true
+    Flags:
+      BuyingStore: true
+      DropEffect: CLIENT
+    Script: |
+      bonus2 bAddEle,Ele_Wind,40;
+      bonus2 bAddEle,Ele_Earth,40;
+      bonus2 bAddRace,RC_Brute,40;
+      bonus2 bAddRace,RC_Player_Doram,40;
+      bonus2 bAddRace,RC_Insect,40;
+  - Id: 27157
+    AegisName: Wood_Goblin_Card
+    Name: Wood Goblin Card
+    Type: Card
+    Buy: 20
+    Weight: 10
+    Locations:
+      Armor: true
+    Flags:
+      BuyingStore: true
+      DropEffect: CLIENT
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddEle,Ele_Water,(.@r >= 9 ? 10 : 5);
+      bonus2 bAddEle,Ele_Earth,(.@r >= 9 ? 10 : 5);
+      bonus2 bSubEle,Ele_Water,-5;
+      bonus2 bSubEle,Ele_Earth,-5;
+  - Id: 31019
+    AegisName: XM_Lude_Card
+    Name: Creepy Demon Card
+    Type: Card
+    Buy: 20
+    Weight: 10
+    Locations:
+      Both_Accessory: true
+    Flags:
+      BuyingStore: true
+      DropEffect: CLIENT
+    Script: |
+      bonus bMaxHPrate,-13;
+      bonus3 bAddEffWhenHit,Eff_Curse,4000,ATF_MAGIC;
+  - Id: 31022
+    AegisName: XM_Teddy_Bear_Card
+    Name: Abandoned Teddy Bear Card
+    Type: Card
+    Buy: 20
+    Weight: 10
+    Locations:
+      Shoes: true
+    Flags:
+      BuyingStore: true
+      DropEffect: CLIENT
+    Script: |
+      bonus bMaxSPrate,20;
+      bonus2 bAddEff2,Eff_Curse,20;

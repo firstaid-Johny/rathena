@@ -460,6 +460,7 @@ public:
 		bool roulette_open;
 		t_itemid item_reform;
 		uint64 item_enchant_index;
+		uint8 collection_flag;
 	} state;
 	struct {
 		unsigned char no_weapon_damage, no_magic_damage, no_misc_damage;
@@ -942,6 +943,8 @@ public:
 	s_macro_detect macro_detect;
 
 	std::vector<uint32> party_booking_requests;
+	std::vector<t_itemid> collection_list;
+	std::vector<t_itemid> collection_preview_ids; // Client-only rows; never persisted.
 	bool force_remove_party_ef = false;
 
 	void update_look( _look look );
@@ -1321,6 +1324,27 @@ public:
 };
 
 extern ReputationDatabase reputation_db;
+
+struct s_collection_entry {
+	t_itemid id;
+	script_code* script = nullptr;
+	~s_collection_entry();
+};
+
+class CollectionDatabase : public TypesafeYamlDatabase<t_itemid, s_collection_entry> {
+public:
+	CollectionDatabase() : TypesafeYamlDatabase("COLLECTION_DB", 1) {}
+	const std::string getDefaultLocation() override;
+	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+};
+
+extern CollectionDatabase collection_db;
+
+enum e_collection_flag : uint8 {
+	PCCOLLECTION_LOAD = 0x01,
+	PCCOLLECTION_RELOAD = 0x02,
+	PCCOLLECTION_RECAL = 0x04,
+};
 
 struct s_reputationgroup {
 	int64 id;
@@ -1798,5 +1822,8 @@ void pc_macro_reporter_process(map_session_data &sd, int32 reporter_account_id =
 #ifdef MAP_GENERATOR
 void pc_reputation_generate();
 #endif
+
+void pc_collection_load(map_session_data& sd);
+void pc_collection_update(s_storage* stor, map_session_data& sd);
 
 #endif /* PC_HPP */

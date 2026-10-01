@@ -76,3 +76,7 @@ max_long_attack_def: 80
 drop_effect_weapon: 6
 drop_effect_armor: 4
 drop_effect_card: 3
+// Collection NPC fees in Zeny per successful one-item transfer. 0 = free.
+// Failed or cancelled transfers are free. Reload with @reloadbattleconf.
+collection_deposit_fee: 0
+collection_withdraw_fee: 0

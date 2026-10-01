@@ -1,0 +1,58 @@
+Collection Storage
+==================
+
+Installation
+1. Import sql-files/custom/storage_collection.sql into the character database.
+2. Build map-server in Release x64 and restart char-server and map-server.
+   Storage ID 1 is reserved for Collection in conf/inter_server.yml.
+3. Edit db/import/collection.yml. Replace Body: [] with entries such as:
+
+   Body:
+     - Id: 1201 # Knife
+       Script: |
+         bonus bStr,1;
+     - Id: 2301 # Cotton Shirt
+       Script: |
+         bonus bMaxHP,100;
+
+4. Use @reloadpcdb after changing collection.yml.
+5. Talk to Collection Storage at prontera,157,181. Choose Deposit Storage or
+   Withdraw Storage to open the original client Storage window.
+6. Set collection_deposit_fee and collection_withdraw_fee in
+   conf/import/battle_conf.txt (Zeny per successfully transferred item; 0 = free).
+   Use @reloadbattleconf to reload fees.
+
+Behavior
+- Configuration uses item IDs and bonus scripts; item_db needs no CollectionScript.
+- Both Pre-Renewal and Renewal read db/collection.yml and its import file.
+- Storage is shared by characters on the same account, like normal account storage.
+- Only registered IDs can be deposited. An ID already present cannot be deposited again.
+- Each distinct stored ID gives its script once, regardless of quantity, refine or cards.
+- Deposit-only Storage displays previews of registered IDs not already deposited.
+  Drag a real item from inventory or cart into the window to deposit one copy.
+  Previews are generated only for network packets; they cannot be withdrawn,
+  saved to SQL, or used as inventory items. A deposited ID disappears from the list.
+  Preview indices remain stable while open; updates remove/add only changed rows
+  so the Client does not accumulate preview quantities after successive deposits.
+- Withdrawal-only Storage displays actual stored items, including IDs removed from
+  the Collection DB. Depositing into this window is denied by storage access flags.
+- Item name colors follow the original Client behavior; arbitrary gray/green name
+  colors require a Client change and are not applied by this server implementation.
+- Refine, grade, cards, random options, binding and other metadata are preserved.
+- Fees apply to successful inventory/cart transfers in either direction, including
+  other scripts using Collection openstorage2. Failures and cancelled actions are free.
+- New deposits move one copy per ID. Legacy stacked withdrawals charge per item.
+- Bonuses update immediately on successful transfers; storage and character data
+  are saved through the original persistence path.
+- Withdrawing part of a stack keeps its bonus; removing the last copy removes it.
+- @reloadpcdb refreshes bonuses of online characters. Removing an ID from the database
+  disables its bonus and further deposits; existing items remain available to withdraw.
+- Scripts run during status calculation. Use bonus/bonus2/etc.; do not use dialogs,
+  item grants or other one-time rewards, since scripts can execute repeatedly.
+- Normal storage restrictions (bound items, trade restrictions and capacity) still apply.
+
+Database fields
+Header.Type: COLLECTION_DB
+Header.Version: 1
+Body[].Id: Existing item ID (required).
+Body[].Script: Non-empty valid bonus script (required).

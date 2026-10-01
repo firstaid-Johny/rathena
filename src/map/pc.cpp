@@ -380,6 +380,37 @@ uint64 ReputationDatabase::parseBodyNode( const ryml::NodeRef& node ){
 
 ReputationDatabase reputation_db;
 
+s_collection_entry::~s_collection_entry() {
+	if (script != nullptr)
+		script_free_code(script);
+}
+
+const std::string CollectionDatabase::getDefaultLocation() {
+	return std::string(db_path) + "/collection.yml";
+}
+
+uint64 CollectionDatabase::parseBodyNode(const ryml::NodeRef& node) {
+	uint32 id;
+	std::string source;
+	if (!this->asUInt32(node, "Id", id) || !this->asString(node, "Script", source))
+		return 0;
+	if (item_db.find(id) == nullptr) {
+		this->invalidWarning(node, "Invalid collection item ID %u.\n", id);
+		return 0;
+	}
+	std::shared_ptr<s_collection_entry> entry = std::make_shared<s_collection_entry>();
+	entry->id = id;
+	entry->script = parse_script(source.c_str(), this->getCurrentFile().c_str(), this->getLineNumber(node["Script"]), SCRIPT_IGNORE_EXTERNAL_BRACKETS);
+	if (entry->script == nullptr) {
+		this->invalidWarning(node["Script"], "Invalid or empty collection script for item %u.\n", id);
+		return 0;
+	}
+	this->put(id, entry);
+	return 1;
+}
+
+CollectionDatabase collection_db;
+
 const std::string ReputationGroupDatabase::getDefaultLocation() {
 	return std::string(db_path) + "/reputation_group.yml";
 }
@@ -16166,6 +16197,35 @@ uint64 CaptchaDatabase::parseBodyNode(const ryml::NodeRef &node) {
 	return 1;
 }
 
+void pc_collection_load(map_session_data& sd) {
+	if (!storage_exists(COLLECTION_STORAGE))
+		return;
+	// A read-only background request must not replace the premium storage cache.
+	if (intif_storage_request(&sd, TABLE_STORAGE, COLLECTION_STORAGE, STOR_MODE_NONE))
+		sd.state.collection_flag |= PCCOLLECTION_LOAD;
+}
+
+void pc_collection_update(s_storage* stor, map_session_data& sd) {
+	if (stor == nullptr || stor->stor_id != COLLECTION_STORAGE)
+		return;
+	const bool recalc = (sd.state.collection_flag & PCCOLLECTION_RECAL) != 0;
+	const bool refresh_inventory = (sd.state.collection_flag & PCCOLLECTION_RELOAD) != 0;
+	sd.state.collection_flag &= PCCOLLECTION_LOAD;
+	if (recalc) {
+		sd.collection_list.clear();
+		for (int32 i = 0; i < stor->max_amount && i < ARRAYLENGTH(stor->u.items_storage); ++i) {
+			const item& stored = stor->u.items_storage[i];
+			if (stored.nameid == 0 || stored.amount == 0)
+				continue;
+			if (std::find(sd.collection_list.begin(), sd.collection_list.end(), stored.nameid) == sd.collection_list.end())
+				sd.collection_list.push_back(stored.nameid);
+		}
+		status_calc_pc(&sd, SCO_FORCE);
+	}
+	if (refresh_inventory)
+		clif_inventorylist(&sd);
+}
+
 /*==========================================
  * pc Init/Terminate
  *------------------------------------------*/
@@ -16178,6 +16238,7 @@ void do_final_pc(void) {
 	ers_destroy(str_reg_ers);
 
 	attendance_db.clear();
+	collection_db.clear();
 	reputation_db.clear();
 #ifdef MAP_GENERATOR
 	reputationgroup_db.clear();
@@ -16193,6 +16254,7 @@ void do_init_pc(void) {
 	pc_readdb();
 	pc_read_motd(); // Read MOTD [Valaris]
 	attendance_db.load();
+	collection_db.load();
 	reputation_db.load();
 #ifdef MAP_GENERATOR
 	reputationgroup_db.load();

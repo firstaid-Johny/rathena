@@ -4668,6 +4668,18 @@ ACMD_FUNC(reloadpcdb){
 
 	pc_readdb();
 	partybonusdb_reload();
+	if (collection_db.reload()) {
+		struct s_mapiterator* iter = mapit_getallusers();
+		for (map_session_data* player = static_cast<map_session_data*>(mapit_first(iter)); mapit_exists(iter); player = static_cast<map_session_data*>(mapit_next(iter))) {
+			if (player->premiumStorage.stor_id == COLLECTION_STORAGE) {
+				player->state.collection_flag |= PCCOLLECTION_RECAL;
+				pc_collection_update(&player->premiumStorage, *player);
+			} else {
+				status_calc_pc(player, SCO_FORCE);
+			}
+		}
+		mapit_free(iter);
+	}
 	clif_displaymessage(fd, msg_txt(sd,257)); // Player database has been reloaded.
 
 	return 0;

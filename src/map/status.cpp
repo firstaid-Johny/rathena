@@ -4521,6 +4521,20 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 		current_equip_opt_index = -1;
 	}
 
+	// Collection bonuses have no equipped-item context. Snapshot IDs in case a script reloads data.
+	current_equip_item_index = -1;
+	current_equip_card_id = 0;
+	current_equip_combo_pos = 0;
+	const auto collection_ids = sd->collection_list;
+	for (t_itemid id : collection_ids) {
+		std::shared_ptr<s_collection_entry> entry = collection_db.find(id);
+		if (entry != nullptr && entry->script != nullptr) {
+			run_script(entry->script, 0, sd->id, 0);
+			if (!calculating)
+				return 1;
+		}
+	}
+
 	if (!sc->empty()){
 		if( status_change_entry* sce = sc->getSCE(SC_ITEMSCRIPT); sce != nullptr ){
 			std::shared_ptr<item_data> data = item_db.find(sc->getSCE(SC_ITEMSCRIPT)->val1);

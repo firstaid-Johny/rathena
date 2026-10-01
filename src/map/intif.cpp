@@ -3436,11 +3436,26 @@ static bool intif_parse_StorageReceived(int32 fd)
 	}
 
 	if (!RFIFOB(fd, 9)) {
+		if (type == TABLE_STORAGE && RFIFOW(fd, 2) - 10 == sz_stor) {
+			const s_storage* failed = reinterpret_cast<const s_storage*>(RFIFOP(fd, 10));
+			if (failed->stor_id == COLLECTION_STORAGE && !failed->state.get && !failed->state.put) {
+				sd->state.collection_flag &= ~PCCOLLECTION_LOAD;
+			}
+		}
 		ShowError("intif_parse_StorageReceived: Failed to load! (AID: %d, type: %d)\n", account_id, type);
 		return false;
 	}
 
 	p = (struct s_storage *)RFIFOP(fd,10);
+	// Background collection reads must not replace an open premium storage cache.
+	if (type == TABLE_STORAGE && RFIFOW(fd, 2) - 10 == sz_stor &&
+		p->stor_id == COLLECTION_STORAGE && !p->state.get && !p->state.put &&
+		(sd->state.collection_flag & PCCOLLECTION_LOAD)) {
+		sd->state.collection_flag &= ~PCCOLLECTION_LOAD;
+		sd->state.collection_flag |= PCCOLLECTION_RECAL;
+		pc_collection_update(p, *sd);
+		return true;
+	}
 
 	switch (type) { 
 		case TABLE_INVENTORY:
@@ -3476,6 +3491,10 @@ static bool intif_parse_StorageReceived(int32 fd)
 	}
 
 	memcpy(stor, p, sz_stor); //copy the items data to correct destination
+	if (type == TABLE_STORAGE && stor->stor_id == COLLECTION_STORAGE) {
+		sd->state.collection_flag |= PCCOLLECTION_RECAL;
+		pc_collection_update(stor, *sd);
+	}
 
 	switch (type) {
 		case TABLE_INVENTORY: {

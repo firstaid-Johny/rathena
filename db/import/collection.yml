@@ -1,0 +1,1434 @@
+# Collection bonuses from ITEM collection.xlsx.
+# Settings: Id = item ID; Script = bonuses applied once per stored item ID.
+# Reload using @reloadpcdb. Hats use normal unslotted versions; Ulle's Cap uses ID 5123.
+Header:
+  Type: COLLECTION_DB
+  Version: 1
+
+Body:
+  - Id: 31022 # Abandoned Teddy Bear Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4140 # Abysmal Knight Card
+    Script: |
+      bonus2 bAddClass,Class_Boss,5;
+  - Id: 4409 # Agav Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4244 # Alarm Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4253 # Alice Card
+    Script: |
+      bonus2 bSubClass,Class_Boss,2;
+  - Id: 4401 # Alicel Card
+    Script: |
+      bonus2 bSubClass,Class_Boss,2;
+  - Id: 4402 # Aliot Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4400 # Aliza Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4252 # Alligator Card
+    Script: |
+      bonus bLongAtkDef,1;
+  - Id: 4245 # Am Mut Card
+    Script: |
+      bonus2 bExpAddRace,RC_DemiHuman,2;
+      bonus2 bExpAddRace,RC_Player_Human,2;
+  - Id: 4032 # Ambernite Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4236 # Amon Ra Card
+    Script: |
+      bonus bAllStats,1;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4062 # Anacondaq Card
+    Script: |
+      bonus2 bAddEle,Ele_Poison,2;
+  - Id: 4387 # Ancient Mimic Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4248 # Ancient Mummy Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4249 # Ancient Worm Card
+    Script: |
+      bonus2 bExpAddRace,RC_Demon,2;
+  - Id: 4043 # Andre Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4013 # Andre Egg Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4054 # Angeling Card
+    Script: |
+      bonus bSPrecovRate,5;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4234 # Anolian Card
+    Script: |
+      bonus2 bSubEle,Ele_Water,2;
+  - Id: 4344 # Anopheles Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4243 # Antonio Card
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+  - Id: 4138 # Anubis Card
+    Script: |
+      bonus2 bSubRace,RC_Angel,2;
+  - Id: 4242 # Apocalipse Card
+    Script: |
+      bonus bVit,1;
+  - Id: 4241 # Arc Angeling Card
+    Script: |
+      bonus bHPrecovRate,10;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4371 # Archdam Card
+    Script: |
+      bonus bDex,1;
+  - Id: 4094 # Archer Skeleton Card
+    Script: |
+      bonus bLongAtkRate,2;
+  - Id: 4240 # Arclouze Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4114 # Argiope Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,2;
+  - Id: 4075 # Argos Card
+    Script: |
+      bonus2 bResEff,Eff_Stone,200;
+  - Id: 4347 # Armeyer Dinze Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4359 # Assassin Cross Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4246 # Assaulter Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4247 # Aster Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4425 # Atroce Card
+    Script: |
+      bonus bCritical,20;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4023 # Baby Desert Wolf Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4233 # Baby Leopard Card
+    Script: |
+      bonus bLuk,1;
+  - Id: 4438 # Banshee Card
+    Script: |
+      bonus bMaxHP,50;
+  - Id: 4129 # Bapho Jr. Card
+    Script: |
+      bonus bAgi,1;
+  - Id: 4147 # Baphomet Card
+    Script: |
+      bonus bCritAtkRate,20;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4119 # Bathory Card
+    Script: |
+      bonus2 bSubEle,Ele_Dark,2;
+  - Id: 4307 # Beetle King Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4356 # Beholder Card
+    Script: |
+      bonus2 bAddEle,Ele_Ghost,1;
+  - Id: 4145 # Berzebub Card
+    Script: |
+      bonus bVariableCastrate,-10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4074 # Bigfoot Card
+    Script: |
+      bonus2 bSubRace,RC_Insect,2;
+  - Id: 4215 # Blazer Card
+    Script: |
+      bonus2 bAddEle,Ele_Fire,2;
+  - Id: 4327 # Bloody Butterfly Card
+    Script: |
+      bonus2 bResEff,Eff_Bleeding,200;
+  - Id: 4320 # Bloody Knight Card
+    Script: |
+      bonus bMdef,10;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4214 # Bloody Murderer Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4379 # Blue Acidus Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 27126 # Boitata Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4212 # Bongun Card
+    Script: |
+      bonus2 bSubEle,Ele_Dark,2;
+  - Id: 4428 # Bow Guardian Card
+    Script: |
+      bonus bLongAtkRate,5;
+  - Id: 4390 # Breeze Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4213 # Brilight Card
+    Script: |
+      bonus2 bResEff,Eff_Silence,200;
+  - Id: 4426 # Byorgue Card
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+  - Id: 4063 # Caramel Card
+    Script: |
+      bonus2 bAddRace,RC_Insect,2;
+  - Id: 4288 # Carat Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4290 # Cat O' Nine Tails Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4289 # Caterpillar Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4368 # Cecil Damon Card
+    Script: |
+      bonus bAspdRate,1;
+  - Id: 4284 # Chepet Card
+    Script: |
+      bonus2 bSkillHeal,"AL_HEAL",5;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4300 # Chimera Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,5;
+  - Id: 4285 # Choco Card
+    Script: |
+      bonus bFlee,5;
+  - Id: 4009 # Chonchon Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4235 # Christmas Cookie Card
+    Script: |
+      bonus2 bExpAddRace,RC_Angel,2;
+  - Id: 4299 # Clock Card
+    Script: |
+      bonus2 bAddRace,RC_Undead,2;
+  - Id: 4262 # Cloud Hermit Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4041 # Coco Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4015 # Condor Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4293 # Cookie Card
+    Script: |
+      bonus2 bSubEle,Ele_Holy,2;
+  - Id: 4061 # Cornutus Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4153 # Crab Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4296 # Cramp Card
+    Script: |
+      bonus bStr,1;
+  - Id: 4040 # Creamy Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4298 # Creamy Fear Card
+    Script: |
+      bonus bAspdRate,1;
+  - Id: 31019 # Creepy Demon Card
+    Script: |
+      bonus2 bResEff,Eff_Curse,500;
+  - Id: 4297 # Cruiser Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4392 # Dame of Sentinel Card
+    Script: |
+      bonus bVit,1;
+  - Id: 4170 # Dark Frame Card
+    Script: |
+      bonus2 bResEff,Eff_Stone,200;
+  - Id: 4169 # Dark Illusion Card
+    Script: |
+      bonus bCastrate,-5;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4168 # Dark Lord Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4171 # Dark Priest Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4173 # Demon Pungus Card
+    Script: |
+      bonus2 bResEff,Eff_Sleep,200;
+  - Id: 4082 # Desert Wolf Card
+    Script: |
+      bonus2 bAddSize,Size_Small,2;
+  - Id: 4397 # Despero of Thanatos Card
+    Script: |
+      bonus bAspdRate,1;
+  - Id: 4386 # Detardeurus Card
+    Script: |
+      bonus bLongAtkDef,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4125 # Deviace Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4174 # Deviling Card
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,10;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4122 # Deviruchi Card
+    Script: |
+      bonus2 bResEff,Eff_Blind,200;
+  - Id: 4182 # Diabolic Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4370 # Dimik Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4181 # Disguise Card
+    Script: |
+      bonus2 bResEff,Eff_Silence,200;
+  - Id: 4098 # Dokebi Card
+    Script: |
+      bonus2 bSubEle,Ele_Wind,2;
+  - Id: 4398 # Dolor of Thanatos Card
+    Script: |
+      bonus2 bSubRace,RC_Angel,2;
+  - Id: 4142 # Doppelganger Card
+    Script: |
+      bonus bAspdRate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4134 # Dracula Card
+    Script: |
+      bonus bMaxHP,1000;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4385 # Dragon Egg Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4179 # Dragon Fly Card
+    Script: |
+      bonus bDex,1;
+  - Id: 4178 # Dragon Tail Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4069 # Drainliar Card
+    Script: |
+      bonus2 bAddEle,Ele_Water,2;
+  - Id: 4137 # Drake Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4180 # Driller Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4004 # Drops Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4421 # Drosera Card
+    Script: |
+      bonus bCritAtkRate,1;
+  - Id: 4177 # Dryad Card
+    Script: |
+      bonus2 bSubEle,Ele_Earth,2;
+  - Id: 4176 # Dullahan Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4154 # Dumpling Child Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4056 # Dustiness Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4279 # Earth Deleter Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4118 # Earth Petite Card
+    Script: |
+      bonus2 bAddRace,RC_Dragon,2;
+  - Id: 4410 # Echio Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4266 # Eclipse Card
+    Script: |
+      bonus bMaxSP,30;
+  - Id: 4123 # Eddga Card
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4070 # Eggyra Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4346 # Egnigem Cenia Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4251 # Elder Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4052 # Elder Willow Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4217 # Enchanted Peach Tree Card
+    Script: |
+      bonus bHealPower,1;
+  - Id: 4360 # Eremes Guile Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4349 # Errende Ebecee Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4141 # Evil Druid Card
+    Script: |
+      bonus2 bSubRace,RC_Undead,2;
+  - Id: 4258 # Evil Nymph Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4330 # Evil Snake Lord Card
+    Script: |
+      bonus bAllStats,1;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4250 # Executioner Card
+    Script: |
+      bonus2 bSubSize,Size_Large,2;
+  - Id: 4267 # Explosion Card
+    Script: |
+      bonus2 bExpAddRace,RC_Dragon,2;
+  - Id: 4002 # Fabre Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4441 # Fallen Bishop Hibram Card
+    Script: |
+      bonus2 bMagicAddRace,RC_DemiHuman,10;
+      bonus2 bMagicAddRace,RC_Player_Human,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4316 # False Angel Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4020 # Familiar Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4026 # Female Thief Bug Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4160 # Firelock Soldier Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4439 # Flame Skull Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4080 # Flora Card
+    Script: |
+      bonus2 bAddRace,RC_Fish,2;
+  - Id: 4319 # Freezer Card
+    Script: |
+      bonus2 bResEff,Eff_Freeze,200;
+  - Id: 4088 # Frilldora Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4405 # Frus Card
+    Script: |
+      bonus bMdef,1;
+  - Id: 4151 # Gajomart Card
+    Script: |
+      bonus2 bExpAddRace,RC_Plant,2;
+  - Id: 4152 # Galapago Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4423 # Galion Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4149 # Gargoyle Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4418 # Gazeti Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4354 # Gemini-S58 Card
+    Script: |
+      bonus2 bResEff,Eff_Stun,200;
+  - Id: 4352 # General Egnigem Cenia Card
+    Script: |
+      bonus2 bSkillAtk,"SM_BASH",50;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4280 # Geographer Card
+    Script: |
+      bonus bHealPower,1;
+  - Id: 4047 # Ghostring Card
+    Script: |
+      bonus bAllStats,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4110 # Ghoul Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,2;
+  - Id: 4271 # Giant Hornet Card
+    Script: |
+      bonus2 bSubEle,Ele_Wind,2;
+  - Id: 4270 # Giant Spider Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,2;
+  - Id: 4303 # Giant Whisper Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4278 # Gibbet Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4087 # Giearth Card
+    Script: |
+      bonus2 bResEff,Eff_Confusion,200;
+  - Id: 4165 # Gig Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4408 # Gloom Under Night Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4150 # Goat Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4157 # Goblin Archer Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4060 # Goblin Card
+    Script: |
+      bonus2 bAddRace,RC_Brute,2;
+  - Id: 4155 # Goblin Leader Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4156 # Goblin Steamrider Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4378 # Gold Acidus Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4128 # Golden Thief Bug Card
+    Script: |
+      bonus bMdef,20;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4072 # Golem Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4161 # Grand Peco Card
+    Script: |
+      bonus bLuk,1;
+  - Id: 4283 # Greatest General Card
+    Script: |
+      bonus2 bAddEle,Ele_Neutral,2;
+  - Id: 4381 # Green Ferus Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4373 # Green Maiden Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4355 # Gremlin Card
+    Script: |
+      bonus2 bAddEle,Ele_Neutral,2;
+  - Id: 4162 # Grizzly Card
+    Script: |
+      bonus2 bResEff,Eff_Blind,200;
+  - Id: 4163 # Gryphon Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4164 # Gullinbursti Card
+    Script: |
+      bonus2 bExpAddRace,RC_Fish,2;
+  - Id: 4325 # Harpy Card
+    Script: |
+      bonus2 bSubDefEle,Ele_Ghost,2;
+      bonus2 bMagicSubDefEle,Ele_Ghost,2;
+  - Id: 4323 # Hatii Babe Card
+    Script: |
+      bonus bCritAtkRate,1;
+  - Id: 4324 # Hatii Card
+    Script: |
+      bonus2 bSkillAtk,"WZ_STORMGUST",30;
+      bonus2 bSkillAtk,"MG_FROSTDIVER",30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4331 # Heater Card
+    Script: |
+      bonus bFlee2,1;
+  - Id: 4437 # Hell Poodle Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4232 # Hermit Plant Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4322 # High Orc Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4363 # High Priest Card
+    Script: |
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",30;
+      bonus2 bSkillAtk,"PR_MAGNUS",30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4365 # High Wizard Card
+    Script: |
+      bonus bAllStats,1;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4345 # Hill Wind Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4081 # Hode Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4413 # Hodremlin Card
+    Script: |
+      bonus bAddMaxWeight,100;
+  - Id: 4343 # Holden Card
+    Script: |
+      bonus bLuk,1;
+  - Id: 4045 # Horn Card
+    Script: |
+      bonus bLongAtkDef,2;
+  - Id: 4019 # Hornet Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4103 # Horong Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4362 # Howard Alt-Eisen Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4115 # Hunter Fly Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4035 # Hydra Card
+    Script: |
+      bonus2 bAddRace,RC_DemiHuman,2;
+      bonus2 bAddRace,RC_Player_Human,2;
+  - Id: 4384 # Hydrolancer Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4321 # Hylozoist Card
+    Script: |
+      bonus2 bAddRace,RC_Insect,2;
+  - Id: 4417 # Ice Titan Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4430 # Ifrit Card
+    Script: |
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4433 # Imp Card
+    Script: |
+      bonus bCastrate,-2;
+  - Id: 4269 # Incubus Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4268 # Injustice Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4239 # Iron Fist Card
+    Script: |
+      bonus2 bExpAddRace,RC_Formless,2;
+  - Id: 4412 # Isilla Card
+    Script: |
+      bonus bCastrate,-2;
+  - Id: 4116 # Isis Card
+    Script: |
+      bonus2 bSubEle,Ele_Dark,2;
+  - Id: 4109 # Jakk Card
+    Script: |
+      bonus2 bSubEle,Ele_Fire,2;
+  - Id: 4265 # Jing Guai Card
+    Script: |
+      bonus2 bSubRace,RC_Undead,2;
+  - Id: 4139 # Joker Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4065 # Kaho Card
+    Script: |
+      bonus2 bAddEle,Ele_Earth,2;
+  - Id: 4287 # Kapha Card
+    Script: |
+      bonus2 bResEff,Eff_Sleep,200;
+  - Id: 4286 # Karakasa Card
+    Script: |
+      bonus2 bResEff,Eff_Confusion,200;
+  - Id: 4431 # Kasa Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4366 # Kathryne Keyron Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4351 # Kavach Icarus Card
+    Script: |
+      bonus2 bAddEle,Ele_Wind,2;
+  - Id: 4136 # Khalitzburg Card
+    Script: |
+      bonus2 bSubRace,RC_Demon,2;
+  - Id: 4403 # Kiel-D-01 Card
+    Script: |
+      bonus bDelayrate,-10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4301 # Killer Mantis Card
+    Script: |
+      bonus2 bResEff,Eff_Bleeding,200;
+  - Id: 4434 # Knocker Card
+    Script: |
+      bonus2 bAddRace,RC_Formless,2;
+  - Id: 4292 # Kobold Archer Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4091 # Kobold Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4291 # Kobold Leader Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4295 # Kraben Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4419 # Ktullanux Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4027 # Kukre Card
+    Script: |
+      bonus bAgi,1;
+  - Id: 4394 # Lady Solace Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4376 # Lady Tanee Card
+    Script: |
+      bonus bMaxSPrate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4350 # Laurell Weinder Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4184 # Lava Golem Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4195 # Leaf Cat Card
+    Script: |
+      bonus2 bSubEle,Ele_Water,2;
+  - Id: 4188 # Leib Olmai Card
+    Script: |
+      bonus2 bSubEle,Ele_Fire,2;
+  - Id: 4191 # Loli Ruri Card
+    Script: |
+      bonus bHealPower,1;
+  - Id: 4357 # Lord Knight Card
+    Script: |
+      bonus bMaxHP,1000;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4276 # Lord of The Dead Card
+    Script: |
+      bonus bCritAtkRate,20;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4193 # Lude Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4006 # Lunatic Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4395 # Maero of Thanatos Card
+    Script: |
+      bonus2 bAddEle,Ele_Neutral,2;
+  - Id: 4076 # Magnolia Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4201 # Majoruros Card
+    Script: |
+      bonus2 bResEff,Eff_Stun,200;
+  - Id: 4050 # Male Thief Bug Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4030 # Mandragora Card
+    Script: |
+      bonus2 bAddEle,Ele_Wind,2;
+  - Id: 4079 # Mantis Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4202 # Mao Guai Card
+    Script: |
+      bonus2 bAddEle,Ele_Ghost,2;
+  - Id: 4105 # Marc Card
+    Script: |
+      bonus2 bResEff,Eff_Freeze,200;
+  - Id: 4112 # Marduk Card
+    Script: |
+      bonus2 bResEff,Eff_Silence,200;
+  - Id: 4364 # Margaretha Sorin Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4196 # Marin Card
+    Script: |
+      bonus2 bAddEle,Ele_Water,2;
+  - Id: 4055 # Marina Card
+    Script: |
+      bonus2 bResEff,Eff_Freeze,200;
+  - Id: 4084 # Marine Sphere Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4113 # Marionette Card
+    Script: |
+      bonus2 bSubEle,Ele_Ghost,2;
+  - Id: 4095 # Marse Card
+    Script: |
+      bonus2 bSubEle,Ele_Water,2;
+  - Id: 4046 # Martin Card
+    Script: |
+      bonus2 bResEff,Eff_Blind,200;
+  - Id: 4197 # Mastering Card
+    Script: |
+      bonus bMaxHPrate,3;
+  - Id: 4361 # MasterSmith Card
+    Script: |
+      bonus2 bSkillAtk,"MC_MAMMONITE",50;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4097 # Matyr Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4146 # Maya Card
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4198 # Maya Purple Card
+    Script: |
+      bonus bAddMaxWeight,2000;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 4124 # Medusa Card
+    Script: |
+      bonus2 bResEff,Eff_Stone,200;
+  - Id: 4200 # Megalith Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4067 # Megalodon Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4399 # Memory of Thanatos Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4199 # Merman Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4341 # Metaling Card
+    Script: |
+      bonus2 bAddRace,RC_Formless,2;
+  - Id: 4057 # Metaller Card
+    Script: |
+      bonus2 bResEff,Eff_Silence,200;
+  - Id: 4231 # Mi Gao Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4205 # Mimic Card
+    Script: |
+      bonus bAddMaxWeight,300;
+  - Id: 4204 # Mini Demon Card
+    Script: |
+      bonus2 bExpAddRace,RC_Brute,2;
+  - Id: 4126 # Minorous Card
+    Script: |
+      bonus2 bAddSize,Size_Large,2;
+  - Id: 4132 # Mistress Card
+    Script: |
+      bonus bMaxSPrate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4208 # Miyabi Doll Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4317 # Mobster Card
+    Script: |
+      bonus bCritAtkRate,1;
+  - Id: 4131 # Moonlight Flower Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4036 # Muka Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4106 # Mummy Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4090 # Munak Card
+    Script: |
+      bonus2 bSubEle,Ele_Earth,2;
+  - Id: 4420 # Muscipular Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4203 # Mutant Dragonoid Card
+    Script: |
+      bonus bAgi,1;
+  - Id: 4108 # Myst Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,2;
+  - Id: 4206 # Myst Case Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4207 # Mysteltainn Card
+    Script: |
+      bonus2 bSubSize,Size_Small,2;
+  - Id: 4440 # Necromancer Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4167 # Nereid Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4127 # Nightmare Card
+    Script: |
+      bonus2 bResEff,Eff_Sleep,200;
+  - Id: 4166 # Nightmare Terror Card
+    Script: |
+      bonus2 bResEff,Eff_Curse,200;
+  - Id: 4159 # Nine Tail Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4334 # Noxious Card
+    Script: |
+      bonus bLongAtkDef,2;
+  - Id: 4093 # Obeaune Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4338 # Obsidian Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4396 # Odium of Thanatos Card
+    Script: |
+      bonus bAgi,1;
+  - Id: 4254 # Ogretooth Card
+    Script: |
+      bonus2 bSubSize,Size_Medium,2;
+  - Id: 4256 # Orc Archer Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4375 # Orc Baby Card
+    Script: |
+      bonus2 bSubRace,RC_Undead,2;
+  - Id: 4143 # Orc Hero Card
+    Script: |
+      bonus2 bSubRace,RC_DemiHuman,10;
+      bonus2 bSubRace,RC_Player_Human,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4255 # Orc Lady Card
+    Script: |
+      bonus2 bResEff,Eff_Bleeding,200;
+  - Id: 4135 # Orc Lord Card
+    Script: |
+      bonus bMaxHP,1000;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4085 # Orc Skeleton Card
+    Script: |
+      bonus2 bAddRace,RC_Angel,2;
+  - Id: 4066 # Orc Warrior Card
+    Script: |
+      bonus2 bSubRace,RC_Brute,2;
+  - Id: 4071 # Orc Zombie Card
+    Script: |
+      bonus2 bSubRace,RC_Undead,2;
+  - Id: 4144 # Osiris Card
+    Script: |
+      bonus bCritAtkRate,20;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4238 # Owl Baron Card
+    Script: |
+      bonus2 bAddEle,Ele_Wind,2;
+  - Id: 4237 # Owl Duke Card
+    Script: |
+      bonus2 bSubDefEle,Ele_Wind,2;
+      bonus2 bMagicSubDefEle,Ele_Wind,2;
+  - Id: 4310 # Panzer Goblin Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4309 # Parasite Card
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,2;
+  - Id: 4099 # Pasana Card
+    Script: |
+      bonus2 bSubEle,Ele_Fire,2;
+  - Id: 4031 # Peco Peco Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4007 # Peco Peco Egg Card
+    Script: |
+      bonus2 bAddRace,RC_Formless,2;
+  - Id: 4314 # Penomena Card
+    Script: |
+      bonus2 bSubRace,RC_Formless,2;
+  - Id: 4311 # Permeter Card
+    Script: |
+      bonus2 bSubDefEle,Ele_Dark,2;
+      bonus2 bMagicSubDefEle,Ele_Dark,2;
+  - Id: 4315 # Pest Card
+    Script: |
+      bonus2 bResEff,Eff_Stone,200;
+  - Id: 4148 # Pharaoh Card
+    Script: |
+      bonus bMaxSP,200;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4077 # Phen Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4329 # Phendark Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4121 # Phreeoni Card
+    Script: |
+      bonus bHit,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4008 # Picky Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4011 # Picky Egg Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4073 # Pirate Skeleton Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4335 # Pitman Card
+    Script: |
+      bonus2 bAddEle,Ele_Earth,2;
+  - Id: 4024 # Plankton Card
+    Script: |
+      bonus bAddMaxWeight,300;
+  - Id: 4389 # Plasma Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4048 # Poison Spore Card
+    Script: |
+      bonus2 bSubEle,Ele_Poison,2;
+  - Id: 4175 # Poisonous Toad Card
+    Script: |
+      bonus2 bAddRace,RC_DemiHuman,2;
+      bonus2 bAddRace,RC_Player_Human,2;
+  - Id: 4033 # Poporing Card
+    Script: |
+      bonus bAddMaxWeight,300;
+  - Id: 4337 # Porcellio Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4001 # Poring Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4313 # Punk Card
+    Script: |
+      bonus2 bSubRace,RC_Plant,2;
+  - Id: 4003 # Pupa Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4294 # Quve Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4083 # Rafflesia Card
+    Script: |
+      bonus2 bSubRace,RC_Fish,2;
+  - Id: 4436 # Ragged Zombie Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4186 # Raggler Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4407 # Randgris Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4187 # Raydric Archer Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4133 # Raydric Card
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,2;
+  - Id: 4380 # Red Ferus Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4383 # Red Novus Card
+    Script: |
+      bonus2 bSubRace,RC_Angel,2;
+  - Id: 4353 # Remover Card
+    Script: |
+      bonus2 bAddEle,Ele_Poison,2;
+  - Id: 4104 # Requiem Card
+    Script: |
+      bonus2 bResEff,Eff_Confusion,200;
+  - Id: 4185 # Rideword Card
+    Script: |
+      bonus bMdef,1;
+  - Id: 4021 # Rocker Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4014 # Roda Frog Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4192 # Rotar Zairo Card
+    Script: |
+      bonus bCritical,2;
+  - Id: 4422 # Roween Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4342 # RSX-0806 Card
+    Script: |
+      bonus bAddMaxWeight,5000;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4194 # Rybio Card
+    Script: |
+      bonus2 bResEff,Eff_Stun,200;
+  - Id: 4219 # Sage Worm Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4429 # Salamander Card
+    Script: |
+      bonus2 bAddEle,Ele_Fire,2;
+  - Id: 4263 # Samurai Spector Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4101 # Sandman Card
+    Script: |
+      bonus2 bSubEle,Ele_Earth,2;
+  - Id: 4005 # Santa Poring Card
+    Script: |
+      bonus2 bAddEle,Ele_Dark,2;
+  - Id: 4216 # Sasquatch Card
+    Script: |
+      bonus2 bResEff,Eff_Freeze,200;
+  - Id: 4017 # Savage Babe Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4078 # Savage Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4068 # Scorpion Card
+    Script: |
+      bonus2 bAddRace,RC_Plant,2;
+  - Id: 4326 # Sea-Otter Card
+    Script: |
+      bonus2 bAddRace,RC_Fish,2;
+  - Id: 4312 # Seal Card
+    Script: |
+      bonus2 bSubRace,RC_Undead,2;
+  - Id: 4414 # Seeker Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4358 # Seyren Windsor Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4273 # Shell Fish Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4230 # Shinobi Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4117 # Sidewinder Card
+    Script: |
+      bonus2 bAddRace,RC_Brute,2;
+  - Id: 4416 # Siroma Card
+    Script: |
+      bonus2 bSubRace,RC_Brute,2;
+  - Id: 4406 # Skeggiold Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4025 # Skeleton Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4221 # Skeleton General Card
+    Script: |
+      bonus2 bExpAddRace,RC_Insect,2;
+  - Id: 4222 # Skeleton Prisoner Card
+    Script: |
+      bonus2 bResEff,Eff_Sleep,200;
+  - Id: 4092 # Skeleton Worker Card
+    Script: |
+      bonus2 bAddSize,Size_Medium,2;
+  - Id: 4404 # Skogul Card
+    Script: |
+      bonus bMatk,2;
+  - Id: 4158 # Sky Deleter Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4120 # Sky Petite Card
+    Script: |
+      bonus2 bSubRace,RC_Dragon,2;
+  - Id: 4228 # Sleeper Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4044 # Smokie Card
+    Script: |
+      bonus2 bAddRace,RC_Brute,2;
+  - Id: 4037 # Snake Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4367 # Sniper Card
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4415 # Snowier Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4100 # Sohee Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4086 # Soldier Skeleton Card
+    Script: |
+      bonus bCritical,1;
+  - Id: 4022 # Spore Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4227 # Spring Rabbit Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4039 # Stainer Card
+    Script: |
+      bonus2 bResEff,Eff_Silence,200;
+  - Id: 4223 # Stalactic Golem Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4042 # Steel Chonchon Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4224 # Stem Worm Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4226 # Sting Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4225 # Stone Shooter Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4318 # Stormy Knight Card
+    Script: |
+      bonus2 bResEff,Eff_Freeze,10000;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4111 # Strouf Card
+    Script: |
+      bonus2 bAddRace,RC_Demon,2;
+  - Id: 4218 # Succubus Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4427 # Sword Guardian Card
+    Script: |
+      bonus2 bAddSize,Size_Medium,2;
+  - Id: 4089 # Swordfish Card
+    Script: |
+      bonus2 bSubEle,Ele_Water,2;
+  - Id: 4304 # Tamruan Card
+    Script: |
+      bonus bDef,1;
+  - Id: 4302 # Tao Gunka Card
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4028 # Tarou Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4340 # Teddy Bear Card
+    Script: |
+      bonus2 bAddRace,RC_Undead,2;
+  - Id: 4282 # Tengu Card
+    Script: |
+      bonus bCritical,1;
+  - Id: 4058 # Thara Frog Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4172 # The Paper Card
+    Script: |
+      bonus bCritAtkRate,1;
+  - Id: 4016 # Thief Bug Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4012 # Thief Bug Egg Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4306 # Toad Card
+    Script: |
+      bonus bLuk,1;
+  - Id: 4229 # Tower Keeper Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4308 # Tri Joint Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4305 # Turtle General Card
+    Script: |
+      bonus bBaseAtk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4336 # Ungoliant Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4049 # Vadon Card
+    Script: |
+      bonus2 bAddEle,Ele_Fire,2;
+  - Id: 4183 # Vagabond Wolf Card
+    Script: |
+      bonus bStr,1;
+  - Id: 4411 # Vanberk Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4369 # Venatu Card
+    Script: |
+      bonus2 bResEff,Eff_Bleeding,200;
+  - Id: 4333 # Venomous Card
+    Script: |
+      bonus2 bResEff,Eff_Poison,200;
+  - Id: 4107 # Verit Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4374 # Vesper Card
+    Script: |
+      bonus bMatk,30;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4209 # Violy Card
+    Script: |
+      bonus2 bSubRace,RC_Angel,2;
+  - Id: 4053 # Vitata Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4211 # Vocal Card
+    Script: |
+      bonus bVit,1;
+  - Id: 4210 # Wanderer Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4332 # Waste Stove Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4102 # Whisper Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4372 # White Lady Card
+    Script: |
+      bonus bAllStats,1;
+      bonus2 bDropAddRace,RC_All,2;
+  - Id: 4348 # Wickebine Tres Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4257 # Wild Rose Card
+    Script: |
+      bonus2 bSubRace,RC_Plant,2;
+  - Id: 4010 # Willow Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4264 # Wind Ghost Card
+    Script: |
+      bonus2 bAddRace,RC_Undead,2;
+  - Id: 4029 # Wolf Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 27157 # Wood Goblin Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4259 # Wooden Golem Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4261 # Wootan Fighter Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4260 # Wootan Shooter Card
+    Script: |
+      bonus2 bResEff,Eff_Confusion,200;
+  - Id: 4034 # Wormtail Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4190 # Wraith Card
+    Script: |
+      bonus bAddMaxWeight,300;
+  - Id: 4189 # Wraith Dead Card
+    Script: |
+      bonus2 bResEff,Eff_Curse,200;
+  - Id: 4328 # Yao Jun Card
+    Script: |
+      bonus2 bSubDefEle,Ele_Ghost,2;
+      bonus2 bMagicSubDefEle,Ele_Ghost,2;
+  - Id: 4382 # Yellow Novus Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4051 # Yoyo Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 4277 # Zealotus Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4096 # Zenorc Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4064 # Zerom Card
+    Script: |
+      bonus bMaxHP,10;
+  - Id: 4272 # Zhu Po Long Card
+    Script: |
+      bonus bCritical,1;
+  - Id: 4281 # Zipper Bear Card
+    Script: |
+      bonus bBaseAtk,2;
+  - Id: 4038 # Zombie Card
+    Script: |
+      bonus bMaxSP,5;
+  - Id: 4274 # Zombie Master Card
+    Script: |
+      bonus bHit,2;
+  - Id: 4275 # Zombie Prisoner Card
+    Script: |
+      bonus2 bExpAddRace,RC_Undead,2;
+  - Id: 4435 # Zombie Slaughter Card
+    Script: |
+      bonus bFlee,2;
+  - Id: 2256 # Majestic Goat
+    Script: |
+      bonus bStr,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 5017 # Bone Helm
+    Script: |
+      bonus bDef,1;
+      bonus2 bExpAddRace,RC_All,2;
+  - Id: 5002 # Jewel Crown
+    Script: |
+      bonus bMdef,1;
+      bonus2 bExpAddRace,RC_All,2;
+  - Id: 2258 # Spiky Band
+    Script: |
+      bonus bDex,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 5019 # Corsair
+    Script: |
+      bonus bVit,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2268 # Pipe
+    Script: |
+      bonus bBaseAtk,5;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2246 # Golden Gear
+    Script: |
+      bonus bMatk,5;
+      bonus2 bExpAddRace,RC_All,2;
+  - Id: 5007 # Grand Circlet
+    Script: |
+      bonus bAgi,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2234 # Tiara
+    Script: |
+      bonus bInt,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2249 # Coronet
+    Script: |
+      bonus bCritical,5;
+      bonus2 bExpAddRace,RC_All,2;
+  - Id: 2235 # Crown
+    Script: |
+      bonus bMatk,5;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 5053 # Sphinx Hat
+    Script: |
+      bonus bDef,1;
+      bonus2 bExpAddRace,RC_All,2;
+  - Id: 5123 # Ulle's Cap
+    Script: |
+      bonus bLuk,1;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2254 # Angel Wing
+    Script: |
+      bonus2 bExpAddRace,RC_All,2;
+      bonus2 bDropAddRace,RC_All,1;
+  - Id: 2274 # Ghost Bandana
+    Script: |
+      bonus2 bExpAddRace,RC_All,2;
+      bonus2 bDropAddRace,RC_All,1;

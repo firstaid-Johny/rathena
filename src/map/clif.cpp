@@ -11006,6 +11006,7 @@ void clif_parse_LoadEndAck(int32 fd,map_session_data *sd)
 
 		if (!sd->state.autotrade) { // Don't trigger NPC event or opening vending/buyingstore will be failed
 			npc_script_event( *sd, NPCE_LOGIN );
+			pc_collection_load(*sd);
 		}
 
 		// Set facing direction before check below to update client
@@ -20913,8 +20914,21 @@ void clif_parse_roulette_open( int32 fd, map_session_data* sd ){
 		clif_messagecolor(sd,color_table[COLOR_RED],msg_txt(sd,1497),false,SELF); //Roulette is disabled
 		return;
 	}
+	
+	if( pc_cant_act(sd) )
+ 		return;
 
-	clif_roulette_open(sd);
+	char npcname[NPC_NAME_LENGTH] = { 0 };
+	safestrncpy(npcname, "Collection Storage", NPC_NAME_LENGTH);
+
+	struct npc_data* nd = npc_name2id( npcname );
+	if( nd == nullptr ){
+		ShowError("clif_parse_roulette_open: npcname '%s' not found, operation failed.\n", npcname);
+ 		return;
+ 	}
+	run_script(nd->u.scr.script,0,sd->id,nd->id);
+
+	//clif_roulette_open(sd); No roullet anymore
 }
 
 /// Sends the info about the available roulette rewards to the client

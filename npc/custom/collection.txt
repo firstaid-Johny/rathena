@@ -1,0 +1,15 @@
+// Account Collection using the original client Storage window.
+// Transaction fees are configured in conf/import/battle_conf.txt.
+prontera,157,181,4	script	Collection Storage	105,{
+	mes "[Collection Storage]";
+	mes "ค่าฝาก: " + getbattleflag("collection_deposit_fee") + " Zeny ต่อชิ้น.";
+	mes "ค่าถอน: " + getbattleflag("collection_withdraw_fee") + " Zeny ต่อชิ้น.";
+	mes "คลังฝากและคลังถอน แยกจากกันชัดเจน";
+	next;
+	.@choice = select("ฝาก Collection:ถอน Collection:Cancel");
+	if (.@choice == 3) close;
+	close2;
+	if (!openstorage2(1, .@choice == 1 ? STOR_MODE_PUT : STOR_MODE_GET))
+		dispbottom "ไม่สามารถเปิดคลัง Collection ได้ กรุณาแจ้งทีมงานเพื่อแก้ไข";
+	end;
+}

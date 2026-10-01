@@ -1,0 +1,20 @@
+# Collection bonus database. Register items in db/import/collection.yml.
+# One bonus is applied per item ID present in Collection Storage, regardless of amount.
+# Settings:
+# - Id: Existing item ID (required).
+#   Script: Bonus script executed during status calculation (required).
+# Reload with @reloadpcdb. Use bonus commands, not one-time item/reward grants.
+# Example:
+# Body:
+#   - Id: 1201
+#     Script: |
+#       bonus bStr,1;
+Header:
+  Type: COLLECTION_DB
+  Version: 1
+
+Body: []
+
+Footer:
+  Imports:
+    - Path: db/import/collection.yml
