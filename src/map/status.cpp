@@ -4199,16 +4199,18 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 				party_foreachsamemap(party_bonus_sub_count, sd, 0) >= battle_config.party_bonus_same_map_minimum){
 				for ( auto &partyjobbonus : PartyJobBonusDb ) {
 					if ( party_job_bonus_check_job( p, partyjobbonus.second->job_id ,sd ) ) {
-						if (partyjobbonus.second->script != nullptr)
+						if (partyjobbonus.second->script != nullptr) {
 							run_script(partyjobbonus.second->script, 0, sd->id, 0);
-						if(partyjobbonus.second->icon)
+							if (!calculating) return 1;
+						}
+						if(partyjobbonus.second->icon != EFST_BLANK)
 							clif_status_change(sd, partyjobbonus.second->icon, 1, -1, 0, 0, 0);
-					}else if( partyjobbonus.second->icon )
+					}else if( partyjobbonus.second->icon != EFST_BLANK )
 						clif_status_change(sd, partyjobbonus.second->icon, 0, 0, 0, 0, 0);
 				}
 			}else{
 				for ( auto &partyjobbonus : PartyJobBonusDb ) {
-					if( partyjobbonus.second->icon )
+					if( partyjobbonus.second->icon != EFST_BLANK )
 						clif_status_change(sd, partyjobbonus.second->icon, 0, 0, 0, 0, 0);
 				}
 			}
@@ -4216,11 +4218,13 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 			sd->force_remove_party_ef = false;
 			// Party Bonus JOB part
 			for ( auto &partyjobbonus : PartyJobBonusDb ) {
-				if( partyjobbonus.second->icon )
+				if( partyjobbonus.second->icon != EFST_BLANK )
 					clif_status_change(sd, partyjobbonus.second->icon, 0, 0, 0, 0, 0);
 			}
 		}
 	}
+
+	sd->party_bonus_last_signature = party_bonus_signature(*sd);
 
 	// Parse equipment
 	for (i = 0; i < EQI_MAX; i++) {
@@ -11943,13 +11947,6 @@ static bool status_change_start_post_delay(block_list* src, block_list* bl, sc_t
 		case SC_TRICKDEAD:
 			if (vd) vd->dead_sit = 1;
 			tick = INFINITE_TICK;
-			// Party Bonus
-			if( sd ){
-				if( battle_config.party_bonus_system_enable && sd->status.party_id){
-					struct party_data *p = party_search(sd->status.party_id);
-					if( p )	p->recal = true;
-				}
-			}
 			break;
 		case SC_CONCENTRATE:
 			val2 = 2 + val1;
@@ -13726,6 +13723,7 @@ static bool status_change_start_post_delay(block_list* src, block_list* bl, sc_t
 	if( opt_flag[SCF_ONTOUCH] && sd && !sd->npc_ontouch_.empty() )
 		npc_touchnext_areanpc(sd,false); // Run OnTouch_ on next char in range
 
+	if (type == SC_TRICKDEAD && sd) party_bonus_refresh(party_search(sd->status.party_id));
 	return true;
 }
 
@@ -14128,13 +14126,6 @@ int32 status_change_end( block_list* bl, enum sc_type type, int32 tid ){
 #endif
 		case SC_TRICKDEAD:
 			if (vd) vd->dead_sit = 0;
-			// Party Bonus
-			if( sd ){
-				if( battle_config.party_bonus_system_enable && sd->status.party_id){
-					struct party_data *p = party_search(sd->status.party_id);
-					if( p )	p->recal = true;
-				}
-			}
 			break;
 		case SC_WARM:
 		case SC__MANHOLE:
@@ -14500,6 +14491,7 @@ int32 status_change_end( block_list* bl, enum sc_type type, int32 tid ){
 	if (type == SC_STONEWAIT && tid != INVALID_TIMER)
 		status_change_start(bl, bl, SC_STONE, 100, val1, val2, 0, 0, val3, SCSTART_NOAVOID);
 
+	if (type == SC_TRICKDEAD && sd) party_bonus_refresh(party_search(sd->status.party_id));
 	return 1;
 }
 

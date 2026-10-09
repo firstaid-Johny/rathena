@@ -72,7 +72,7 @@ void vending_closevending(map_session_data* sd)
 		idb_remove(vending_db, sd->status.char_id);
 		if (battle_config.party_bonus_system_enable && sd->status.party_id) {
 			if (party_data* p = party_search(sd->status.party_id))
-				p->recal = true;
+				party_bonus_refresh(p);
 		}
 	}
 }
@@ -397,7 +397,7 @@ int8 vending_openvending( map_session_data& sd, const char* message, const uint8
 	safestrncpy(sd.message, message, MESSAGE_SIZE);
 	if (battle_config.party_bonus_system_enable && sd.status.party_id) {
 		if (party_data* p = party_search(sd.status.party_id))
-			p->recal = true;
+			party_bonus_refresh(p);
 	}
 	
 	Sql_EscapeString( mmysql_handle, message_sql, sd.message );

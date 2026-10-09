@@ -20,7 +20,7 @@ struct mob_data;
 struct script_code;
 struct s_guild_donate_bonus {
 	uint16 level = 0;
-	bool enabled = false;
+	int64 required_zeny = 0;
 	int16 icon = -1; // EFST_BLANK
 	script_code* script = nullptr;
 	~s_guild_donate_bonus();
@@ -28,18 +28,20 @@ struct s_guild_donate_bonus {
 
 class GuildDonateDatabase : public TypesafeYamlDatabase<uint16, s_guild_donate_bonus> {
 public:
-	GuildDonateDatabase() : TypesafeYamlDatabase("GUILD_DONATE_DB", 1) {}
+	GuildDonateDatabase() : TypesafeYamlDatabase("GUILD_DONATE_DB", 2) {}
 	const std::string getDefaultLocation() override;
 	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+	bool valid = true;
+	void clear() override { TypesafeYamlDatabase<uint16, s_guild_donate_bonus>::clear(); valid = true; }
 };
 extern GuildDonateDatabase guild_donate_db;
-bool guild_donate_configure(const std::vector<int64>& thresholds, bool enabled);
+bool guild_donate_configure(bool refresh_players = true);
 bool guild_donate_refresh(int32 guild_id);
-int64 guild_donate_info(int32 guild_id, int32 field);
+int64 guild_donate_info(int32 guild_id, int32 field, int32 level = 0);
 int64 guild_donate_pay(map_session_data& sd, int64 amount, int32 expected_guild_id);
 std::shared_ptr<s_guild_donate_bonus> guild_donate_bonus(const map_session_data& sd);
 void guild_donate_refresh_icon(map_session_data& sd, bool force = false);
-void guild_donate_reload();
+bool guild_donate_reload(bool refresh_players = true);
 
 //For quick linking to a guardian's info. [Skotlex]
 struct guardian_data {

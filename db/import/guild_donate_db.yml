@@ -1,65 +1,43 @@
 ###########################################################################
 # Guild Donate Bonus Settings
 ###########################################################################
-# Level: Position in the NPC Required array (first entry = level 1).
-# Enabled: Set true after choosing the real bonus. Examples are disabled.
-# Icon: Use an unused supported EFST_* value, or EFST_BLANK for no icon.
-# Script: Only the current highest tier runs. Set the complete bonus for that tier.
-# Example: Enabled: true / Icon: EFST_BLANK / Script: bonus bAllStats,1;
-# Reload: @reloadpcdb
+# Level: Consecutive tier number from 1. The loaded DB determines the tier count.
+# RequiredZeny: Positive CUMULATIVE guild donation total, strictly increasing.
+# Icon: Supported EFST_* value; EFST_BLANK disables the icon.
+# Every valid tier is active automatically.
+# Script: Complete passive bonus for this tier; only the highest unlocked tier runs.
+# Example: Level: 1 / RequiredZeny: 100000 / Script: bonus bAllStats,1;
+# Add/remove Level rows to change the cap; no NPC setarray is required.
+# Reload: @reloadpcdb updates thresholds, SQL levels, online bonuses and icons.
+# Existing total_zeny and donation logs are preserved when tiers change.
 ###########################################################################
 Header:
   Type: GUILD_DONATE_DB
-  Version: 1
+  Version: 2
 
 Body:
   - Level: 1
-    Enabled: false
+    RequiredZeny: 100000
     Icon: EFST_BLANK
     Script: |
       bonus bAllStats,1;
   - Level: 2
-    Enabled: false
+    RequiredZeny: 200000
     Icon: EFST_BLANK
     Script: |
       bonus bAllStats,2;
   - Level: 3
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,3;
-  - Level: 4
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,4;
-  - Level: 5
-    Enabled: false
+    RequiredZeny: 300000
     Icon: EFST_BLANK
     Script: |
       bonus bAllStats,5;
-  - Level: 6
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,6;
-  - Level: 7
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,7;
-  - Level: 8
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,8;
-  - Level: 9
-    Enabled: false
-    Icon: EFST_BLANK
-    Script: |
-      bonus bAllStats,9;
-  - Level: 10
-    Enabled: false
+  - Level: 4
+    RequiredZeny: 400000
     Icon: EFST_BLANK
     Script: |
       bonus bAllStats,10;
+  - Level: 5
+    RequiredZeny: 500000
+    Icon: EFST_BLANK
+    Script: |
+      bonus bAllStats,15;

@@ -10145,28 +10145,10 @@ BUILDIN_FUNC(bonus)
 }
 
 // Summary of the bonus calls executed by Collection scripts during status calculation.
-// Configure cumulative Guild Donate thresholds from a numeric NPC array.
+// Configure Guild Donate using the tier count and cumulative totals from DB.
 BUILDIN_FUNC(guilddonateconfigure)
 {
-	auto data = script_getdata(st, 2);
-	if (!data_isreference(data) || !reference_tovariable(data) || is_string_variable(reference_getname(data))) {
-		script_pushint(st, 0);
-		return SCRIPT_CMD_FAILURE;
-	}
-	const char* name = reference_getname(data);
-	map_session_data* sd = nullptr;
-	if (not_server_variable(*name) && !script_rid2sd(sd)) return SCRIPT_CMD_FAILURE;
-	const auto id = reference_getid(data);
-	const auto start = reference_getindex(data);
-	auto ref = reference_getref(data);
-	const auto end = script_array_highest_key(st, sd, name, ref);
-	if (end <= start || end - start > 1000) {
-		script_pushint(st, 0);
-		return SCRIPT_CMD_SUCCESS;
-	}
-	std::vector<int64> thresholds;
-	for (uint32 i = start; i < end; ++i) thresholds.push_back(get_val2_num(st, reference_uid(id, i), ref));
-	script_pushint(st, guild_donate_configure(thresholds, script_hasdata(st, 3) && script_getnum(st, 3) != 0));
+	script_pushint(st, guild_donate_configure());
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -10182,7 +10164,21 @@ BUILDIN_FUNC(guilddonateinfo)
 {
 	map_session_data* sd;
 	if (!script_rid2sd(sd)) return SCRIPT_CMD_FAILURE;
-	script_pushint(st, guild_donate_info(sd->status.guild_id, script_getnum(st, 2)));
+	auto field = get_val(st, script_getdata(st, 2));
+	int64 level = 0;
+	if (!data_isint(field) || field->u.num < 0 || field->u.num > 5) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_SUCCESS;
+	}
+	if (script_hasdata(st, 3)) {
+		auto arg = get_val(st, script_getdata(st, 3));
+		if (!data_isint(arg) || arg->u.num <= 0 || arg->u.num > UINT16_MAX) {
+			script_pushint(st, -1);
+			return SCRIPT_CMD_SUCCESS;
+		}
+		level = arg->u.num;
+	}
+	script_pushint(st, guild_donate_info(sd->status.guild_id, static_cast<int32>(field->u.num), static_cast<int32>(level)));
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -28775,9 +28771,9 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(jobcanentermap,"s?"),
 	BUILDIN_DEF(openstorage2,"i??"),
 	BUILDIN_DEF(getcollectionbonuslist,""),
-	BUILDIN_DEF(guilddonateconfigure,"r?"),
+	BUILDIN_DEF(guilddonateconfigure,""),
 	BUILDIN_DEF(guilddonaterefresh,""),
-	BUILDIN_DEF(guilddonateinfo,"i"),
+	BUILDIN_DEF(guilddonateinfo,"i?"),
 	BUILDIN_DEF(guilddonate,"ii"),
 	BUILDIN_DEF(unloadnpc, "s"),
 	BUILDIN_DEF(duplicate, "ssii?????"),

@@ -19,6 +19,7 @@
 #include "map.hpp"
 #include "npc.hpp" // npc_event_do()
 #include "pc.hpp"
+#include "party.hpp"
 #include "pc_groups.hpp"
 
 int32 chat_triggerevent(chat_data *cd); // forward declaration
@@ -104,6 +105,7 @@ int32 chat_createpcchat(map_session_data* sd, const char* title, const char* pas
 		cd->users = 1;
 		cd->usersd[0] = sd;
 		pc_setchatid(sd,cd->id);
+	party_bonus_refresh(party_search(sd->status.party_id));
 		unit_stop_attack( sd );
 		clif_createchat( *sd, CREATEROOM_SUCCESS );
 		clif_dispchat(*cd);
@@ -167,6 +169,7 @@ int32 chat_joinchat(map_session_data* sd, int32 chatid, const char* pass)
 	cd->users++;
 
 	pc_setchatid(sd,cd->id);
+	party_bonus_refresh(party_search(sd->status.party_id));
 
 	// To the person who newly joined the chat
 	clif_joinchatok(*sd, *cd);
@@ -200,17 +203,20 @@ int32 chat_leavechat(map_session_data* sd, bool kicked)
 
 	if( cd == nullptr ) {
 		pc_setchatid(sd, 0);
+	party_bonus_refresh(party_search(sd->status.party_id));
 		return 1;
 	}
 
 	ARR_FIND( 0, cd->users, i, cd->usersd[i] == sd );
 	if ( i == cd->users ) { // Not found in the chatroom?
 		pc_setchatid(sd, 0);
+	party_bonus_refresh(party_search(sd->status.party_id));
 		return -1;
 	}
 
 	clif_chat_leave( *cd, *sd, kicked );
 	pc_setchatid(sd, 0);
+	party_bonus_refresh(party_search(sd->status.party_id));
 	cd->users--;
 
 	leavechar = i;

@@ -7206,7 +7206,7 @@ enum e_setpos pc_setpos(map_session_data* sd, uint16 mapindex, int32 x, int32 y,
 	sd->y = sd->ud.to_y = y;
 	if (battle_config.party_bonus_system_enable && sd->status.party_id) {
 		if (party_data* p = party_search(sd->status.party_id))
-			p->recal = true;
+			party_bonus_refresh(p);
 	}
 
 	if( sd->status.guild_id > 0 && mapdata->getMapFlag(MF_GVG_CASTLE) )
@@ -9974,7 +9974,7 @@ int32 pc_dead(map_session_data *sd,block_list *src)
 	pc_setparam(sd, SP_KILLERRID, src?src->id:0);
 	if (battle_config.party_bonus_system_enable && sd->status.party_id) {
 		if (party_data* p = party_search(sd->status.party_id))
-			p->recal = true;
+			party_bonus_refresh(p);
 	}
 
 	if (battle_config.loose_ap_on_death == 1)
@@ -10260,7 +10260,7 @@ void pc_revive(map_session_data *sd,uint32 hp, uint32 sp, uint32 ap) {
 	// when sd is revived
 	if( battle_config.party_bonus_system_enable && sd->status.party_id){
 		struct party_data *p = party_search(sd->status.party_id);
-		if( p )	p->recal = true;
+		if( p )	party_bonus_refresh(p);
 	}
 }
 
@@ -11172,7 +11172,7 @@ bool pc_jobchange(map_session_data *sd,int32 job, char upper)
 				p->party.member[i].class_ = sd->status.class_;
 				clif_party_job_and_level( *sd );
 				// Party Bonus
-				if( battle_config.party_bonus_system_enable )	p->recal = true;
+				if( battle_config.party_bonus_system_enable )	party_bonus_refresh(p);
 			}
 		}
 	}

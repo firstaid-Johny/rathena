@@ -1162,9 +1162,13 @@ Body:
     Help: |
       Reload instance database.
   - Command: reloaditemdb
+    Aliases:
+      - ritem
     Help: |
       Reload item database.
   - Command: reloadlogconf
+    Aliases:
+      - rconf
     Help: |
       Reload the log settings.
   - Command: reloadmobdb
@@ -1178,17 +1182,21 @@ Body:
       Reload message configuration.
   - Command: reloadnpcfile
     Aliases:
-      - reloadnpc
+      - n
     Help: |
       Params: <path> - path to script
       Unloads and loads a script file from <path>.
   - Command: reloadpcdb
+    Aliases:
+      - rpc
     Help: |
       Reload player settings.
   - Command: reloadquestdb
     Help: |
       Reload quest database.
   - Command: reloadscript
+    Aliases:
+      - rsc
     Help: |
       Reload all scripts.
   - Command: reloadskilldb
@@ -1435,6 +1443,8 @@ Body:
       Params: <NPC name>
       Unload the specified NPC according to name.
   - Command: unloadnpcfile
+    Aliases:
+      - un
     Help: |
       Params: <path>
       Unload the specified script file path.

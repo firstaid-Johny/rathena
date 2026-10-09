@@ -558,6 +558,7 @@ public:
 
 	int16 weapontype1,weapontype2;
 	int16 disguise; // [Valaris]
+	std::vector<uint64> party_bonus_last_signature; // Conditions used by the last status calculation.
 	int16 guild_donate_icon = -1; // Last Guild Donate EFST sent to the client.
 
 	struct weapon_data right_weapon, left_weapon;

@@ -55,10 +55,47 @@ void partybonusdb_reload() {
 					clif_status_change(member.sd, entry.second->icon, 0, 0, 0, 0, 0);
 			}
 		}
-		p->recal = true;
+
 	}
 	dbi_destroy(iter);
 	PartyJobBonusDb.reload();
+	iter = db_iterator(party_db);
+	for (auto p = static_cast<party_data*>(dbi_first(iter)); dbi_exists(iter); p = static_cast<party_data*>(dbi_next(iter)))
+		party_bonus_refresh(p, true);
+	dbi_destroy(iter);
+}
+
+// The comparison includes eligible member IDs/classes, not just granted rows:
+// scripts may depend on party composition even when the same job remains present.
+std::vector<uint64> party_bonus_signature(const map_session_data& sd) {
+	if (!battle_config.party_bonus_system_enable || !sd.status.party_id) return {};
+	auto p = party_search(sd.status.party_id);
+	if (!p) return {};
+	std::vector<uint64> members;
+	for (int32 i = 0; i < MAX_PARTY; ++i) {
+		auto other = p->data[i].sd;
+		if (!other || !p->party.member[i].online || other->status.party_id != sd.status.party_id || other->m != sd.m ||
+			!party_bonus_sub_count(other, nullptr)) continue;
+		members.push_back((static_cast<uint64>(other->status.char_id) << 32) | p->party.member[i].class_);
+	}
+	std::sort(members.begin(), members.end());
+	members.insert(members.begin(), { static_cast<uint64>(sd.status.party_id), static_cast<uint64>(sd.m),
+		static_cast<uint64>(party_bonus_sub_count(const_cast<map_session_data*>(&sd), nullptr)),
+		static_cast<uint64>(battle_config.party_bonus_same_map_minimum) });
+	return members;
+}
+
+void party_bonus_refresh(party_data* p, bool force) {
+	if (!p || p->bonus_refreshing) return;
+	p->bonus_refreshing = true;
+	// Only the affected party is visited on an action, never on a periodic timer.
+	for (auto& member : p->data) {
+		auto sd = member.sd;
+		if (!sd || !sd->fd || !sd->state.pc_loaded || sd->state.connect_new || !sd->state.active || sd->state.warping) continue;
+		if (force || sd->party_bonus_last_signature != party_bonus_signature(*sd))
+			status_calc_pc(sd, SCO_NONE);
+	}
+	p->bonus_refreshing = false;
 }
 
 /*==========================================
@@ -137,8 +174,7 @@ bool party_job_bonus_check_job(const party_data* p, uint16 job_id, const map_ses
 		const auto& member = p->party.member[i];
 		map_session_data* other = p->data[i].sd;
 		if (member.char_id == sd->status.char_id || !member.online || other == nullptr ||
-			other->m != sd->m || other->state.autotrade || pc_isdead(other) ||
-			other->state.vending || other->chatID || other->state.buyingstore || pc_is_trickdead(other))
+			other->status.party_id != sd->status.party_id || other->m != sd->m || !party_bonus_sub_count(other, nullptr))
 			continue;
 		if (job_id == UINT16_MAX || member.class_ == job_id)
 			return true;
@@ -424,6 +460,8 @@ int32 party_recv_info(struct party* sp, uint32 char_id)
 			sd->status.party_id = 0;// was not in the party
 	}
 
+	party_bonus_refresh(p);
+
 	return 0;
 }
 
@@ -681,6 +719,7 @@ void party_member_joined( map_session_data& sd ){
 
 	if (i < MAX_PARTY) {
 		p->data[i].sd = &sd;
+		party_bonus_refresh(p);
 	} else
 		sd.status.party_id = 0; //He does not belongs to the party really?
 }
@@ -742,7 +781,7 @@ int32 party_member_added(int32 party_id,uint32 account_id,uint32 char_id, int32 
 
 	// Party Bonus WHEN sd joined a party
 	if( battle_config.party_bonus_system_enable && sd->status.party_id){
-		p->recal = true;
+		party_bonus_refresh(p);
 	}
 
 	return 0;
@@ -780,9 +819,6 @@ bool party_removemember( map_session_data& sd, uint32 account_id, const char* na
 
 	party_trade_bound_cancel(sd);
 	intif_party_leave(p->party.party_id,account_id,p->party.member[i].char_id,p->party.member[i].name,PARTY_MEMBER_WITHDRAW_EXPEL);
-	if (battle_config.party_bonus_system_enable)
-		p->recal = true;
-
 	return true;
 }
 
@@ -891,7 +927,7 @@ int32 party_member_withdraw(int32 party_id, uint32 account_id, uint32 char_id, c
 			sd->force_remove_party_ef = true;
 			status_calc_pc(sd, SCO_FORCE);
 			if (p != nullptr)
-				p->recal = true;
+				party_bonus_refresh(p);
 		}
 		clif_name_area(sd); //Update name display [Skotlex]
 		//TODO: hp bars should be cleared too
@@ -927,6 +963,8 @@ int32 party_broken(int32 party_id)
 		if( p->data[i].sd != nullptr ) {
 			clif_party_withdraw( *p->data[i].sd, p->party.member[i].account_id, p->party.member[i].name, PARTY_MEMBER_WITHDRAW_EXPEL, SELF );
 			p->data[i].sd->status.party_id=0;
+			p->data[i].sd->force_remove_party_ef = true;
+			if (p->data[i].sd->state.pc_loaded) status_calc_pc(p->data[i].sd, SCO_FORCE);
 		}
 	}
 
@@ -1096,6 +1134,8 @@ int32 party_recv_movemap( int32 party_id, uint32 account_id, uint32 char_id, int
 
 	clif_party_info( *p );
 
+	party_bonus_refresh(p);
+
 	return 0;
 }
 
@@ -1155,6 +1195,8 @@ int32 party_send_logout(map_session_data *sd)
 		memset(&p->data[i], 0, sizeof(p->data[0]));
 	else
 		ShowError("party_send_logout: Failed to locate member %d:%d in party %d!\n", sd->status.account_id, sd->status.char_id, p->party.party_id);
+
+	party_bonus_refresh(p);
 
 	return 1;
 }
@@ -1265,13 +1307,7 @@ TIMER_FUNC(party_send_xy_timer){
 				p->data[i].hp = sd->battle_status.hp;
 			}
 
-			// Party Bonus
-			if( battle_config.party_bonus_system_enable && p->recal && sd->fd && sd->state.pc_loaded && !sd->state.connect_new && sd->state.active && !sd->state.warping) {
-				status_calc_pc(sd, SCO_NONE);
-			}
 		}
-		// Party Bonus
-		if( battle_config.party_bonus_system_enable )	p->recal = false;
 	}
 	dbi_destroy(iter);
 
@@ -1475,7 +1511,7 @@ int party_bonus_sub_count(struct block_list *bl, va_list ap)
 {
 	map_session_data *sd = (TBL_PC *)bl;
 
-	if ( sd->state.autotrade || pc_isdead(sd) || sd->state.vending || sd->chatID || sd->state.buyingstore || pc_is_trickdead(sd) )
+	if ( !sd->prev || !sd->state.pc_loaded || !sd->state.active || sd->state.connect_new || sd->state.warping || sd->state.autotrade || pc_isdead(sd) || sd->state.vending || sd->chatID || sd->state.buyingstore || pc_is_trickdead(sd) )
 		return 0;
 
 	return 1;

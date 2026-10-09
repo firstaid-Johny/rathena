@@ -4668,8 +4668,10 @@ ACMD_FUNC(reloadpcdb){
 
 	pc_readdb();
 	partybonusdb_reload();
-	const bool guild_donate_reloaded = guild_donate_db.reload();
-	if (collection_db.reload() || guild_donate_reloaded) {
+	// Rebuild DB-derived tiers/SQL levels, then reuse the online refresh below.
+	guild_donate_reload(false);
+	collection_db.reload();
+	{
 		struct s_mapiterator* iter = mapit_getallusers();
 		for (map_session_data* player = static_cast<map_session_data*>(mapit_first(iter)); mapit_exists(iter); player = static_cast<map_session_data*>(mapit_next(iter))) {
 			if (player->premiumStorage.stor_id == COLLECTION_STORAGE) {

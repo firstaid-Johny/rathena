@@ -233,7 +233,7 @@ int8 buyingstore_create( map_session_data* sd, int32 zenylimit, unsigned char re
 	// Party Bonus
 	if( battle_config.party_bonus_system_enable && sd->status.party_id){
 		struct party_data *p = party_search(sd->status.party_id);
-		if( p )	p->recal = true;
+		if( p )	party_bonus_refresh(p);
 	}
 
 	Sql_EscapeString( mmysql_handle, message_sql, sd->message );
@@ -287,7 +287,7 @@ void buyingstore_close(map_session_data* sd) {
 		// Party Bonus
 		if( battle_config.party_bonus_system_enable && sd->status.party_id){
 			struct party_data *p = party_search(sd->status.party_id);
-			if( p )	p->recal = true;
+			if( p )	party_bonus_refresh(p);
 		}
 	}
 }

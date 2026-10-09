@@ -5,6 +5,7 @@
 #define PARTY_HPP
 
 #include <cstdarg>
+#include <vector>
 
 #include <common/database.hpp>
 #include <common/mmo.hpp> // struct party
@@ -36,7 +37,7 @@ struct party_data {
 		unsigned snovice :1; //There's a Super Novice
 		unsigned tk : 1; //There's a taekwon
 	} state;
-	bool recal;
+	bool bonus_refreshing; // Guard nested action refreshes; no bonus polling timer.
 };
 
 struct party_booking_detail {
@@ -76,6 +77,8 @@ public:
 
 extern PartyJobBonusDatabase PartyJobBonusDb;
 void partybonusdb_reload();
+std::vector<uint64> party_bonus_signature(const map_session_data& sd);
+void party_bonus_refresh(party_data* p, bool force = false);
 bool party_job_bonus_check_job(const party_data* p, uint16 job_id, const map_session_data* sd);
 int32 party_bonus_sub_count(block_list* bl, va_list ap);
 bool pc_is_trickdead(map_session_data* sd);
