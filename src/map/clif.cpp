@@ -11205,6 +11205,7 @@ void clif_parse_LoadEndAck(int32 fd,map_session_data *sd)
 	}
 #endif
 
+	guild_donate_refresh_icon(*sd, true);
 	sd->state.connect_new = 0;
 	sd->state.changemap = false;
 }

@@ -4553,6 +4553,14 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 		}
 	}
 
+	// Exactly one highest-tier Guild Donate script. No SQL queries in this path.
+	if (auto entry = guild_donate_bonus(*sd); entry && entry->script) {
+		sd->state.lr_flag = LR_FLAG_NONE;
+		run_script(entry->script, 0, sd->id, 0);
+		if (!calculating) return 1;
+	}
+	guild_donate_refresh_icon(*sd);
+
 	pc_bonus_script(sd);
 
 	if( sd->pd ) { // Pet Bonus

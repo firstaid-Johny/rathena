@@ -4,6 +4,9 @@
 #include "guild.hpp"
 
 #include <cstdlib>
+#include <algorithm>
+#include <common/sql.hpp>
+#include "chrif.hpp"
 #include <memory>
 
 #include <common/cbasetypes.hpp>
@@ -36,6 +39,262 @@ using namespace rathena;
 
 std::unordered_map<int32, std::shared_ptr<MapGuild>> guild_db;
 CastleDatabase castle_db;
+
+// Guild Donate uses an in-memory snapshot during status calculation. SQL is
+// accessed only for configuration/login/transactions, never in the bonus loop.
+struct s_guild_donate_total { int64 total = 0; uint16 level = 0; };
+static std::unordered_map<int32, s_guild_donate_total> guild_donate_totals;
+static std::vector<int64> guild_donate_thresholds;
+static bool guild_donate_ready = false;
+static bool guild_donate_enabled = false;
+GuildDonateDatabase guild_donate_db;
+
+s_guild_donate_bonus::~s_guild_donate_bonus() {
+	if (script) script_free_code(script);
+}
+
+const std::string GuildDonateDatabase::getDefaultLocation() {
+	return std::string(db_path) + "/guild_donate_db.yml";
+}
+
+uint64 GuildDonateDatabase::parseBodyNode(const ryml::NodeRef& node) {
+	uint16 level;
+	std::string source;
+	if (!this->asUInt16(node, "Level", level) || !this->asString(node, "Script", source)) return 0;
+	if (level == 0 || level > 1000) {
+		this->invalidWarning(node, "Guild Donate Level must be in 1..1000.\n");
+		return 0;
+	}
+	auto entry = std::make_shared<s_guild_donate_bonus>();
+	entry->level = level;
+	if (this->nodeExists(node, "Enabled") && !this->asBool(node, "Enabled", entry->enabled)) return 0;
+	if (this->nodeExists(node, "Icon")) {
+		std::string icon;
+		int64 value;
+		if (!this->asString(node, "Icon", icon)) return 0;
+		if (icon.compare(0, 5, "EFST_") != 0 || !script_get_constant(icon.c_str(), &value) || value < EFST_BLANK || value >= EFST_MAX) {
+			this->invalidWarning(node["Icon"], "Invalid Guild Donate EFST icon %s.\n", icon.c_str());
+			return 0;
+		}
+		entry->icon = static_cast<int16>(value);
+	}
+	entry->script = parse_script(source.c_str(), this->getCurrentFile().c_str(), this->getLineNumber(node["Script"]), SCRIPT_IGNORE_EXTERNAL_BRACKETS);
+	if (!entry->script) {
+		this->invalidWarning(node["Script"], "Invalid Guild Donate script for level %u.\n", level);
+		return 0;
+	}
+	this->put(level, entry);
+	return 1;
+}
+
+static uint16 guild_donate_level(int64 total) {
+	return static_cast<uint16>(std::upper_bound(guild_donate_thresholds.begin(), guild_donate_thresholds.end(), total) - guild_donate_thresholds.begin());
+}
+
+std::shared_ptr<s_guild_donate_bonus> guild_donate_bonus(const map_session_data& sd) {
+	if (!guild_donate_ready || !guild_donate_enabled || !sd.guild || sd.guild->guild.guild_id != sd.status.guild_id) return nullptr;
+	auto it = guild_donate_totals.find(sd.status.guild_id);
+	if (it == guild_donate_totals.end() || it->second.level == 0) return nullptr;
+	auto entry = guild_donate_db.find(it->second.level);
+	return entry && entry->enabled ? entry : nullptr;
+}
+
+void guild_donate_refresh_icon(map_session_data& sd, bool force) {
+	// Defer the login icon until LoadEndAck so the Client does not discard it.
+	if (sd.state.connect_new && !force) return;
+	auto entry = guild_donate_bonus(sd);
+	const int16 icon = entry ? entry->icon : EFST_BLANK;
+	if (sd.guild_donate_icon != icon && sd.guild_donate_icon != EFST_BLANK)
+		clif_status_change(&sd, sd.guild_donate_icon, 0, 0, 0, 0, 0);
+	if (icon != EFST_BLANK && (force || icon != sd.guild_donate_icon))
+		clif_status_change(&sd, icon, 1, INFINITE_TICK, entry->level, 0, 0);
+	sd.guild_donate_icon = icon;
+}
+
+static void guild_donate_recalculate(int32 guild_id) {
+	auto g = guild_search(guild_id);
+	if (!g) return;
+	for (int32 i = 0; i < g->guild.max_member && i < MAX_GUILD; ++i) {
+		auto sd = g->guild.member[i].sd;
+		if (sd && sd->status.guild_id == guild_id && sd->state.pc_loaded)
+			status_calc_pc(sd, SCO_FORCE);
+	}
+}
+
+static void guild_donate_refresh_all() {
+	auto iter = mapit_getallusers();
+	for (auto sd = static_cast<map_session_data*>(mapit_first(iter)); mapit_exists(iter); sd = static_cast<map_session_data*>(mapit_next(iter))) {
+		if (sd->state.pc_loaded && (sd->status.guild_id != 0 || sd->guild_donate_icon != EFST_BLANK))
+			status_calc_pc(sd, SCO_FORCE);
+	}
+	mapit_free(iter);
+}
+
+bool guild_donate_configure(const std::vector<int64>& thresholds, bool enabled) {
+	if (thresholds.empty() || thresholds.size() > 1000) return false;
+	int64 previous = 0;
+	for (int64 amount : thresholds) {
+		if (amount <= previous) return false;
+		previous = amount;
+	}
+	for (uint16 level = 1; level <= thresholds.size(); ++level) {
+		if (!guild_donate_db.find(level)) {
+			ShowError("Guild Donate: missing DB entry for level %u.\n", level);
+			return false;
+		}
+	}
+	guild_donate_ready = false;
+	guild_donate_enabled = enabled;
+	guild_donate_thresholds = thresholds;
+	if (SQL_ERROR == Sql_Query(mmysql_handle, "SELECT `guild_id`,`total_zeny`,`level` FROM `guild_donate`")) {
+		Sql_ShowDebug(mmysql_handle);
+		guild_donate_totals.clear();
+		guild_donate_refresh_all();
+		return false;
+	}
+	std::unordered_map<int32, s_guild_donate_total> loaded;
+	bool update_levels = false;
+	while (SQL_SUCCESS == Sql_NextRow(mmysql_handle)) {
+		char *gid, *total, *level;
+		Sql_GetData(mmysql_handle, 0, &gid, nullptr);
+		Sql_GetData(mmysql_handle, 1, &total, nullptr);
+		Sql_GetData(mmysql_handle, 2, &level, nullptr);
+		const int64 amount = strtoll(total, nullptr, 10);
+		if (amount < 0) { Sql_FreeResult(mmysql_handle); return false; }
+		const uint16 rank = guild_donate_level(amount);
+		update_levels |= rank != strtoul(level, nullptr, 10);
+		loaded[atoi(gid)] = { amount, rank };
+	}
+	Sql_FreeResult(mmysql_handle);
+	if (update_levels) {
+		// One bulk UPDATE when setarray thresholds change, not one query per guild.
+		std::string expression = "0";
+		for (int64 amount : thresholds) expression += "+(`total_zeny`>=" + std::to_string(amount) + ")";
+		if (SQL_ERROR == Sql_Query(mmysql_handle, "UPDATE `guild_donate` SET `level`=%s", expression.c_str())) {
+			Sql_ShowDebug(mmysql_handle);
+			guild_donate_refresh_all();
+			return false;
+		}
+	}
+	guild_donate_totals = std::move(loaded);
+	guild_donate_ready = true;
+	guild_donate_refresh_all();
+	return true;
+}
+
+bool guild_donate_refresh(int32 guild_id) {
+	if (!guild_donate_ready || guild_id <= 0) return false;
+	if (SQL_ERROR == Sql_Query(mmysql_handle, "SELECT `total_zeny`,`level` FROM `guild_donate` WHERE `guild_id`=%d", guild_id)) {
+		Sql_ShowDebug(mmysql_handle);
+		return false;
+	}
+	s_guild_donate_total current;
+	if (SQL_SUCCESS == Sql_NextRow(mmysql_handle)) {
+		char* total;
+		Sql_GetData(mmysql_handle, 0, &total, nullptr);
+		current.total = strtoll(total, nullptr, 10);
+		current.level = guild_donate_level(current.total);
+	}
+	Sql_FreeResult(mmysql_handle);
+	auto old = guild_donate_totals.find(guild_id);
+	const uint16 old_level = old != guild_donate_totals.end() ? old->second.level : 0;
+	guild_donate_totals[guild_id] = current;
+	if (current.level != old_level) guild_donate_recalculate(guild_id);
+	return true;
+}
+
+static void guild_donate_member_attached(map_session_data& sd) {
+	const auto previous = guild_donate_info(sd.status.guild_id, 1);
+	const auto g = sd.guild;
+	const int32 index = g ? guild_getindex(g->guild, sd.status.account_id, sd.status.char_id) : -1;
+	const bool linked = index >= 0 && g->guild.member[index].sd == &sd;
+	guild_donate_refresh(sd.status.guild_id);
+	// A changed level already recalculated linked online members in refresh().
+	if (sd.state.pc_loaded && (!linked || previous == guild_donate_info(sd.status.guild_id, 1)))
+		status_calc_pc(&sd, SCO_FORCE);
+}
+
+int64 guild_donate_info(int32 guild_id, int32 field) {
+	if (!guild_donate_ready || guild_id <= 0) return -1;
+	auto it = guild_donate_totals.find(guild_id);
+	const s_guild_donate_total current = it != guild_donate_totals.end() ? it->second : s_guild_donate_total{};
+	switch (field) {
+		case 0: return current.total;
+		case 1: return current.level;
+		case 2: return current.level < guild_donate_thresholds.size() ? std::max<int64>(0, guild_donate_thresholds[current.level] - current.total) : 0;
+		case 3: return guild_donate_enabled;
+		case 4: return guild_donate_thresholds.size();
+	}
+	return -1;
+}
+
+// Bind donation data separately from SQL text, including character/guild names.
+static bool guild_donate_write(const char* query, std::vector<int64> values, map_session_data* sd = nullptr) {
+	SqlStmt stmt(*mmysql_handle);
+	if (stmt.PrepareStr(query) != SQL_SUCCESS) { SqlStmt_ShowDebug(stmt); return false; }
+	for (size_t i = 0; i < values.size(); ++i) {
+		if (stmt.BindParam(i, SQLDT_INT64, &values[i], sizeof(values[i])) != SQL_SUCCESS) { SqlStmt_ShowDebug(stmt); return false; }
+	}
+	if (sd && (stmt.BindParam(values.size(), SQLDT_STRING, sd->status.name, strlen(sd->status.name)) != SQL_SUCCESS ||
+		stmt.BindParam(values.size() + 1, SQLDT_STRING, sd->guild->guild.name, strlen(sd->guild->guild.name)) != SQL_SUCCESS)) {
+		SqlStmt_ShowDebug(stmt); return false;
+	}
+	if (stmt.Execute() != SQL_SUCCESS) { SqlStmt_ShowDebug(stmt); return false; }
+	return true;
+}
+
+int64 guild_donate_pay(map_session_data& sd, int64 requested, int32 expected_guild_id) {
+	const int32 guild_id = sd.status.guild_id;
+	if (guild_id != expected_guild_id || !sd.guild || guild_id <= 0 || sd.guild->guild.guild_id != guild_id || guild_getindex(sd.guild->guild, sd.status.account_id, sd.status.char_id) < 0) return -1;
+	if (!guild_donate_ready || !guild_donate_enabled) return -2;
+	if (requested <= 0 || requested > MAX_ZENY) return -3;
+	if (!chrif_isconnected() || !sd.state.pc_loaded || sd.state.trading || sd.state.vending || sd.state.buyingstore) return -6;
+	// Lock the authoritative guild row. Another member/map-server cannot overwrite its total.
+	if (SQL_ERROR == Sql_Query(mmysql_handle, "START TRANSACTION")) return -5;
+	auto rollback = []() { Sql_Query(mmysql_handle, "ROLLBACK"); return int64{-5}; };
+	if (!guild_donate_write("INSERT IGNORE INTO `guild_donate` (`guild_id`,`total_zeny`,`level`) VALUES (?,0,0)", { guild_id })) return rollback();
+	if (SQL_ERROR == Sql_Query(mmysql_handle, "SELECT `total_zeny` FROM `guild_donate` WHERE `guild_id`=%d FOR UPDATE", guild_id)) return rollback();
+	if (SQL_SUCCESS != Sql_NextRow(mmysql_handle)) { Sql_FreeResult(mmysql_handle); return rollback(); }
+	char* data;
+	Sql_GetData(mmysql_handle, 0, &data, nullptr);
+	const int64 total = strtoll(data, nullptr, 10);
+	Sql_FreeResult(mmysql_handle);
+	if (total < 0 || total >= guild_donate_thresholds.back()) { Sql_Query(mmysql_handle, "ROLLBACK"); return -4; }
+	// Stop at the configured last threshold; never charge for a benefit beyond the cap.
+	const int64 amount = std::min(requested, guild_donate_thresholds.back() - total);
+	if (sd.status.zeny < amount) { Sql_Query(mmysql_handle, "ROLLBACK"); return -3; }
+	const int64 next_total = total + amount;
+	const uint16 old_level = guild_donate_level(total), level = guild_donate_level(next_total);
+	if (level > 0 && !guild_donate_db.find(level)) { Sql_Query(mmysql_handle, "ROLLBACK"); return -2; }
+	if (!guild_donate_write("UPDATE `guild_donate` SET `total_zeny`=?,`level`=?,`updated_at`=NOW() WHERE `guild_id`=?", { next_total, level, guild_id })) return rollback();
+	if (!guild_donate_write("INSERT INTO `guild_donate_log` (`guild_id`,`account_id`,`char_id`,`amount`,`total_after`,`level_after`,`char_name`,`guild_name`) VALUES (?,?,?,?,?,?,?,?)",
+		{ guild_id, sd.status.account_id, sd.status.char_id, amount, next_total, level }, &sd)) return rollback();
+	if (pc_payzeny(&sd, static_cast<int32>(amount), LOG_TYPE_NPC) != 0) { Sql_Query(mmysql_handle, "ROLLBACK"); return -3; }
+	if (SQL_ERROR == Sql_Query(mmysql_handle, "COMMIT")) {
+		Sql_ShowDebug(mmysql_handle);
+		Sql_Query(mmysql_handle, "ROLLBACK");
+		pc_getzeny(&sd, static_cast<int32>(amount), LOG_TYPE_NPC);
+		return -5;
+	}
+	const auto cached = guild_donate_totals.find(guild_id);
+	const uint16 cached_level = cached != guild_donate_totals.end() ? cached->second.level : 0;
+	guild_donate_totals[guild_id] = { next_total, level };
+	chrif_save(&sd, CSAVE_INVENTORY);
+	// Partial donations do not recalculate the entire guild.
+	if (level != old_level || level != cached_level) guild_donate_recalculate(guild_id);
+	return amount;
+}
+
+void guild_donate_reload() {
+	if (guild_donate_db.reload()) guild_donate_refresh_all();
+}
+
+static void guild_donate_delete(int32 guild_id) {
+	guild_donate_totals.erase(guild_id);
+	if (guild_donate_ready && SQL_ERROR == Sql_Query(mmysql_handle, "DELETE FROM `guild_donate` WHERE `guild_id`=%d", guild_id)) Sql_ShowDebug(mmysql_handle);
+	// Keep the donation log for audit after disbanding a guild.
+}
+
 
 static DBMap* guild_expcache_db; // uint32 char_id -> struct guild_expcache*
 static DBMap* guild_infoevent_db; // int32 guild_id -> struct eventlist*
@@ -867,12 +1126,14 @@ int32 guild_recv_info(const struct mmo_guild &sg) {
 			bm++;
 	}
 
+	if (guild_new) guild_donate_refresh(sg.guild_id);
 	for (i = 0; i < g->guild.max_member; i++) { //Transmission of information at all members
 		sd = g->guild.member[i].sd;
 		if( sd==nullptr )
 			continue;
 		if( sd->guild == nullptr || sd->guild != g ){
 			sd->guild = g;
+			if (sd->state.pc_loaded) status_calc_pc(sd, SCO_FORCE);
 			clif_name_area(sd);
 		}
 		if(channel_config.ally_tmpl.name[0] && (channel_config.ally_tmpl.opt&CHAN_OPT_AUTOJOIN)) {
@@ -1091,6 +1352,7 @@ void guild_member_joined(map_session_data *sd) {
 	else {
 		g->guild.member[i].sd = sd;
 		sd->guild = g;
+		guild_donate_member_attached(*sd);
 		clif_name_area(sd);
 
 		if( channel_config.ally_tmpl.name[0] && (channel_config.ally_tmpl.opt&CHAN_OPT_AUTOJOIN) ) {
@@ -1131,6 +1393,7 @@ int32 guild_member_added(int32 guild_id,uint32 account_id,uint32 char_id,int32 f
 	sd->status.guild_id = g->guild.guild_id;
 	sd->guild_emblem_id = g->guild.emblem_id;
 	sd->guild = g;
+	guild_donate_member_attached(*sd);
 	//Packets which were sent in the previous 'guild_sent' implementation.
 	clif_guild_belonginfo( *sd );
 	clif_guild_notice( *sd );
@@ -1288,6 +1551,8 @@ int32 guild_member_withdraw(int32 guild_id, uint32 account_id, uint32 char_id, i
 		sd->status.guild_id = 0;
 		sd->guild = nullptr;
 		sd->guild_emblem_id = 0;
+		if (sd->state.pc_loaded) status_calc_pc(sd, SCO_FORCE);
+		guild_donate_refresh_icon(*sd);
 
 		if (g->instance_id) {
 			struct map_data *mapdata = map_getmapdata(sd->m);
@@ -2150,8 +2415,8 @@ int32 guild_broken(int32 guild_id,int32 flag) {
 	auto g = guild_search(guild_id);
 	int32 i;
 
-	if (flag != 0 || g == nullptr)
-		return 0;
+	if (flag != 0) return 0;
+	if (g == nullptr) { guild_donate_delete(guild_id); return 0; }
 
 	for (i = 0; i < g->guild.max_member; i++){	// Destroy all relationships
 		map_session_data *sd = g->guild.member[i].sd;
@@ -2161,6 +2426,8 @@ int32 guild_broken(int32 guild_id,int32 flag) {
 			sd->status.guild_id=0;
 			sd->guild = nullptr;
 			sd->state.gmaster_flag = 0;
+			if (sd->state.pc_loaded) status_calc_pc(sd, SCO_FORCE);
+			guild_donate_refresh_icon(*sd);
 			clif_guild_broken( *sd, 0 );
 			clif_name_area(sd); // [LuzZza]
 			status_change_end(sd,SC_LEADERSHIP);
@@ -2182,6 +2449,7 @@ int32 guild_broken(int32 guild_id,int32 flag) {
 	if( channel_config.ally_tmpl.name[0] ) {
 		channel_delete(g->channel,false);
 	}
+	guild_donate_delete(guild_id);
 	guild_db.erase(guild_id);
 	return 0;
 }
@@ -2729,6 +2997,7 @@ void do_init_guild(void) {
 
 	guild_flags_count = 0;
 
+	guild_donate_db.load();
 	castle_db.load();
 	guild_skill_tree_db.load();
 
@@ -2753,6 +3022,9 @@ void do_final_guild(void) {
 		channel_delete(it.second->channel, false);
 	}
 
+	guild_donate_totals.clear();
+	guild_donate_thresholds.clear();
+	guild_donate_db.clear();
 	guild_db.clear();
 	castle_db.clear();
 	guild_expcache_db->destroy(guild_expcache_db,guild_expcache_db_final);

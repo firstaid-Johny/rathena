@@ -1,0 +1,79 @@
+// Guild Donate: cumulative thresholds; highest tier only; no polling timer.
+// Enable real bonuses in db/import/guild_donate_db.yml (examples disabled).
+prontera,160,181,4	script	Guild Donate	4_M_MANAGER,{
+	mes "[Guild Donate]";
+	.@guild = getcharid(2);
+	if (!.@guild) {
+		mes "คุณต้องเป็นสมาชิก Guild ก่อนบริจาค";
+		close;
+	}
+	if (!.Ready || !guilddonaterefresh()) {
+		mes "ระบบบริจาคไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง";
+		close;
+	}
+	.@total = guilddonateinfo(0);
+	.@level = guilddonateinfo(1);
+	mes "Guild: " + getguildname(.@guild);
+	mes "ระดับบริจาค: " + .@level + " / " + getarraysize(.Required);
+	mes "ยอดสะสม: " + .@total + " Zeny";
+	mes "สามารถทยอยบริจาคได้ ยอดจะสะสมร่วมกันทั้ง Guild";
+	if (.@level < getarraysize(.Required))
+		mes "อีก " + guilddonateinfo(2) + " Zeny จะถึงขั้นถัดไป";
+	next;
+	switch (select("บริจาค Zeny:ดูยอดที่ต้องใช้แต่ละขั้น:ยกเลิก")) {
+	case 1:
+		if (!guilddonateinfo(3)) {
+			mes "ระบบบริจาคปิดอยู่";
+			close;
+		}
+		if (.@level >= getarraysize(.Required)) {
+			mes "Guild ของคุณถึงขั้นสูงสุดแล้ว";
+			close;
+		}
+		if (Zeny < 1) {
+			mes "คุณมี Zeny ไม่เพียงพอ";
+			close;
+		}
+		mes "ระบุจำนวน Zeny ที่ต้องการบริจาค";
+		if (input(.@amount,1,Zeny) != 0) {
+			mes "จำนวนเงินไม่ถูกต้อง กรุณาทำรายการใหม่";
+			close;
+		}
+		mes "ยืนยันบริจาค " + .@amount + " Zeny ให้ Guild นี้?";
+		mes "หากเกินยอดขั้นสูงสุด จะหักเฉพาะจำนวนที่ยังขาด";
+		next;
+		if (select("ยืนยัน:ยกเลิก") == 2) close;
+		.@paid = guilddonate(.@amount,.@guild);
+		mes "[Guild Donate]";
+		if (.@paid > 0) {
+			mes "บริจาคสำเร็จ: " + .@paid + " Zeny";
+			mes "ยอดสะสม: " + guilddonateinfo(0) + " Zeny";
+			mes "ระดับบริจาค: " + guilddonateinfo(1);
+		} else if (.@paid == -1) mes "ข้อมูลสมาชิก Guild เปลี่ยนแปลง กรุณาคุยใหม่อีกครั้ง";
+		else if (.@paid == -2) mes "ระบบบริจาคปิดอยู่หรือไม่พร้อมใช้งาน";
+		else if (.@paid == -3) mes "จำนวนไม่ถูกต้องหรือ Zeny ไม่เพียงพอ";
+		else if (.@paid == -4) mes "Guild ถึงขั้นสูงสุดแล้ว";
+		else if (.@paid == -6) mes "ไม่สามารถบริจาคขณะทำรายการอื่นได้ กรุณาลองใหม่";
+		else mes "บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่ภายหลัง";
+		close;
+	case 2:
+		mes "[ยอดสะสมแต่ละขั้น]";
+		for (.@i = 0; .@i < getarraysize(.Required); ++.@i) {
+			if (.@i && .@i % 10 == 0) { next; mes "[ยอดสะสมแต่ละขั้น]"; }
+			mes "ขั้น " + (.@i+1) + ": " + .Required[.@i] + " Zeny";
+		}
+		close;
+	default:
+		close;
+	}
+OnInit:
+	// Change the number of entries to add/remove tiers (1..1000).
+	// Each number is the cumulative guild total, not the additional cost per tier.
+	deletearray .Required[0];
+	setarray .Required[0],100000,200000,300000,400000,500000,
+		600000,700000,800000,900000,1000000;
+	.Enabled = 1; // 0 = disable donations and Guild Donate buffs.
+	.Ready = guilddonateconfigure(.Required[0],.Enabled);
+	if (!.Ready) debugmes "Guild Donate: invalid thresholds or SQL is unavailable.";
+	end;
+}

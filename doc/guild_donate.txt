@@ -1,0 +1,76 @@
+Guild Donate (Pre-Renewal)
+
+ติดตั้งและตั้งค่า
+- SQL: sql-files/custom/guild_donate.sql ใช้ฐานข้อมูลเดียวกับ map_server_db.
+  ตาราง guild_donate และ guild_donate_log ต้องเป็น InnoDB.
+- NPC: npc/custom/guild_donate.txt ที่ prontera 160,181 (แก้ตำแหน่งได้).
+- setarray .Required[0] เป็นยอดสะสมของ Guild แต่ละขั้น; ค่าเริ่มต้น 100,000 ถึง 1,000,000.
+  บริจาค 30,000 + 70,000 จะถึงขั้น 1. ตัวเลขต้องเพิ่มขึ้นและมากกว่า 0.
+  เพิ่ม/ลดจำนวนรายการได้ 1..1000 ขั้น และต้องมี Level ตรงกันใน DB ทุกขั้น.
+- .Enabled = 0 ปิดการรับบริจาคและบัฟ; .Enabled = 1 เปิดระบบ.
+- db/import/guild_donate_db.yml กำหนด Script, Enabled และ Icon ของแต่ละ Level.
+  ตัวอย่างทั้ง 10 ขั้นตั้ง Enabled: false ไว้ก่อน ผู้ดูแลต้องกำหนดโบนัสแล้วเปิดเอง.
+  เปิดระบบบริจาคแต่ยังไม่เปิด Enabled ของขั้นนั้น จะเก็บยอดได้แต่ยังไม่มีบัฟขั้นนั้น.
+- บัฟใช้เฉพาะขั้นสูงสุด ไม่มีการรวมสคริปต์ทุกขั้น. Script ของขั้นใหม่ต้องเป็นโบนัสเต็มขั้นนั้น.
+  ตัวอย่าง ขั้น 1 STR+1, ขั้น 2 STR+2 -> ขั้น 2 ได้ STR+2 รวม ไม่ใช่ STR+3.
+- Script ใช้คำสั่ง bonus เท่านั้น ไม่ใช้ mes, item grants, sleep, end ที่มีผลข้างเคียง.
+- Icon: EFST_BLANK ไม่แสดง; เลือก EFST_* ที่ Client รองรับและไม่ชนบัฟอื่น.
+  ระบบนี้ส่ง Icon เท่านั้น ไม่สร้างสถานะ SC_* และไม่ต้องใช้ sc_start.
+- @reloadpcdb โหลดสคริปต์/Enabled/Icon ใหม่และรวมการคำนวณสมาชิกในรอบเดิม.
+  เปลี่ยน setarray/.Enabled ให้ reload NPC (หรือรีสตาร์ต) เพื่อคำนวณระดับจากยอด SQL ใหม่.
+
+การทำงาน
+- ใช้ทุกสมาชิก Guild ไม่จำเป็นต้องเป็นหัวหน้าหรืออยู่แผนที่เดียวกัน.
+- เก็บ guild_id, total_zeny, level, updated_at ใน SQL.
+- ตรวจยอด SQL ภายใต้ row lock ก่อนหักเงินและเพิ่มยอด; บันทึกประวัติรายการใน guild_donate_log.
+- จำนวนต่อรายการเป็นจำนวนเต็ม 1..MAX_ZENY; รวมทั้ง Guild ใช้ BIGINT.
+- ถ้าเกินยอดขั้นสุดท้าย หักเฉพาะที่ยังขาด. ถึงขั้นสุดท้ายแล้วปฏิเสธการบริจาคเพิ่ม.
+- ตรวจ Guild อีกครั้งก่อนจ่ายเงิน ป้องกันเปลี่ยน Guild ระหว่างหน้าต่างยืนยัน.
+- SQL error/เงินไม่พอ/ยกเลิก/รายการขัดแย้งจะไม่คงการหักเงินไว้.
+- สมาชิกออนไลน์รับระดับใหม่ทันทีบน map-server เดียวกัน; สมาชิกออฟไลน์รับเมื่อล็อกอิน.
+- ตรวจตอนล็อกอิน/รับข้อมูล Guild/เข้ากิล; ออกจากกิล/ถูกไล่/ยุบกิลถอดโบนัสและ Icon.
+- โหลดแผนที่เสร็จส่ง Icon อีกครั้งเมื่อ Client อาจทิ้ง Icon ระหว่างล็อกอิน/วาร์ป.
+- ยุบ Guild ลบยอดของ Guild แต่เก็บ log ประวัติไว้สำหรับตรวจสอบ.
+
+ภาระและลูป
+- ไม่เพิ่ม timer/polling/OnPCStatCalcEvent จึงไม่มีวงรอบ SQL ทุกวินาที.
+- status calculation: ค้น cache Guild/lookup DB สูงสุดอย่างละ 2 ครั้ง (สคริปต์และ Icon) + run Script ขั้นสูงสุด 1 ครั้ง.
+  ไม่มี SQL และไม่วนสคริปต์ 10 ขั้นในรอบนี้; Icon ส่งเมื่อเปลี่ยนหรือโหลดแผนที่.
+- ยอดเพิ่มแต่ไม่เลื่อนขั้น: ไม่วนคำนวณสมาชิก Guild.
+- เลื่อนขั้น: วนเฉพาะ slot สมาชิก Guild <= MAX_GUILD และคำนวณเฉพาะสมาชิกออนไลน์.
+  ข้ามหลายขั้นในรายการเดียวก็อัปเดตสมาชิกเพียงรอบเดียว.
+- ตรวจหน้าต่าง NPC/ล็อกอิน: SELECT สำหรับ Guild ปัจจุบัน 1 ครั้ง; cache ใช้ต่อระหว่างคำนวณสถานะ.
+- รายการสำเร็จ: START, INSERT IGNORE, SELECT FOR UPDATE, UPDATE, INSERT LOG, COMMIT = 6 คำสั่ง SQL.
+- reload NPC/เริ่มระบบ: SELECT ยอด Guild ทั้งหมด 1 ครั้ง และ bulk UPDATE ระดับ 1 ครั้งเฉพาะเมื่อเกณฑ์เปลี่ยน.
+- reload DB/เกณฑ์: วนผู้เล่นออนไลน์ 1 รอบตามเหตุการณ์ ไม่ใช่งานรายวินาที.
+
+ข้อแนะนำและข้อจำกัด
+- ให้ใช้เกณฑ์เดียวกันทุก map-server. เมื่อแยกหลาย process การบริจาค SQL ยังไม่ทับกัน
+  แต่สมาชิกที่อยู่อีก process จะรีเฟรชระดับเมื่อล็อกอิน/เข้ากิล/เปิด NPC; ยังไม่มี inter-server push.
+  หากต้องการทันทีข้าม process ควรเพิ่ม packet ผ่าน char-server แทน timer เช็ค SQL.
+- Zeny ใช้ pc_payzeny/log_zeny และส่งบันทึก char-server หลังจบรายการ.
+  ยอด Guild+audit อยู่ใน transaction เดียวกัน แต่ยอดเงินตัวละครบันทึกผ่านระบบ char-server เดิม
+  จึงไม่ใช่ transaction เดียวข้าม map/char-server. หาก process/connection หายพอดีระหว่าง commit/save
+  ต้องตรวจเทียบ audit กับ zeny log; งาน production ที่ต้องการ crash-atomic ควรย้ายจ่ายเงิน+เพิ่มยอด
+  ไปทำ transaction ที่ char-server พร้อม idempotent transaction ID และตรวจ engine ของตาราง char.
+- ไม่ใส่คำสั่งโบนัสที่บริจาค/เปลี่ยน Guild/reload status อีกครั้งใน Script เพราะจะทำให้เกิด recursion.
+- ไม่ให้รางวัลไอเทมหรือใช้ OnPCLoginEvent ซ้ำเพื่อให้บัฟ; status calculation มีโบนัสนี้อยู่แล้ว.
+
+Script commands
+- guilddonateconfigure(<numeric array>,<enabled>) -> 1/0.
+- guilddonaterefresh() -> 1/0; SELECT/cache refresh สำหรับ Guild ตัวละคร.
+- guilddonateinfo(field): 0=ยอดรวม, 1=ระดับ, 2=ยอดขาดขั้นถัดไป, 3=เปิดระบบ, 4=จำนวนขั้น; -1=ไม่พร้อม.
+- guilddonate(amount,expected_guild_id): จำนวนที่หักจริง หรือ -1=สมาชิกเปลี่ยน/-2=ปิดระบบ
+  /-3=ยอดไม่ถูกต้องหรือเงินไม่พอ/-4=ถึงขั้นสุดท้าย/-5=SQL error/-6=ไม่พร้อมทำรายการ.
+
+ประวัติผู้บริจาคและการตรวจอินพุต
+- guild_donate_log เก็บ account_id, char_id, char_name, guild_id, guild_name,
+  amount (จำนวนที่หักจริง), total_after, level_after และ created_at ทุกครั้งที่บริจาคสำเร็จ.
+- ชื่อเป็น snapshot ณ เวลาบริจาค; ไม่เปลี่ยนตามชื่อใหม่และเก็บไว้หลังยุบกิล.
+- ใช้ prepared statement ผูกข้อมูลผู้บริจาคและชื่อแยกจาก SQL; ชื่อที่มี quote ไม่กลายเป็นคำสั่ง SQL.
+- log และยอดกิลอยู่ใน transaction เดียวกัน: ถ้าเขียน log ไม่สำเร็จ จะยกเลิกรายการก่อนหัก Zeny.
+- จำนวนจาก NPC นอกช่วงถูกปฏิเสธแทนการปรับให้เข้าช่วงอัตโนมัติ.
+- guilddonate ไม่รับจำนวน/ID เป็น string และไม่รับ guild ID เกิน INT32_MAX.
+- ฐานข้อมูลเดิม: รัน sql-files/custom/guild_donate_log_names.sql ครั้งเดียวก่อนใช้ server ใหม่.
+- ประวัติเดิมไม่มี snapshot ชื่อ (ค่าว่าง) สามารถค้นตัวละครด้วย char_id.
+- ตัวอย่างตรวจประวัติ: SELECT * FROM guild_donate_log WHERE guild_id=1 ORDER BY id DESC LIMIT 100;

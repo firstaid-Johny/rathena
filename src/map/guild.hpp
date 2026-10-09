@@ -17,6 +17,30 @@ struct guild_castle;
 class map_session_data;
 struct mob_data;
 
+struct script_code;
+struct s_guild_donate_bonus {
+	uint16 level = 0;
+	bool enabled = false;
+	int16 icon = -1; // EFST_BLANK
+	script_code* script = nullptr;
+	~s_guild_donate_bonus();
+};
+
+class GuildDonateDatabase : public TypesafeYamlDatabase<uint16, s_guild_donate_bonus> {
+public:
+	GuildDonateDatabase() : TypesafeYamlDatabase("GUILD_DONATE_DB", 1) {}
+	const std::string getDefaultLocation() override;
+	uint64 parseBodyNode(const ryml::NodeRef& node) override;
+};
+extern GuildDonateDatabase guild_donate_db;
+bool guild_donate_configure(const std::vector<int64>& thresholds, bool enabled);
+bool guild_donate_refresh(int32 guild_id);
+int64 guild_donate_info(int32 guild_id, int32 field);
+int64 guild_donate_pay(map_session_data& sd, int64 amount, int32 expected_guild_id);
+std::shared_ptr<s_guild_donate_bonus> guild_donate_bonus(const map_session_data& sd);
+void guild_donate_refresh_icon(map_session_data& sd, bool force = false);
+void guild_donate_reload();
+
 //For quick linking to a guardian's info. [Skotlex]
 struct guardian_data {
 	int32 number; //0-MAX_GUARDIANS-1 = Guardians. MAX_GUARDIANS = Emperium.

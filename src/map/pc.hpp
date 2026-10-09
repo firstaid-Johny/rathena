@@ -558,6 +558,7 @@ public:
 
 	int16 weapontype1,weapontype2;
 	int16 disguise; // [Valaris]
+	int16 guild_donate_icon = -1; // Last Guild Donate EFST sent to the client.
 
 	struct weapon_data right_weapon, left_weapon;
 

@@ -1,0 +1,28 @@
+###########################################################################
+# Guild Donate Bonus Database
+###########################################################################
+# Settings:
+# - Level: Donation tier matching the NPC cumulative setarray thresholds (1..1000).
+#   Enabled: Apply this tier's bonus/icon. Default: false.
+#   Icon: EFST_* icon supported by the Client. EFST_BLANK disables the icon.
+#   Script: Passive bonus script run during status calculation.
+# Only the highest unlocked tier is applied; scripts do not stack across tiers.
+# Use bonus commands only. Do not use dialogs, item grants, sleep or timers.
+# Amounts and number of tiers are configured in npc/custom/guild_donate.txt.
+# Reload bonus scripts/icons with @reloadpcdb; reload NPC to change thresholds.
+# Example:
+# - Level: 1
+#   Enabled: true
+#   Icon: EFST_BLANK
+#   Script: |
+#     bonus bStr,1;
+###########################################################################
+Header:
+  Type: GUILD_DONATE_DB
+  Version: 1
+
+Body: []
+
+Footer:
+  Imports:
+    - Path: db/import/guild_donate_db.yml
