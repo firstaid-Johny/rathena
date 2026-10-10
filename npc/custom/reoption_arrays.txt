@@ -1,0 +1,731 @@
+// Re-Option: ค่าต่าง ๆ ในสูตรใช้ index เดียวกับ .RefineLevels
+// ID ใบชั่วคราว 901..916 = ระดับ +5..+20; เปลี่ยนเป็น ID ใบจริงก่อนใช้งาน
+// กลุ่มสุ่มอ่านจาก refine_randomopt.yml โดยตรง ไม่ต้องคัดลอก Group ID มาที่ NPC
+
+prontera,155,172,0	script	asd	800,{
+	
+	.@optidna = getequiprandomoption(EQI_ARMOR,0,ROA_ID);
+	.@optvalna = getequiprandomoption(EQI_ARMOR,0,ROA_VALUE);
+	.@options$ += callfunc("F_GetRDMOPT_Name",.@optidna) + " : "+ callfunc("F_GetRDMOPT_Value",.@optidna,.@optvalna);
+	//.@options$ += .@optidna + " : " + .@optvalna;
+	mes "ID:"+.@optidna+",Val:"+optvalna+" [" + .@options$ + "]";
+	close;
+}
+
+prontera,149,175,0	script	Re-Option	800,{
+	disable_items;
+	@ReOptionSellSession = 0; // Cancel authorization from a previously closed shop
+	mes "[Re-Option]";
+	mes "คะแนนสะสมปัจจุบันมี: " + F_InsertComma(#ReOptionPoints);
+	setdialogsize(350,400);
+	switch (select("รีออฟชั่นอุปกรณ์:แลกไอเทมเป็นคะแนน:ใช้คะแนนแลกใบ Re-Option:ยกเลิก")) {
+	case 1:
+		next;
+		break;
+	case 2:
+		mes "เลือกไอเท็มที่จะแลกเป็นแต้ม";
+		close2;
+		@ReOptionSellSession = 1;
+		callshop "ReOptionExchange",2;
+		end;
+	case 3:
+		if (!.TicketShopCount) {
+			mes "ยังไม่มีรายการใบที่ตั้งราคาเป็นคะแนน";
+			close;
+		}
+		mes "ร้านนี้ใช้คะแนน Re-Option เท่านั้น";
+		close2;
+		callshop "ReOptionPointShop",1;
+		end;
+	default:
+		close;
+	}
+	mes "[Re-Option]";
+	mes "เลือกอุปกรณ์ที่สวมใส่";
+	// ใช้ inventory index กันอุปกรณ์หลายตำแหน่งแสดงซ้ำ เช่น อาวุธสองมือ
+	for (.@i = 0; .@i < getarraysize(.EquipSlots); ++.@i) {
+		.@pos = .EquipSlots[.@i];
+		.@idx = getequipinventoryindex(.@pos);
+		if (.@idx < 0) continue;
+		.@duplicate = 0;
+		for (.@j = 0; .@j < .@count; ++.@j)
+			if (.@indices[.@j] == .@idx) .@duplicate = 1;
+		if (.@duplicate) continue;
+		.@id = getequipid(.@pos);
+		.@type = getiteminfo(.@id,ITEMINFO_TYPE);
+		if (.@type != IT_ARMOR && .@type != IT_WEAPON) continue;
+		if (!getequipisenableref(.@pos)) continue;
+		.@refine = getequiprefinerycnt(.@pos);
+		if (.@refine < 5 || getequiprandomoption(.@pos,0,ROA_ID) <= 0) continue;
+		.@positions[.@count] = .@pos;
+		.@indices[.@count] = .@idx;
+		.@ids[.@count] = .@id;
+		.@refines[.@count] = .@refine;
+		.@uids$[.@count] = getequipuniqueid(.@pos);
+		.@menu$ += "+" + .@refine + " " + getitemname(.@id) + ":";
+		++.@count;
+	}
+	if (!.@count) {
+		mes "ไม่มีอุปกรณ์ที่ผ่านเงื่อนไข";
+		close;
+	}
+	.@selected = select(.@menu$ + "ยกเลิก") - 1;
+	if (.@selected == .@count) close;
+	.@pos = .@positions[.@selected];
+	.@id = .@ids[.@selected];
+	.@refine = .@refines[.@selected];
+	.@row = -1;
+	for (.@i = 0; .@i < getarraysize(.RefineLevels); ++.@i)
+		if (.RefineLevels[.@i] == .@refine) .@row = .@i;
+	// อาวุธใช้ subtype ส่วนชุดเกราะใช้รายการ Item ID จาก array เดิม
+	if (getiteminfo(.@id,ITEMINFO_TYPE) == IT_WEAPON) {
+		for (.@i = 0; .@i < getarraysize(.WeaponTypes); ++.@i)
+			if (.WeaponTypes[.@i] == getiteminfo(.@id,ITEMINFO_SUBTYPE)) .@category$ = "Weapon";
+	} else {
+		for (.@i = 0; .@i < getarraysize(.RecipeCategories$); ++.@i) {
+			.@name$ = .RecipeCategories$[.@i];
+			for (.@j = 0; .@j < getarraysize(getd("." + .@name$ + "Items")); ++.@j)
+				if (getd("." + .@name$ + "Items[" + .@j + "]") == .@id) .@category$ = .@name$;
+		}
+	}
+	if (.@row < 0 || .@category$ == "") {
+		mes "ยังไม่ได้กำหนดสูตรสำหรับอุปกรณ์นี้";
+		close;
+	}
+	.@ticket = .ReOptionTicketIDs[.@row];
+	.@ticket_amount = getd("." + .@category$ + "TicketAmounts[" + .@row + "]");
+	.@mat1 = getd("." + .@category$ + "Material1IDs[" + .@row + "]");
+	.@amount1 = getd("." + .@category$ + "Material1Amounts[" + .@row + "]");
+	.@mat2 = getd("." + .@category$ + "Material2IDs[" + .@row + "]");
+	.@amount2 = getd("." + .@category$ + "Material2Amounts[" + .@row + "]");
+	.@zeny = getd("." + .@category$ + "ZenyCosts[" + .@row + "]");
+	.@group = getequiprefinegroup(.@pos);
+	if (.@ticket <= 0 || .@ticket_amount <= 0 || .@group <= 0) {
+		mes "ยังไม่ได้ตั้งค่าใบ Re-Option หรือกลุ่มสุ่มของระดับนี้";
+		mes "ไม่มีการหักค่าใช้จ่าย";
+		close;
+	}
+	next;
+	mes "[Re-Option]";
+	mes "+" + .@refine + " " + mesitemlink(.@id);
+	mes "วัตถุดิบที่ใช้";
+	mes ""+ mesitemlink(.@ticket) + " x " + .@ticket_amount;
+	if (.@amount1 > 0) mes mesitemlink(.@mat1) + " x " + .@amount1;
+	if (.@amount2 > 0) mes mesitemlink(.@mat2) + " x " + .@amount2;
+	mes "Zeny: " + F_InsertComma(.@zeny);
+	mes "จะสุ่มใหม่ทั้งหมด (มีโอกาสได้ออฟชั่นเดิม)";
+	if (select("ดำเนินการ:ยกเลิก") == 2) close;
+	// ตรวจซ้ำและหักค่าใช้จ่ายในคำสั่งเดียว ไม่มีช่วงรอระหว่างหักกับสุ่ม
+	.@result = rerollequiprefineoption(.@pos,.@indices[.@selected],.@uids$[.@selected],
+		.@id,.@refine,.@ticket,.@ticket_amount,.@mat1,.@amount1,.@mat2,.@amount2,.@zeny);
+	if (.@result == 1) {
+		mes "เปลี่ยน Random Option เรียบร้อยแล้ว";
+		.@optidna = getequiprandomoption(.@pos,0,ROA_ID);
+		.@optvalna = getequiprandomoption(.@pos,0,ROA_VALUE);
+		.@options$ += callfunc("F_GetRDMOPT_Name",.@optidna) + callfunc("F_GetRDMOPT_Value",.@optidna,.@optvalna);
+		announce "["+strcharinfo(0)+"] รีออฟชั่น [+"+.@refine + getitemname(.@id)+"] ได้รับ [" + .@options$ + "]",bc_all;
+	}
+	else if (.@result == -1) mes "อุปกรณ์เปลี่ยนไปหรือไม่ผ่านเงื่อนไข กรุณาเลือกใหม่";
+	else if (.@result == -2) mes "ข้อมูลสูตรหรือกลุ่มสุ่มไม่สมบูรณ์";
+	else if (.@result == -3) mes "ไอเทมหรือ Zeny ไม่เพียงพอ";
+	else mes "ไม่สามารถทำรายการขณะตายหรือเปิดร้านหรือแลกเปลี่ยนได้";
+	close;
+
+OnSellItem:
+	// Freeze the selected items in local arrays before any mes/next/select can yield.
+	if (!@ReOptionSellSession) end;
+	@ReOptionSellSession = 0;
+	.@count = getarraysize(@sold_nameid);
+	if (.@count <= 0 || .@count > 100) end;
+	for (.@i = 0; .@i < .@count; ++.@i) {
+		.@recipe = inarray(.ExchangeIDs,@sold_nameid[.@i]);
+		if (.@recipe < 0) {
+			++.@skipped; // Not accepted: leave this inventory item untouched.
+			continue;
+		}
+		.@n = .@accepted;
+		.@idx[.@n] = @sold_idx[.@i];
+		.@id[.@n] = @sold_nameid[.@i];
+		.@quantity[.@n] = @sold_quantity[.@i];
+		.@uid$[.@n] = @sold_uniqueid$[.@i];
+		.@refine[.@n] = @sold_refine[.@i];
+		.@attribute[.@n] = @sold_attribute[.@i];
+		.@identify[.@n] = @sold_identify[.@i];
+		.@grade[.@n] = @sold_enchantgrade[.@i];
+		.@points[.@n] = .ExchangePoints[.@recipe] * .@quantity[.@n];
+		if (.@quantity[.@n] <= 0 || .ExchangePoints[.@recipe] <= 0) goto L_SellReject;
+		// Fixed fields: avoid nine script loop iterations per selected item.
+		.@card1[.@n] = @sold_card1[.@i];
+		.@card2[.@n] = @sold_card2[.@i];
+		.@card3[.@n] = @sold_card3[.@i];
+		.@card4[.@n] = @sold_card4[.@i];
+		.@option_id1[.@n] = @sold_option_id1[.@i];
+		.@option_value1[.@n] = @sold_option_val1[.@i];
+		.@option_parameter1[.@n] = @sold_option_param1[.@i];
+		.@option_id2[.@n] = @sold_option_id2[.@i];
+		.@option_value2[.@n] = @sold_option_val2[.@i];
+		.@option_parameter2[.@n] = @sold_option_param2[.@i];
+		.@option_id3[.@n] = @sold_option_id3[.@i];
+		.@option_value3[.@n] = @sold_option_val3[.@i];
+		.@option_parameter3[.@n] = @sold_option_param3[.@i];
+		.@option_id4[.@n] = @sold_option_id4[.@i];
+		.@option_value4[.@n] = @sold_option_val4[.@i];
+		.@option_parameter4[.@n] = @sold_option_param4[.@i];
+		.@option_id5[.@n] = @sold_option_id5[.@i];
+		.@option_value5[.@n] = @sold_option_val5[.@i];
+		.@option_parameter5[.@n] = @sold_option_param5[.@i];
+		.@gain += .@points[.@n];
+		if (.@gain <= 0 || .@gain > .MaxPoints) goto L_SellReject;
+		++.@accepted;
+	}
+	// The transaction now owns local snapshots, not reusable @sold_* shop variables.
+	deletearray @sold_nameid;
+	deletearray @sold_quantity;
+	deletearray @sold_idx;
+	deletearray @sold_uniqueid$;
+	if (!.@accepted) {
+		mes "[Re-Option]";
+		mes "ไม่มีรายการที่อยู่ในลิสต์รับแลก";
+		mes "ไม่ได้ลบไอเทมหรือเพิ่มคะแนน";
+		close;
+	}
+	.@balance = #ReOptionPoints;
+	// Pass 0 checks before preview; pass 1 rechecks after confirmation.
+	for (.@pass = 0; .@pass < 2; ++.@pass) {
+		// Build a direct lookup once per pass; +1 preserves inventory slot zero.
+		getinventorylist;
+		deletearray .@invlookup;
+		for (.@j = 0; .@j < @inventorylist_count; ++.@j)
+			.@invlookup[@inventorylist_idx[.@j]] = .@j + 1;
+		deletearray .@seen;
+		for (.@i = 0; .@i < .@accepted; ++.@i) {
+			if (.@idx[.@i] < 0 || .@idx[.@i] >= MAX_INVENTORY) goto L_SellReject;
+			if (.@seen[.@idx[.@i]]) goto L_SellReject;
+			.@seen[.@idx[.@i]] = 1;
+			.@inv = .@invlookup[.@idx[.@i]] - 1;
+			if (.@inv < 0 || .@quantity[.@i] > @inventorylist_amount[.@inv]) goto L_SellReject;
+			if (@inventorylist_id[.@inv] != .@id[.@i] ||
+				@inventorylist_uniqueid$[.@inv] != .@uid$[.@i] ||
+				@inventorylist_equip[.@inv] || @inventorylist_equipswitch[.@inv] ||
+				@inventorylist_expire[.@inv] || @inventorylist_bound[.@inv] ||
+				@inventorylist_refine[.@inv] != .@refine[.@i] ||
+				@inventorylist_attribute[.@inv] != .@attribute[.@i] ||
+				@inventorylist_identify[.@inv] != .@identify[.@i] ||
+				@inventorylist_enchantgrade[.@inv] != .@grade[.@i] ||
+				@inventorylist_card1[.@inv] != .@card1[.@i] ||
+				@inventorylist_card2[.@inv] != .@card2[.@i] ||
+				@inventorylist_card3[.@inv] != .@card3[.@i] ||
+				@inventorylist_card4[.@inv] != .@card4[.@i] ||
+				@inventorylist_option_id1[.@inv] != .@option_id1[.@i] ||
+				@inventorylist_option_value1[.@inv] != .@option_value1[.@i] ||
+				@inventorylist_option_parameter1[.@inv] != .@option_parameter1[.@i] ||
+				@inventorylist_option_id2[.@inv] != .@option_id2[.@i] ||
+				@inventorylist_option_value2[.@inv] != .@option_value2[.@i] ||
+				@inventorylist_option_parameter2[.@inv] != .@option_parameter2[.@i] ||
+				@inventorylist_option_id3[.@inv] != .@option_id3[.@i] ||
+				@inventorylist_option_value3[.@inv] != .@option_value3[.@i] ||
+				@inventorylist_option_parameter3[.@inv] != .@option_parameter3[.@i] ||
+				@inventorylist_option_id4[.@inv] != .@option_id4[.@i] ||
+				@inventorylist_option_value4[.@inv] != .@option_value4[.@i] ||
+				@inventorylist_option_parameter4[.@inv] != .@option_parameter4[.@i] ||
+				@inventorylist_option_id5[.@inv] != .@option_id5[.@i] ||
+				@inventorylist_option_value5[.@inv] != .@option_value5[.@i] ||
+				@inventorylist_option_parameter5[.@inv] != .@option_parameter5[.@i]) goto L_SellReject;
+		}
+		if (#ReOptionPoints < 0 || #ReOptionPoints > .MaxPoints - .@gain) goto L_SellReject;
+		if (#ReOptionPoints != .@balance) goto L_SellBalanceChanged;
+		if (.@pass == 0) {
+			mes "[ยืนยันแลกคะแนน Re-Option]";
+			for (.@i = 0; .@i < .@accepted; ++.@i) {
+				mes "+" + .@refine[.@i] + " " + mesitemlink(.@id[.@i]) + " x " + .@quantity[.@i] + " = " + .@points[.@i] + " แต้ม";
+			}
+			mes "แลกทั้งหมด: " + .@accepted + " ชิ้น";
+			mes "รวมเป็น: " + .@gain +" แต้ม";
+			setdialogsize(350,400);
+			next;
+			if (select("ยืนยันแลก:ยกเลิก") == 2) {
+				close;
+			}
+		}
+	}
+	// No yields after the final complete validation; delete only accepted snapshot indices.
+	for (.@i = 0; .@i < .@accepted; ++.@i)
+		delitemidx .@idx[.@i],.@quantity[.@i];
+	#ReOptionPoints += .@gain;
+	mes "แลกสำเร็จ ได้รับ " + .@gain + " แต้ม";
+	mes "รวมเป็น: " + #ReOptionPoints +" แต้ม";
+	close;
+
+L_SellBalanceChanged:
+	mes "[Re-Option]";
+	mes "คะแนนเปลี่ยนระหว่างยืนยัน กรุณาเลือกทำรายการใหม่";
+	mes "ไม่มีการลบไอเทมหรือเพิ่มคะแนน";
+	close;
+
+L_SellReject:
+	deletearray @sold_nameid;
+	deletearray @sold_quantity;
+	deletearray @sold_idx;
+	deletearray @sold_uniqueid$;
+	mes "[Re-Option]";
+	mes "รายการที่รับแลกมีข้อมูลเปลี่ยนไปหรือไม่ผ่านเงื่อนไข";
+	mes "ไม่มีการลบไอเทมหรือเพิ่มคะแนน กรุณาเลือกใหม่";
+	close;
+
+OnInit:
+	waitingroom "Re Option",0;
+	setarray .EquipSlots[0],EQI_ARMOR,EQI_HAND_L,EQI_GARMENT,EQI_SHOES,
+		EQI_HEAD_TOP,EQI_HEAD_MID,EQI_HEAD_LOW,EQI_HAND_R,EQI_ACC_L,EQI_ACC_R;
+	setarray .RecipeCategories$[0],"Armor","Shield","Garment","Footgear","Headgear","Accessory";
+	// รายการไอเท็มที่สามารถแลกเป็นคะแนนรีออฟชั่นตีบวก
+	// แลกได้ 1 คะแนน
+	setarray .Point1Items[0],
+		2404, // Shoes [1]   [Footgear]
+		2504, // Muffler [1]   [Garment]
+		2508, // Ragamuffin Manteau [0]   [Garment]
+		2406, // Boots [1]   [Footgear]
+		2104, // Buckler [1]   [Shield]
+		2106, // Shield [1]   [Shield]
+		2313, // Padded Armor [1]   [Body]
+		2326, // Saint's Robe [1]   [Body]
+		2322, // Silk Robe [1]   [Body]
+		2331, // Tights [1]   [Body]
+		1520, // Chain [3]   [One Hand]
+		1705, // Composite Bow [4]   [Two Handed]
+		1158; // Two-Handed Sword [2]   [Two Handed]
+
+	// แลกได้ 2 คะแนน
+	setarray .Point2Items[0],
+		2102, // Guard [1]   [Shield]
+		2320, // Formal Suit [1]   [Body]
+		2311, // Mink Coat [1]   [Body]
+		1220, // Gladius [3]   [One Hand]
+		1226, // Damascus [2]   [One Hand]
+		1120; // Tsurugi [2]   [One Hand]
+
+	// แลกได้ 3 คะแนน
+	setarray .Point3Items[0],
+		2506, // Manteau [1]   [Garment]
+		2315, // Chain Mail [1]   [Body]
+		2229, // Helm [1]   [Upper Head]
+		2108, // Mirror Shield [1]   [Shield]
+		1127, // Saber [3]   [One Hand]
+		1716, // Gakkung Bow [2]   [Two Handed]
+		1715; // Arbalest [2]   [Two Handed]
+
+	// แลกได้ 4 คะแนน
+	setarray .Point4Items[0],
+		2317, // Full Plate [1]   [Body]
+		2231, // Gemmed Sallet [1]   [Upper Head]
+		2318, // Lord's Clothes [1]   [Body]
+		2336, // Thief Clothes [1]   [Body]
+		2109; // Memory Book [0]   [Shield]
+
+	setarray .PointValues[0],
+		1,
+		2,
+		3,
+		4;
+
+	// คะแนนที่ใช้แลกใบรีออฟชั่น
+	setarray .RefineLevels[0],
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,12,13,14,15,16,17,18,19,20; // +11..+20: ยังไม่มีสูตร ค่าใช้จ่ายด้านล่างเป็น 0
+
+	setarray .TicketPointCosts[0],
+		3,
+		4,
+		5,
+		6,
+		7,
+		10;
+
+	setarray .ReOptionTicketIDs[0],
+		901, // +5: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		902, // +6: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		903, // +7: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		904, // +8: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		905, // +9: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		906, // +10: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		907, // +11: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		908, // +12: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		909, // +13: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		910, // +14: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		911, // +15: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		912, // +16: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		913, // +17: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		914, // +18: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		915, // +19: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+		916; // +20: ID ชั่วคราว เปลี่ยนเป็นใบ Re-Option จริงภายหลัง
+
+	// การรีออฟชั่นตีบวกไอเท็มประเภท สวมใส่ - Equipment
+	// ประเภท ชุดเกราะ - Armor
+	setarray .ArmorItems[0],
+		2315, // Chain Mail [1]   [Body]
+		2320, // Formal Suit [1]   [Body]
+		2317, // Full Plate [1]   [Body]
+		2318, // Lord's Clothes [1]   [Body]
+		2326, // Saint's Robe [1]   [Body]
+		2322, // Silk Robe [1]   [Body]
+		2336, // Thief Clothes [1]   [Body]
+		2331; // Tights [1]   [Body]
+
+	// วัตถุดิบที่ใช้: index 0..5 = refine +5..+10
+	setarray .ArmorTicketAmounts[0],
+		1,
+		1,
+		1,
+		1,
+		1,
+		1;
+
+	setarray .ArmorMaterial1IDs[0],
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984; // Oridecon
+
+	setarray .ArmorMaterial1Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .ArmorMaterial2IDs[0],
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985; // Elunium
+
+	setarray .ArmorMaterial2Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .ArmorZenyCosts[0],
+		200000,
+		200000,
+		200000,
+		200000,
+		200000,
+		200000;
+
+	// ประเภท โล่ - Shield
+	setarray .ShieldItems[0],
+		2102, // Guard [1]   [Shield]
+		2104, // Buckler [1]   [Shield]
+		2106, // Shield [1]   [Shield]
+		2108, // Mirror Shield [1]   [Shield]
+		2109; // Memory Book [0]   [Shield]
+
+	// วัตถุดิบที่ใช้: index 0..5 = refine +5..+10
+	setarray .ShieldTicketAmounts[0],
+		1,
+		1,
+		1,
+		1,
+		1,
+		1;
+
+	setarray .ShieldMaterial1IDs[0],
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984; // Oridecon
+
+	setarray .ShieldMaterial1Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .ShieldMaterial2IDs[0],
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985; // Elunium
+
+	setarray .ShieldMaterial2Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .ShieldZenyCosts[0],
+		200000,
+		200000,
+		200000,
+		200000,
+		200000,
+		200000;
+
+	// ประเภท ผ้าคลุม - Garment
+	setarray .GarmentItems[0],
+		2504, // Muffler [1]   [Garment]
+		2506, // Manteau [1]   [Garment]
+		2508; // Ragamuffin Manteau [0]   [Garment]
+
+	// วัตถุดิบที่ใช้: index 0..5 = refine +5..+10
+	setarray .GarmentTicketAmounts[0],
+		1,
+		1,
+		1,
+		1,
+		1,
+		1;
+
+	setarray .GarmentMaterial1IDs[0],
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984; // Oridecon
+
+	setarray .GarmentMaterial1Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .GarmentMaterial2IDs[0],
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985; // Elunium
+
+	setarray .GarmentMaterial2Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .GarmentZenyCosts[0],
+		200000,
+		200000,
+		200000,
+		200000,
+		200000,
+		200000;
+
+	// ประเภท รองเท้า - Footgear
+	setarray .FootgearItems[0],
+		2404, // Shoes [1]   [Footgear]
+		2406, // Boots [1]   [Footgear]
+		2407; // Crystal Pumps [0]   [Footgear]
+
+	// วัตถุดิบที่ใช้: index 0..5 = refine +5..+10
+	setarray .FootgearTicketAmounts[0],
+		1,
+		1,
+		1,
+		1,
+		1,
+		1;
+
+	setarray .FootgearMaterial1IDs[0],
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984, // Oridecon
+		984; // Oridecon
+
+	setarray .FootgearMaterial1Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .FootgearMaterial2IDs[0],
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985, // Elunium
+		985; // Elunium
+
+	setarray .FootgearMaterial2Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .FootgearZenyCosts[0],
+		200000,
+		200000,
+		200000,
+		200000,
+		200000,
+		200000;
+
+	// ประเภท อาวุธ - Weapon: applies to every item of these subtypes.
+	setarray .WeaponTypes[0],
+		W_DAGGER, // Dagger
+		W_1HSWORD, // One-Handed Sword
+		W_2HSWORD, // Two-Handed Sword
+		W_1HSPEAR, // One-Handed Spear
+		W_2HSPEAR, // Two-Handed Spear
+		W_MACE, // Mace
+		W_STAFF, // One-Handed Staff
+		W_2HSTAFF, // Two-Handed Staff
+		W_BOW, // Bow
+		W_1HAXE, // One-Handed Axe
+		W_2HAXE; // Two-Handed Axe
+
+	setarray .WeaponTicketAmounts[0],
+		1,
+		1,
+		1,
+		1,
+		1,
+		1;
+
+	setarray .WeaponMaterial1IDs[0],
+		756, // Rough Oridecon
+		756, // Rough Oridecon
+		756, // Rough Oridecon
+		756, // Rough Oridecon
+		756, // Rough Oridecon
+		756; // Rough Oridecon
+
+	setarray .WeaponMaterial1Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .WeaponMaterial2IDs[0],
+		757, // Rough Elunium
+		757, // Rough Elunium
+		757, // Rough Elunium
+		757, // Rough Elunium
+		757, // Rough Elunium
+		757; // Rough Elunium
+
+	setarray .WeaponMaterial2Amounts[0],
+		2,
+		2,
+		2,
+		2,
+		2,
+		2;
+
+	setarray .WeaponZenyCosts[0],
+		200000,
+		200000,
+		200000,
+		200000,
+		200000,
+		200000;
+
+
+	// +11..+20 ยังไม่มีข้อมูลค่าใช้จ่าย: ค่าเป็น 0 ต้องกำหนดสูตรและกลุ่มก่อนใช้
+	for (.@i = 6; .@i < getarraysize(.RefineLevels); ++.@i) {
+		.TicketPointCosts[.@i] = 0; // ยังไม่มีข้อมูลคะแนน (ยังไม่เปิดระบบแลกคะแนน)
+		for (.@j = 0; .@j < 5; ++.@j) {
+			.@category$ = (.@j == 4) ? "Weapon" : .RecipeCategories$[.@j];
+			setd "." + .@category$ + "TicketAmounts[" + .@i + "]",0;
+			setd "." + .@category$ + "Material1IDs[" + .@i + "]",0;
+			setd "." + .@category$ + "Material1Amounts[" + .@i + "]",0;
+			setd "." + .@category$ + "Material2IDs[" + .@i + "]",0;
+			setd "." + .@category$ + "Material2Amounts[" + .@i + "]",0;
+			setd "." + .@category$ + "ZenyCosts[" + .@i + "]",0;
+		}
+	}
+
+	// ยังไม่มีข้อมูลหมวกและประดับ: ID และค่าใช้จ่ายเป็น 0 ไม่สามารถทำรายการได้
+	setarray .HeadgearItems[0],0;
+	setarray .AccessoryItems[0],0;
+	for (.@i = 0; .@i < getarraysize(.RefineLevels); ++.@i) {
+		for (.@j = 4; .@j < 6; ++.@j) {
+			.@category$ = .RecipeCategories$[.@j];
+			setd "." + .@category$ + "TicketAmounts[" + .@i + "]",0;
+			setd "." + .@category$ + "Material1IDs[" + .@i + "]",0;
+			setd "." + .@category$ + "Material1Amounts[" + .@i + "]",0;
+			setd "." + .@category$ + "Material2IDs[" + .@i + "]",0;
+			setd "." + .@category$ + "Material2Amounts[" + .@i + "]",0;
+			setd "." + .@category$ + "ZenyCosts[" + .@i + "]",0;
+		}
+	}
+
+	// คะแนนสูงสุดต้องไม่เกิน int32 ของ pointshop; คะแนนเก็บร่วมบัญชีใน #ReOptionPoints
+	.MaxPoints = 2147483647;
+	deletearray .ExchangeIDs;
+	deletearray .ExchangePoints;
+	deletearray .TicketShopIDs;
+	.TicketShopCount = 0;
+
+	// Flatten the four existing point arrays. Duplicate definitions are rejected.
+	for (.@tier = 1; .@tier <= getarraysize(.PointValues); ++.@tier) {
+		.@value = .PointValues[.@tier - 1];
+		if (.@value <= 0 || .@value > .MaxPoints) continue;
+		for (.@i = 0; .@i < getarraysize(getd(".Point" + .@tier + "Items")); ++.@i) {
+			.@id = getd(".Point" + .@tier + "Items[" + .@i + "]");
+			if (.@id <= 0 || getiteminfo(.@id,ITEMINFO_TYPE) < 0) continue;
+			if (inarray(.ExchangeIDs,.@id) >= 0) {
+				debugmes "Re-Option: duplicate exchange ID " + .@id;
+				continue;
+			}
+			.@n = getarraysize(.ExchangeIDs);
+			.ExchangeIDs[.@n] = .@id;
+			.ExchangePoints[.@n] = .@value;
+		}
+	}
+	npcshopattach "ReOptionExchange";
+
+	// Use the existing pointshop payment/weight/slot checks, no OnBuyItem replacement.
+	// Blank the dummy inventory first; zero IDs/prices are not offered as free rewards.
+	npcshopdelitem "ReOptionPointShop",501;
+	for (.@i = 0; .@i < getarraysize(.RefineLevels); ++.@i) {
+		.@id = .ReOptionTicketIDs[.@i];
+		.@price = .TicketPointCosts[.@i];
+		if (.@id <= 0 || .@price <= 0 || .@price > .MaxPoints) continue;
+		if (getiteminfo(.@id,ITEMINFO_TYPE) < 0) continue;
+		if (inarray(.TicketShopIDs,.@id) >= 0) {
+			debugmes "Re-Option: duplicate ticket ID " + .@id;
+			continue;
+		}
+		.TicketShopIDs[.TicketShopCount++] = .@id;
+		npcshopadditem "ReOptionPointShop",.@id,.@price;
+	}
+	end;
+}
+
+// Hidden shops: OnSellItem is attached only to the exchange shop.
+-	shop	ReOptionExchange	-1,no,501:10
+-	pointshop	ReOptionPointShop	-1,#ReOptionPoints:0,501:1

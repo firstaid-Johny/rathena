@@ -2579,6 +2579,22 @@ static TIMER_FUNC(mob_delay_item_drop) {
  * rate is the drop-rate of the item, required for autoloot.
  * flag : Killed only by homunculus/mercenary?
  *------------------------------------------*/
+static void mob_announce_drop_player(const char* message, const char* sender)
+{
+	std::string text(message), name(sender);
+	std::string prefix = name + " ";
+	std::string quoted = "'" + name + "' ";
+	if (text.compare(0, prefix.size(), prefix) == 0)
+		text.erase(0, prefix.size());
+	else if (text.compare(0, quoted.size(), quoted) == 0)
+		text.erase(0, quoted.size());
+	// Keep the sender prefix intact if a translated drop announcement is too long.
+	size_t maximum = CHAT_SIZE_MAX - 1 - name.size() - 3;
+	if (text.size() > maximum)
+		text.resize(maximum);
+	intif_broadcast_player(text.c_str(), sender, BC_DEFAULT);
+}
+
 static void mob_announce_card_drop( const map_session_data* sd, const mob_data* md, t_itemid nameid, uint32 rate, uint32 denominator )
 {
 	const item_data* item = itemdb_search(nameid);
@@ -2591,7 +2607,10 @@ static void mob_announce_card_drop( const map_session_data* sd, const mob_data* 
 	safesnprintf(message, sizeof(message), msg_txt(nullptr, 835),
 		sd != nullptr ? sd->status.name : "Unknown", item->ename.c_str(),
 		map_mapid2mapname(md->m), 100.0 * rate / denominator);
-	intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+	if (sd != nullptr)
+		mob_announce_drop_player(message, sd->status.name);
+	else
+		intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
 	log_card_drop(sd, md, nameid, rate, denominator);
 }
 
@@ -3363,10 +3382,10 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 
 			//A Rare Drop Global Announce by Lupus
 			if (first_sd != nullptr && it->type != IT_CARD && entry->rate <= battle_config.rare_drop_announce) {
-				char message[128];
-				sprintf(message, msg_txt(nullptr, 541), first_sd->status.name, md->name, it->ename.c_str(), (float)drop_rate / 100);
+				char message[512];
+				safesnprintf(message, sizeof(message), msg_txt(nullptr, 541), first_sd->status.name, md->name, it->ename.c_str(), (float)drop_rate / 100);
 				//MSG: "'%s' won %s's %s (chance: %0.02f%%)"
-				intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+				mob_announce_drop_player(message, first_sd->status.name);
 			}
 			// Announce first, or else ditem will be freed. [Lance]
 			// By popular demand, use base drop rate for autoloot code. [Skotlex]
@@ -3530,10 +3549,10 @@ int32 mob_dead(mob_data *md, block_list *src, int32 type)
 				if (i_data->type == IT_CARD)
 					mob_announce_card_drop(mvp_sd, md, item.nameid, temp, 10000);
 				else if(temp<=battle_config.rare_drop_announce) {
-					char message[128];
-					sprintf (message, msg_txt(nullptr,541), mvp_sd->status.name, md->name, i_data->ename.c_str(), temp/100.);
+					char message[512];
+					safesnprintf(message, sizeof(message), msg_txt(nullptr,541), mvp_sd->status.name, md->name, i_data->ename.c_str(), temp/100.);
 					//MSG: "'%s' won %s's %s (chance: %0.02f%%)"
-					intif_broadcast(message,strlen(message)+1,BC_DEFAULT);
+					mob_announce_drop_player(message, mvp_sd->status.name);
 				}
 
 				mob_setdropitem_option( item, entry );

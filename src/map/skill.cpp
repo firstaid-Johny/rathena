@@ -10663,6 +10663,7 @@ void skill_weaponrefine( map_session_data& sd, int32 idx ){
 				log_pick_pc(&sd, LOG_TYPE_OTHER, -1, item);
 				item->refine++;
 				status_apply_refine_random_options(*ditem, *item);
+				clif_broadcast_refine_result(sd, *item, item->refine, true);
 				log_pick_pc(&sd, LOG_TYPE_OTHER,  1, item);
 				if(item->equip) {
 					ep = item->equip;
@@ -10695,6 +10696,7 @@ void skill_weaponrefine( map_session_data& sd, int32 idx ){
 					}
 				}
 			} else {
+				clif_broadcast_refine_result(sd, *item, item->refine + 1, false);
 				item->refine = 0;
 				if(item->equip)
 					pc_unequipitem(&sd,idx,3);

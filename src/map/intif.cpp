@@ -204,6 +204,17 @@ int32 intif_rename( const map_session_data* sd, int32 type, char* name )
  * @param type : Color of msg
  * @return 0=error occurred, 1=msg sent
  */
+int32 intif_broadcast_player(const char* message, const char* sender, int32 type)
+{
+	std::string payload = clif_announceplayer_message(message, sender);
+	if (payload.empty())
+		return 0;
+	int32 result = intif_broadcast2(payload.c_str(), payload.size() + 1, ANNOUNCEPLAYER_CHAT_COLOR, 0, 0, 0, 0);
+	if (type & BC_COLOR_MASK)
+		intif_broadcast(message, strlen(message) + 1, type);
+	return result;
+}
+
 int32 intif_broadcast( const char* mes, size_t len, int32 type ){
 	nullpo_ret(mes);
 	if (len < 2)
@@ -254,7 +265,10 @@ int32 intif_broadcast2( const char* mes, size_t len, unsigned long fontColor, in
 		return 0;
 
 	// Send to the local players
-	clif_broadcast2(nullptr, mes, len, fontColor, fontType, fontSize, fontAlign, fontY, ALL_CLIENT);
+	if (fontColor == ANNOUNCEPLAYER_CHAT_COLOR)
+		clif_announceplayer_chat(mes, nullptr, ALL_CLIENT);
+	else
+		clif_broadcast2(nullptr, mes, len, fontColor, fontType, fontSize, fontAlign, fontY, ALL_CLIENT);
 
 	if (CheckForCharServer())
 		return 0;
@@ -3802,7 +3816,11 @@ int32 intif_parse(int32 fd)
 	// Processing branch
 	switch(cmd){
 	case 0x3800:
-		if (RFIFOL(fd,4) == 0xFF000000) //Normal announce.
+		if (RFIFOL(fd,4) == ANNOUNCEPLAYER_CHAT_COLOR) {
+			// The char-server relays 0x3000 unchanged. Reject malformed chat payloads.
+			if (packet_len > 16 && packet_len <= 16 + CHAT_SIZE_MAX && RFIFOB(fd, packet_len - 1) == 0)
+				clif_announceplayer_chat(RFIFOCP(fd,16), nullptr, ALL_CLIENT);
+		} else if (RFIFOL(fd,4) == 0xFF000000) //Normal announce.
 			clif_broadcast(nullptr, RFIFOCP(fd,16), packet_len-16, BC_DEFAULT, ALL_CLIENT);
 		else //Color announce.
 			clif_broadcast2(nullptr, RFIFOCP(fd,16), packet_len-16, RFIFOL(fd,4), RFIFOW(fd,8), RFIFOW(fd,10), RFIFOW(fd,12), RFIFOW(fd,14), ALL_CLIENT);

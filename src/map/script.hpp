@@ -2332,6 +2332,7 @@ void script_free_state(struct script_state* st);
 
 struct DBMap* script_get_label_db(void);
 struct DBMap* script_get_userfunc_db(void);
+void script_run_refine_announce(map_session_data& sd, const item& target, int32 level, bool success, const std::string& name);
 void script_run_autobonus(const char *autobonus, map_session_data *sd, uint32 pos);
 void script_run_petautobonus(const std::string &autobonus, map_session_data &sd);
 

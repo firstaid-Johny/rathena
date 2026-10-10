@@ -6726,6 +6726,39 @@ void clif_displaymessage(const int32 fd, const char* mes)
 
 /// Send broadcast message in yellow or blue without font formatting.
 /// 009a <packet len>.W <message>.?B (ZC_BROADCAST)
+// Use the same "name : message" representation as ordinary player chat.
+std::string clif_announceplayer_message(const char* message, const char* sender)
+{
+	if (message == nullptr || sender == nullptr)
+		return {};
+	size_t name_length = strlen(sender), message_length = strlen(message);
+	if (name_length == 0 || name_length >= NAME_LENGTH || message_length == 0 ||
+		name_length + 3 + message_length >= CHAT_SIZE_MAX)
+		return {};
+	for (size_t i = 0; i < name_length; ++i)
+		if (static_cast<unsigned char>(sender[i]) < 32 || sender[i] == 127)
+			return {};
+	// Keep one announcement in one chat row and prevent ambiguous sender prefixes.
+	if (strstr(sender, " : ") != nullptr || strchr(message, '\n') || strchr(message, '\r'))
+		return {};
+	return std::string(sender) + " : " + message;
+}
+
+void clif_announceplayer_chat(const char* message, const block_list* source, enum send_target target)
+{
+	if (message == nullptr)
+		return;
+	size_t length = strlen(message);
+	if (length == 0 || length >= CHAT_SIZE_MAX)
+		return;
+	// 008e carries text only, so recipients need no actor/name cache or map visibility.
+	unsigned char packet[4 + CHAT_SIZE_MAX];
+	WBUFW(packet, 0) = 0x008e;
+	WBUFW(packet, 2) = static_cast<uint16>(4 + length + 1);
+	memcpy(WBUFP(packet, 4), message, length + 1);
+	clif_send(packet, static_cast<int32>(4 + length + 1), source, target);
+}
+
 void clif_broadcast( const block_list* bl, const char* mes, size_t len, int32 type, enum send_target target )
 {
 	nullpo_retv(mes);
@@ -22821,7 +22854,7 @@ void clif_parse_refineui_refine( int32 fd, map_session_data* sd ){
 		clif_misceffect( *sd, NOTIFYEFFECT_REFINE_SUCCESS );
 		clif_refine( *sd, index, ITEMREFINING_SUCCESS );
 		if (info->broadcast_success) {
-			clif_broadcast_refine_result(*sd, item->nameid, item->refine, true);
+			clif_broadcast_refine_result(*sd, *item, item->refine, true);
 		}
 		if( id->type == IT_WEAPON ){
 			achievement_update_objective( sd, AG_ENCHANT_SUCCESS, 2, id->weapon_level, item->refine );
@@ -22831,7 +22864,7 @@ void clif_parse_refineui_refine( int32 fd, map_session_data* sd ){
 		// Failure
 
 		if (info->broadcast_failure) {
-			clif_broadcast_refine_result(*sd, item->nameid, item->refine, false);
+			clif_broadcast_refine_result(*sd, *item, item->refine + 1, false);
 		}
 		// Blacksmith blessings were used to prevent breaking and downgrading
 		if( blacksmith_amount > 0 ){
@@ -25158,25 +25191,19 @@ void clif_parse_itempackage_select( int32 fd, map_session_data* sd ){
 #endif
 }
 
-void clif_broadcast_refine_result(const map_session_data& sd, t_itemid itemId, int8 level, bool success)
+void clif_broadcast_refine_result(map_session_data& sd, const item& target, int32 level, bool success)
 {
-#if PACKETVER_MAIN_NUM >= 20170906 || PACKETVER_RE_NUM >= 20170830 || defined(PACKETVER_ZERO)
-	PACKET_ZC_BROADCAST_ITEMREFINING_RESULT p{};
-	p.packetType = HEADER_ZC_BROADCAST_ITEMREFINING_RESULT;
-	p.itemId = itemId;
-	p.refine_level = level;
-	p.status = (int8)success;
-
-	if (battle_config.broadcast_hide_name) {
-		std::string dispname = clif_hide_name(sd.status.name);
-		safestrncpy(p.name, dispname.c_str(), sizeof(p.name));
-	}
-	else {
-		safestrncpy(p.name, sd.status.name, sizeof(p.name));
-	}
-
-	clif_send(&p, sizeof(p), &sd, ALL_CLIENT);
-#endif
+	auto data = item_db.find(target.nameid);
+	if (!data || level < 1 || level > MAX_REFINE)
+		return;
+	// Honor refine.yml, including per-weapon-level flags; never hardcode thresholds here.
+	item attempted = target;
+	attempted.refine = level - 1;
+	auto info = refine_db.findLevelInfo(*data, attempted);
+	if (!info || !(success ? info->broadcast_success : info->broadcast_failure))
+		return;
+	const std::string name = battle_config.broadcast_hide_name ? clif_hide_name(sd.status.name) : sd.status.name;
+	script_run_refine_announce(sd, target, level, success, name);
 }
 
 void clif_parse_captcha_register(int32 fd, map_session_data *sd) {

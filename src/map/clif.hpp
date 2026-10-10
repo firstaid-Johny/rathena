@@ -1144,6 +1144,8 @@ void clif_font(const map_session_data* sd);
 // atcommand
 void clif_displaymessage( const int32 fd, const char* mes );
 void clif_disp_message( const block_list* src, const char* mes, size_t len, enum send_target target );
+std::string clif_announceplayer_message(const char* message, const char* sender);
+void clif_announceplayer_chat(const char* message, const block_list* source, enum send_target target);
 void clif_broadcast( const block_list* bl, const char* mes, size_t len, int32 type, enum send_target target );
 void clif_broadcast2( const block_list* bl, const char* mes, size_t len, unsigned long fontColor, int16 fontType, int16 fontSize, int16 fontAlign, int16 fontY, enum send_target target );
 void clif_heal( const map_session_data& sd, int32 type, uint32 val );
@@ -1471,7 +1473,7 @@ void clif_enchantwindow_open( map_session_data& sd, uint64 clientLuaIndex );
 // Enchanting Shadow / Shadow Scar Spirit
 void clif_enchantingshadow_spirit(const unit_data &ud);
 
-void clif_broadcast_refine_result(const map_session_data& sd, t_itemid itemId, int8 level, bool success);
+void clif_broadcast_refine_result(map_session_data& sd, const item& target, int32 level, bool success);
 
 // Captcha Register
 void clif_captcha_upload_request(const map_session_data &sd);

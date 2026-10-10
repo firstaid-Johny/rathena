@@ -4619,6 +4619,30 @@ void script_add_autobonus(const char *autobonus)
 	}
 }
 
+// Cache the fixed runner in the existing script cache; no parsing or file I/O per option.
+// run_script saves/restores the player's current NPC script state. The formatter never yields.
+void script_run_refine_announce(map_session_data& sd, const item& target, int32 level, bool success, const std::string& name)
+{
+	const char* runner = "{ callfunc \"F_RefineAnnounce\"; end; }";
+	if (strdb_get(script_get_userfunc_db(), "F_RefineAnnounce") == nullptr) {
+		ShowWarning("Refine announcement: load npc/custom/randomoptname.txt first.\n");
+		return;
+	}
+	script_add_autobonus(runner);
+	auto code = static_cast<script_code*>(strdb_get(autobonus_db, runner));
+	if (code == nullptr)
+		return;
+	pc_setreg(&sd, add_str("@RefineAnnounceItemID"), target.nameid);
+	pc_setreg(&sd, add_str("@RefineAnnounceLevel"), level);
+	pc_setreg(&sd, add_str("@RefineAnnounceSuccess"), success);
+	pc_setregstr(&sd, add_str("@RefineAnnounceName$"), name.c_str());
+	for (int32 i = 0; i < MAX_ITEM_RDM_OPT; ++i) {
+		pc_setreg(&sd, reference_uid(add_str("@RefineAnnounceOptID"), i), target.option[i].id);
+		pc_setreg(&sd, reference_uid(add_str("@RefineAnnounceOptValue"), i), target.option[i].value);
+	}
+	run_script(code, 0, sd.id, 0);
+}
+
 void script_run_petautobonus(const std::string &autobonus, map_session_data &sd) {
 	std::shared_ptr<s_pet_autobonus_wrapper> script = util::umap_find(pet_autobonuses, autobonus);
 
@@ -9760,6 +9784,8 @@ BUILDIN_FUNC(successrefitem) {
 		sd->inventory.u.items_inventory[i].refine = cap_value( sd->inventory.u.items_inventory[i].refine, 0, MAX_REFINE);
 		if (up > 0)
 			status_apply_refine_random_options(*sd->inventory_data[i], sd->inventory.u.items_inventory[i]);
+		if (up > 0)
+			clif_broadcast_refine_result(*sd, sd->inventory.u.items_inventory[i], sd->inventory.u.items_inventory[i].refine, true);
 		pc_unequipitem(sd,i,2); // status calc will happen in pc_equipitem() below
 
 		clif_refine( *sd, i, ITEMREFINING_SUCCESS );
@@ -9819,6 +9845,7 @@ BUILDIN_FUNC(failedrefitem) {
 	if (equip_index_check(pos))
 		i = pc_checkequip(sd,equip_bitmask[pos]);
 	if (i >= 0) {
+		clif_broadcast_refine_result(*sd, sd->inventory.u.items_inventory[i], sd->inventory.u.items_inventory[i].refine + 1, false);
 		sd->inventory.u.items_inventory[i].refine = 0;
 		pc_unequipitem(sd,i,3); //recalculate bonus
 		clif_refine( *sd, i, ITEMREFINING_FAILURE);
@@ -12245,6 +12272,62 @@ BUILDIN_FUNC(announce)
 			intif_broadcast2(mes, (int32)strlen(mes)+1, strtol(fontColor, (char **)nullptr, 0), fontType, fontSize, fontAlign, fontY);
 		else
 			intif_broadcast(mes, (int32)strlen(mes)+1, flag&BC_COLOR_MASK);
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
+
+BUILDIN_FUNC(announceplayer)
+{
+	const char* message = script_getstr(st,2);
+	const char* sender = script_getstr(st,3);
+	std::string payload = clif_announceplayer_message(message, sender);
+	if (payload.empty()) {
+		ShowError("announceplayer: Invalid sender/message; the complete chat row must fit in 255 bytes.\n");
+		return SCRIPT_CMD_FAILURE;
+	}
+	int32 flag = script_getnum(st,4);
+	const char* fontColor = script_hasdata(st,5) ? script_getstr(st,5) : nullptr;
+	int32 fontType = script_hasdata(st,6) ? script_getnum(st,6) : FW_NORMAL;
+	int32 fontSize = script_hasdata(st,7) ? script_getnum(st,7) : 12;
+	int32 fontAlign = script_hasdata(st,8) ? script_getnum(st,8) : 0;
+	int32 fontY = script_hasdata(st,9) ? script_getnum(st,9) : 0;
+	send_target target = ALL_CLIENT;
+	const block_list* source = nullptr;
+	if (flag & (BC_TARGET_MASK | BC_SOURCE_MASK)) {
+		if (flag & BC_NPC)
+			source = map_id2bl(st->oid);
+		else {
+			map_session_data* sd;
+			if (script_charid2sd(10, sd))
+				source = sd;
+		}
+		switch (flag & BC_TARGET_MASK) {
+			case BC_MAP: target = ALL_SAMEMAP; break;
+			case BC_AREA: target = AREA; break;
+			case BC_SELF: target = SELF; break;
+		}
+	}
+	if (target != ALL_CLIENT && source == nullptr)
+		return SCRIPT_CMD_FAILURE;
+
+	if (target == ALL_CLIENT)
+		intif_broadcast2(payload.c_str(), payload.size() + 1, ANNOUNCEPLAYER_CHAT_COLOR, 0, 0, 0, 0);
+	else
+		clif_announceplayer_chat(payload.c_str(), source, target);
+
+	// Ordinary chat has no custom-color fields. Explicit color requests additionally
+	// use an ordinary broadcast; the selectable player-chat row is always sent.
+	if (fontColor || (flag & BC_COLOR_MASK)) {
+		if (target == ALL_CLIENT) {
+			if (fontColor)
+				intif_broadcast2(message, strlen(message) + 1, strtol(fontColor, nullptr, 0), fontType, fontSize, fontAlign, fontY);
+			else
+				intif_broadcast(message, strlen(message) + 1, flag & BC_COLOR_MASK);
+		} else if (fontColor)
+			clif_broadcast2(source, message, strlen(message) + 1, strtol(fontColor, nullptr, 0), fontType, fontSize, fontAlign, fontY, target);
+		else
+			clif_broadcast(source, message, strlen(message) + 1, flag & BC_COLOR_MASK, target);
 	}
 	return SCRIPT_CMD_SUCCESS;
 }
@@ -15281,6 +15364,8 @@ BUILDIN_FUNC(getinventorylist)
 		if(sd->inventory.u.items_inventory[i].nameid > 0 && sd->inventory.u.items_inventory[i].amount > 0){
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_id"), j),sd->inventory.u.items_inventory[i].nameid);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_idx"), j),i);
+			pc_setregstr(sd,reference_uid(add_str("@inventorylist_uniqueid$"), j),std::to_string(sd->inventory.u.items_inventory[i].unique_id).c_str());
+			pc_setreg(sd,reference_uid(add_str("@inventorylist_equipswitch"), j),sd->inventory.u.items_inventory[i].equipSwitch);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_amount"), j),sd->inventory.u.items_inventory[i].amount);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_equip"), j),sd->inventory.u.items_inventory[i].equip);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_refine"), j),sd->inventory.u.items_inventory[i].refine);
@@ -25102,6 +25187,129 @@ BUILDIN_FUNC(getrandomoptinfo) {
 	return SCRIPT_CMD_SUCCESS;
 }
 
+// Inventory index is used to list multi-slot equipment once and to recheck a selection.
+BUILDIN_FUNC(getequipinventoryindex) {
+	map_session_data* sd;
+	if (!script_rid2sd(sd)) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	int32 pos = script_getnum(st, 2);
+	script_pushint(st, equip_index_check(pos) ? pc_checkequip(sd, equip_bitmask[pos]) : -1);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+// Use the same exact-refine and ItemIds precedence as automatic refine options.
+BUILDIN_FUNC(getequiprefinegroup) {
+	map_session_data* sd;
+	if (!script_rid2sd(sd)) {
+		script_pushint(st, 0);
+		return SCRIPT_CMD_FAILURE;
+	}
+	int32 pos = script_getnum(st, 2);
+	int32 idx = equip_index_check(pos) ? pc_checkequip(sd, equip_bitmask[pos]) : -1;
+	uint16 group = 0;
+	if (idx >= 0 && sd->inventory_data[idx])
+		group = refine_randomopt_db.findGroup(*sd->inventory_data[idx], sd->inventory.u.items_inventory[idx].refine);
+	script_pushint(st, group && random_option_group.find(group) ? group : 0);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+// Recheck, prepare all five options and pay in one synchronous script command.
+// Returns: 1 success, -1 changed/ineligible item, -2 configuration, -3 funds,
+//          -4 busy/dead. No dialog or yield is allowed between checks and payment.
+// rerollequiprefineoption(pos,index,uniqueid$,itemid,refine,ticket,amount,
+//                        material1,amount1,material2,amount2,zeny)
+BUILDIN_FUNC(rerollequiprefineoption) {
+	map_session_data* sd;
+	if (!script_rid2sd(sd)) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	auto finish = [&](int32 result) {
+		script_pushint(st, result);
+		return SCRIPT_CMD_SUCCESS;
+	};
+	if (pc_isdead(sd) || sd->state.trading || sd->state.vending || sd->state.buyingstore)
+		return finish(-4);
+
+	int32 pos = script_getnum(st, 2);
+	int32 idx = equip_index_check(pos) ? pc_checkequip(sd, equip_bitmask[pos]) : -1;
+	if (idx < 0 || idx != script_getnum(st, 3) || !sd->inventory_data[idx])
+		return finish(-1);
+	auto& target = sd->inventory.u.items_inventory[idx];
+	const auto& data = *sd->inventory_data[idx];
+	if (std::to_string(target.unique_id) != script_getstr(st, 4) ||
+		target.nameid != script_getnum(st, 5) || target.refine != script_getnum(st, 6) ||
+		target.refine < 5 || target.refine > MAX_REFINE || target.option[0].id <= 0 ||
+		(data.type != IT_ARMOR && data.type != IT_WEAPON) || data.flag.no_refine ||
+		target.expire_time || target.attribute || !target.identify)
+		return finish(-1);
+
+	// Validate before narrowing; merge repeated material IDs to prevent double spending.
+	std::map<t_itemid, int64> costs;
+	for (int32 arg = 7; arg <= 11; arg += 2) {
+		int64 id = script_getnum64(st, arg);
+		int64 amount = script_getnum64(st, arg + 1);
+		if (id < 0 || id > UINT32_MAX || amount < 0 || amount > INT32_MAX ||
+			(arg == 7 && (id == 0 || amount == 0)) ||
+			(id == 0 && amount != 0) || (id != 0 && !item_db.find(static_cast<t_itemid>(id))))
+			return finish(-2);
+		if (amount > 0) {
+			costs[static_cast<t_itemid>(id)] += amount;
+			if (costs[static_cast<t_itemid>(id)] > INT32_MAX)
+				return finish(-2);
+		}
+	}
+	int64 zeny = script_getnum64(st, 13);
+	if (zeny < 0 || zeny > MAX_ZENY)
+		return finish(-2);
+	if (sd->status.zeny < zeny)
+		return finish(-3);
+
+	// Only consume unequipped, non-rental inventory items, never the target or switch set.
+	std::vector<std::pair<int32, int32>> deductions;
+	for (const auto& cost : costs) {
+		int64 remaining = cost.second;
+		for (int32 n = 0; n < MAX_INVENTORY && remaining > 0; ++n) {
+			const auto& material = sd->inventory.u.items_inventory[n];
+			if (n == idx || !sd->inventory_data[n] || material.nameid != cost.first ||
+				material.equip || material.equipSwitch || material.expire_time || material.amount <= 0)
+				continue;
+			int32 amount = static_cast<int32>(std::min<int64>(remaining, material.amount));
+			deductions.emplace_back(n, amount);
+			remaining -= amount;
+		}
+		if (remaining > 0)
+			return finish(-3);
+	}
+
+	item rolled = target;
+	if (!status_apply_refine_random_options(data, rolled) || rolled.option[0].id <= 0)
+		return finish(-2);
+	for (const auto& option : rolled.option)
+		if (option.id != 0 && !random_option_db.find(option.id))
+			return finish(-2);
+
+	// Preflight covers every pc_delitem failure condition. Map execution is serial;
+	// these helpers neither yield nor run equipment scripts for the selected materials.
+	if (pc_payzeny(sd, static_cast<int32>(zeny), LOG_TYPE_SCRIPT))
+		return finish(-3);
+	for (const auto& deduction : deductions)
+		pc_delitem(sd, deduction.first, deduction.second, 0, 0, LOG_TYPE_SCRIPT);
+
+	log_pick_pc(sd, LOG_TYPE_SCRIPT, -1, &target);
+	std::copy(std::begin(rolled.option), std::end(rolled.option), std::begin(target.option));
+	log_pick_pc(sd, LOG_TYPE_SCRIPT, 1, &target);
+	clif_delitem(*sd, idx, 1, 3);
+	clif_additem(sd, idx, 1, 0);
+	clif_equipitemack(*sd, ITEM_EQUIP_ACK_OK, idx, target.equip);
+	// Keep equipment, cards, refine, grade, binding and unique ID unchanged.
+	status_calc_pc(sd, SCO_FORCE);
+	chrif_save(sd, CSAVE_INVENTORY);
+	return finish(1);
+}
+
 /**
 * Retrieves a random option on an equipped item.
 * getequiprandomoption(<equipment slot>,<index>,<type>{,<char id>});
@@ -28339,6 +28547,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(detachnpctimer,"?"), // detached the player id from the npc timer [Celest]
 	BUILDIN_DEF(playerattached,""), // returns id of the current attached player. [Skotlex]
 	BUILDIN_DEF(announce,"si??????"),
+	BUILDIN_DEF(announceplayer,"ssi??????"),
 	BUILDIN_DEF(mapannounce,"ssi?????"),
 	BUILDIN_DEF(areaannounce,"siiiisi?????"),
 	BUILDIN_DEF(getusers,"i"),
@@ -28766,6 +28975,9 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(getrandomoptinfo, "i"),
 	BUILDIN_DEF(getequiprandomoption, "iii?"),
 	BUILDIN_DEF(setrandomoption,"iiiii?"),
+	BUILDIN_DEF(getequipinventoryindex,"i"),
+	BUILDIN_DEF(getequiprefinegroup,"i"),
+	BUILDIN_DEF(rerollequiprefineoption,"iisiiiiiiiii"),
 	BUILDIN_DEF(needed_status_point,"ii?"),
 	BUILDIN_DEF(needed_trait_point, "ii?"),
 	BUILDIN_DEF(jobcanentermap,"s?"),

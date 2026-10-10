@@ -696,6 +696,8 @@ Body:
       - Level: 1
         RefineLevels:
           - Level: 1
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9500    # 95%
@@ -708,6 +710,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 2
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -720,6 +724,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 3
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -732,6 +738,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 4
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -744,6 +752,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 5
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 5000    # 50%
@@ -756,6 +766,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 6
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 4000    # 40%
@@ -768,6 +780,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 7
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 3000    # 30%
@@ -780,6 +794,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 8
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 2000    # 20%
@@ -792,6 +808,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 9
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1500    # 15%
@@ -804,6 +822,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 10
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1000    # 10%
@@ -820,6 +840,8 @@ Body:
       - Level: 1
         RefineLevels:
           - Level: 1
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9500    # 95%
@@ -832,6 +854,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 2
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -844,6 +868,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 3
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -856,6 +882,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 4
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -868,6 +896,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 5
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -880,6 +910,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 6
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -892,6 +924,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 7
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -904,6 +938,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 8
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 5000    # 50%
@@ -916,6 +952,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 9
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 3000    # 30%
@@ -928,6 +966,8 @@ Body:
                 Price: 2000
                 BreakingRate: 10000
           - Level: 10
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 2000    # 20%
@@ -942,6 +982,8 @@ Body:
       - Level: 2
         RefineLevels:
           - Level: 1
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9500    # 95%
@@ -954,6 +996,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 2
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -966,6 +1010,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 3
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -978,6 +1024,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 4
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -990,6 +1038,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 5
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -1002,6 +1052,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 6
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -1014,6 +1066,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 7
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 4500    # 45%
@@ -1026,6 +1080,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 8
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 3500    # 35%
@@ -1038,6 +1094,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 9
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 2500    # 25%
@@ -1050,6 +1108,8 @@ Body:
                 Price: 4000
                 BreakingRate: 10000
           - Level: 10
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1500    # 15%
@@ -1064,6 +1124,8 @@ Body:
       - Level: 3
         RefineLevels:
           - Level: 1
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9500    # 95%
@@ -1076,6 +1138,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 2
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -1088,6 +1152,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 3
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -1100,6 +1166,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 4
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -1112,6 +1180,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 5
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -1124,6 +1194,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 6
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 5000    # 50%
@@ -1136,6 +1208,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 7
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 4000    # 40%
@@ -1148,6 +1222,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 8
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 3000    # 30%
@@ -1160,6 +1236,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 9
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 2000    # 20%
@@ -1172,6 +1250,8 @@ Body:
                 Price: 10000
                 BreakingRate: 10000
           - Level: 10
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1000    # 10%
@@ -1186,6 +1266,8 @@ Body:
       - Level: 4
         RefineLevels:
           - Level: 1
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9500    # 95%
@@ -1198,6 +1280,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 2
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -1210,6 +1294,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 3
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 9000    # 90%
@@ -1222,6 +1308,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 4
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 8500    # 85%
@@ -1234,6 +1322,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 5
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 5000    # 50%
@@ -1246,6 +1336,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 6
+            BroadcastSuccess: false
+            BroadcastFailure: false
             Chances:
               - Type: Normal
                 Rate: 4000    # 40%
@@ -1258,6 +1350,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 7
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 3000    # 30%
@@ -1270,6 +1364,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 8
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 2000    # 20%
@@ -1282,6 +1378,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 9
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1500    # 15%
@@ -1294,6 +1392,8 @@ Body:
                 Price: 40000
                 BreakingRate: 10000
           - Level: 10
+            BroadcastSuccess: true
+            BroadcastFailure: true
             Chances:
               - Type: Normal
                 Rate: 1000    # 10%

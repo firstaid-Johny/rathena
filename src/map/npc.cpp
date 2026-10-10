@@ -2954,6 +2954,7 @@ static int32 npc_selllist_sub(map_session_data* sd, int32 list_length, const PAC
 	char card_slot[NAME_LENGTH];
 	char option_id[NAME_LENGTH], option_val[NAME_LENGTH], option_param[NAME_LENGTH];
 	int32 i, j;
+	int32 key_index = 0;
 	int32 key_nameid = 0;
 	int32 key_amount = 0;
 	int32 key_refine = 0;
@@ -2964,6 +2965,8 @@ static int32 npc_selllist_sub(map_session_data* sd, int32 list_length, const PAC
 	int32 key_option_id[MAX_ITEM_RDM_OPT], key_option_val[MAX_ITEM_RDM_OPT], key_option_param[MAX_ITEM_RDM_OPT];
 
 	// discard old contents
+	script_cleararray_pc( sd, "@sold_idx" );
+	script_cleararray_pc( sd, "@sold_uniqueid$" );
 	script_cleararray_pc( sd, "@sold_nameid" );
 	script_cleararray_pc( sd, "@sold_quantity" );
 	script_cleararray_pc( sd, "@sold_refine" );
@@ -2994,6 +2997,9 @@ static int32 npc_selllist_sub(map_session_data* sd, int32 list_length, const PAC
 	{
 		int32 idx = item_list[i].index - 2;
 
+		// Expose the exact selected inventory slot; never resolve a sale by Item ID.
+		script_setarray_pc(sd, "@sold_idx", i, idx, &key_index);
+		pc_setregstr(sd, reference_uid(add_str("@sold_uniqueid$"), i), std::to_string(sd->inventory.u.items_inventory[idx].unique_id).c_str());
 		script_setarray_pc( sd, "@sold_nameid", i, sd->inventory.u.items_inventory[idx].nameid, &key_nameid );
 		script_setarray_pc( sd, "@sold_quantity", i, item_list[i].amount, &key_amount );
 		script_setarray_pc( sd, "@sold_refine", i, sd->inventory.u.items_inventory[idx].refine, &key_refine );
@@ -3042,6 +3048,7 @@ uint8 npc_selllist(map_session_data* sd, int32 list_length, const PACKET_CZ_PC_S
 		return 1;
 	}
 
+	bool sold_indices[MAX_INVENTORY] = {};
 	z = 0;
 
 	// verify the sell list
@@ -3053,10 +3060,15 @@ uint8 npc_selllist(map_session_data* sd, int32 list_length, const PACKET_CZ_PC_S
 		idx    = item_list[i].index - 2;
 		amount = item_list[i].amount;
 
-		if( idx >= MAX_INVENTORY || idx < 0 || amount < 0 )
+		if( idx >= MAX_INVENTORY || idx < 0 || amount <= 0 )
 		{
 			return 1;
 		}
+
+		// Reject repeated slots before invoking scripts or deleting any item.
+		if (sold_indices[idx])
+			return 1;
+		sold_indices[idx] = true;
 
 		nameid = sd->inventory.u.items_inventory[idx].nameid;
 
