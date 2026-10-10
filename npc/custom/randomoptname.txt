@@ -255,6 +255,16 @@ function	script	F_GetRDMOPT_Name	{
 		case 252: return "Mres ";
 		case 253: return "H.Plus ";
 		case 254: return "C.Rate ";
+		//FA
+		case 255: return "เพิ่มอัตราดรอป";
+		case 256: return "เพิ่มดาเมจต่อเป้าหมายทุกขนาด";
+		case 257: return "เมื่อโจมตีปกติมีโอกาสติด Curse";
+		case 258: return "เมื่อโจมตีปกติมีโอกาสติด Confuse";
+		case 259: return "ป้องกันสถานะ Curse";
+		case 260: return "ป้องกันสถานะ Confuse";
+		case 261: return "ป้องกันสถานะ Stun";
+		
+		// New
 		case 401: return "Str";
 		case 402: return "Agi";
 		case 403: return "Vit";
@@ -526,6 +536,17 @@ function	script	F_GetRDMOPT_Value	{
 		case 252: return "+"+getarg(1);
 		case 253: return "+"+getarg(1);
 		case 254: return "+"+getarg(1);
+		//FA
+		case 255: return "+"+getarg(1);
+		case 256: return "+"+getarg(1);
+		case 257: return "+"+getarg(1);
+		case 258: return "+"+getarg(1);
+		case 259: return "+"+getarg(1);
+		case 260: return "+"+getarg(1);
+		case 261: return "+"+getarg(1);
+		
+		
+		// New
 		case 401: return " +"+getarg(1)+"%";
 		case 402: return " +"+getarg(1)+"%";
 		case 403: return " +"+getarg(1)+"%";
