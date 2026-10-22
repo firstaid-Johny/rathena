@@ -39,3 +39,8 @@
 	{ "npc_sell_cap_unknown",				&battle_config.npc_sell_price_cap[IT_UNKNOWN], 		-1, 		-1, 		MAX_ZENY 		},
 { "party_bonus_system_enable", &battle_config.party_bonus_system_enable, 0, 0, 1 },
 { "party_bonus_same_map_minimum", &battle_config.party_bonus_same_map_minimum, 1, 1, MAX_PARTY },
+
+{ "feature.goldpc_active", &battle_config.feature_goldpc_active, 1, 0, 1 },
+{ "feature.goldpc_time", &battle_config.feature_goldpc_time, 3600, 1, INT_MAX },
+{ "feature.goldpc_max_points", &battle_config.feature_goldpc_max_points, 300, 0, INT_MAX },
+{ "feature.goldpc_vip", &battle_config.feature_goldpc_vip, 1, 0, 1 },

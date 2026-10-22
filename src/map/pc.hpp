@@ -65,6 +65,9 @@ class MapGuild;
 #define ATTENDANCE_DATE_VAR "#AttendanceDate"
 #define ATTENDANCE_COUNT_VAR "#AttendanceCounter"
 #define ACHIEVEMENTLEVEL "AchievementLevel"
+#define GOLDPC_POINT_VAR "#Goldpc_Points"
+#define GOLDPC_SECONDS_VAR "#Goldpc_Seconds"
+#define GOLDPC_MILLISECONDS_VAR "#Goldpc_Milliseconds"
 
 //Total number of classes (for data storage)
 #define CLASS_COUNT (JOB_MAX - JOB_NOVICE_HIGH + JOB_MAX_BASIC)
@@ -946,6 +949,13 @@ public:
 	s_macro_detect macro_detect;
 
 	std::vector<uint32> party_booking_requests;
+
+	// Only one reward-deadline timer while eligible; no per-second polling.
+	int goldpc_tid = INVALID_TIMER;
+	t_tick goldpc_elapsed_ms = 0;
+	t_tick goldpc_started = 0;
+	t_tick goldpc_period_ms = 0;
+	bool goldpc_ready = false;
 	std::vector<t_itemid> collection_list;
 	bool collection_bonus_recording = false;
 	std::map<std::vector<int32>, int64> collection_bonus_totals;
@@ -1830,5 +1840,12 @@ void pc_reputation_generate();
 
 void pc_collection_load(map_session_data& sd);
 void pc_collection_update(s_storage* stor, map_session_data& sd);
+
+void pc_goldpc_pause(map_session_data& sd, bool credit = true);
+void pc_goldpc_refresh(map_session_data& sd);
+void pc_goldpc_save(map_session_data& sd, bool quitting);
+void pc_goldpc_config_reload(bool before);
+t_tick pc_goldpc_elapsed(const map_session_data& sd);
+TIMER_FUNC(pc_goldpc_update);
 
 #endif /* PC_HPP */

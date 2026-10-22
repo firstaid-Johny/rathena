@@ -26,3 +26,9 @@
 	int32 vip_weight_increase;
 int party_bonus_system_enable;
 int party_bonus_same_map_minimum;
+
+// Gold PC online-time rewards (PR #7410, with an allowed-map list).
+int feature_goldpc_active;
+int feature_goldpc_time;
+int feature_goldpc_max_points;
+int feature_goldpc_vip;

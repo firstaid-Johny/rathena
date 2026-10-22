@@ -80,3 +80,27 @@ drop_effect_card: 3
 // Failed or cancelled transfers are free. Reload with @reloadbattleconf.
 collection_deposit_fee: 0
 collection_withdraw_fee: 0
+
+///////////////////////////////////////////////////////////////////////////
+// Gold PC online-time points (PR #7410)
+///////////////////////////////////////////////////////////////////////////
+// 1 = enabled, 0 = disabled. Existing points/progress are preserved when off.
+feature.goldpc_active: 1
+
+// Eligible online seconds per reward. Minimum 1; default 3600 (one hour).
+feature.goldpc_time: 3600
+
+// Maximum shared points per account. 0 pauses earning; default 300.
+feature.goldpc_max_points: 300
+
+// 1 = VIP earns 2 points per interval; 0 = everyone earns 1.
+feature.goldpc_vip: 0
+
+// Only these exact map names count time. No .gat suffix or spaces.
+// Multiple maps: prontera,geffen,payon
+// none = count nowhere. Leaving pauses progress; returning resumes it.
+// Offline/autotrade/loading time does not count. Fractions are preserved.
+feature.goldpc_maps: prontera
+
+// Apply all Gold PC settings with @reloadbattleconf (or restart).
+// Stored in the existing account registry SQL; no new SQL table is needed.

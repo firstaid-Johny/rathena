@@ -2377,6 +2377,103 @@ bool pc_set_hate_mob(map_session_data *sd, int32 pos, block_list *bl)
 	return true;
 }
 
+// Gold PC: one deadline timer per eligible character, driven by login/map/save events.
+// Progress is stored in existing character registries, including the millisecond remainder.
+static void pc_goldpc_store(map_session_data& sd) {
+	if (!sd.goldpc_ready || !sd.vars_ok)
+		return;
+	pc_setreg2(&sd, GOLDPC_SECONDS_VAR, sd.goldpc_elapsed_ms / 1000);
+	pc_setreg2(&sd, GOLDPC_MILLISECONDS_VAR, sd.goldpc_elapsed_ms % 1000);
+}
+
+t_tick pc_goldpc_elapsed(const map_session_data& sd) {
+	return sd.goldpc_elapsed_ms + (sd.goldpc_tid == INVALID_TIMER ? 0 : std::max<t_tick>(0, gettick() - sd.goldpc_started));
+}
+
+static void pc_goldpc_credit(map_session_data& sd, t_tick period) {
+	const int64 maximum = battle_config.feature_goldpc_max_points;
+	if (maximum <= 0 || period <= 0)
+		return;
+	int64 points = cap_value(pc_readreg2(&sd, GOLDPC_POINT_VAR), int64(0), maximum);
+	if (points < maximum && sd.goldpc_elapsed_ms >= period) {
+		const int64 multiplier = battle_config.feature_goldpc_vip && pc_isvip(&sd) ? 2 : 1;
+		const int64 periods = sd.goldpc_elapsed_ms / period;
+		const int64 required = (maximum - points + multiplier - 1) / multiplier;
+		const int64 rewarded = std::min(periods, required);
+		points = std::min(maximum, points + rewarded * multiplier);
+		sd.goldpc_elapsed_ms -= rewarded * period;
+	}
+	if (points >= maximum)
+		sd.goldpc_elapsed_ms = 0; // Time at the point cap cannot be banked for later spending.
+	pc_setreg2(&sd, GOLDPC_POINT_VAR, points);
+}
+
+void pc_goldpc_pause(map_session_data& sd, bool credit) {
+	if (!sd.goldpc_ready)
+		return;
+	if (sd.goldpc_tid != INVALID_TIMER) {
+		sd.goldpc_elapsed_ms = pc_goldpc_elapsed(sd);
+		delete_timer(sd.goldpc_tid, pc_goldpc_update);
+		sd.goldpc_tid = INVALID_TIMER;
+		if (credit)
+			pc_goldpc_credit(sd, sd.goldpc_period_ms);
+	}
+	pc_goldpc_store(sd);
+}
+
+static bool pc_goldpc_eligible(const map_session_data& sd) {
+	return sd.goldpc_ready && sd.vars_ok && sd.prev != nullptr && sd.fd > 0 &&
+		!sd.state.connect_new && !sd.state.autotrade && battle_config.feature_goldpc_active &&
+		battle_config.feature_goldpc_max_points > 0 && battle_goldpc_map_allowed(map_mapid2mapname(sd.m));
+}
+
+void pc_goldpc_refresh(map_session_data& sd) {
+	if (!sd.goldpc_ready)
+		return;
+	pc_goldpc_pause(sd);
+	if (pc_goldpc_eligible(sd)) {
+		sd.goldpc_period_ms = t_tick(battle_config.feature_goldpc_time) * 1000;
+		pc_goldpc_credit(sd, sd.goldpc_period_ms);
+		if (pc_readreg2(&sd, GOLDPC_POINT_VAR) < battle_config.feature_goldpc_max_points) {
+			sd.goldpc_started = gettick();
+			sd.goldpc_tid = add_timer(sd.goldpc_started + sd.goldpc_period_ms - sd.goldpc_elapsed_ms,
+				pc_goldpc_update, sd.id, 0);
+		}
+	}
+	pc_goldpc_store(sd);
+	clif_goldpc_info(sd);
+}
+
+TIMER_FUNC(pc_goldpc_update) {
+	map_session_data* sd = map_id2sd(id);
+	if (sd == nullptr || sd->goldpc_tid != tid)
+		return 0; // Disconnected character or an obsolete timer callback.
+	// The firing timer is already being removed by the timer engine; don't delete it twice.
+	sd->goldpc_elapsed_ms = pc_goldpc_elapsed(*sd);
+	sd->goldpc_tid = INVALID_TIMER;
+	pc_goldpc_refresh(*sd);
+	return 0;
+}
+
+void pc_goldpc_save(map_session_data& sd, bool quitting) {
+	pc_goldpc_pause(sd);
+	if (!quitting)
+		pc_goldpc_refresh(sd);
+}
+
+static int32 pc_goldpc_reload_sub(map_session_data* sd, va_list args) {
+	if (va_arg(args, int))
+		pc_goldpc_pause(*sd);
+	else
+		pc_goldpc_refresh(*sd);
+	return 0;
+}
+
+void pc_goldpc_config_reload(bool before) {
+	// A single traversal only when configuration changes, never a periodic scan.
+	map_foreachpc(pc_goldpc_reload_sub, before ? 1 : 0);
+}
+
 /*==========================================
  * Invoked once after the char/account/account2 registry variables are received. [Skotlex]
  * We didn't receive item information at this point so DO NOT attempt to do item operations here.
@@ -2387,6 +2484,12 @@ void pc_reg_received(map_session_data *sd)
 	uint8 i;
 
 	sd->vars_ok = true;
+	if (!sd->goldpc_ready) {
+		sd->goldpc_elapsed_ms = cap_value(pc_readreg2(sd, GOLDPC_SECONDS_VAR), int64(0), int64(INT_MAX)) * 1000
+			+ cap_value(pc_readreg2(sd, GOLDPC_MILLISECONDS_VAR), int64(0), int64(999));
+		sd->goldpc_tid = INVALID_TIMER;
+		sd->goldpc_ready = true;
+	}
 
 	sd->change_level_2nd = static_cast<unsigned char>(pc_readglobalreg(sd, add_str(JOBCHANGE2ND_VAR)));
 	sd->change_level_3rd = static_cast<unsigned char>(pc_readglobalreg(sd, add_str(JOBCHANGE3RD_VAR)));
@@ -10368,6 +10471,7 @@ int64 pc_readparam( const map_session_data* sd, int64 type )
 		case SP_PCDIECOUNTER:    val = sd->die_counter; break;
 		case SP_COOKMASTERY:     val = sd->cook_mastery; break;
 		case SP_ACHIEVEMENT_LEVEL: val = sd->achievement_data.level; break;
+		case SP_GOLDPC_POINTS: val = pc_readreg2(sd, GOLDPC_POINT_VAR); break;
 		case SP_CRITICAL:        val = sd->battle_status.cri/10; break;
 		case SP_ASPD:            val = (AMOTION_ZERO_ASPD-sd->battle_status.amotion)/AMOTION_INTERVAL; break;
 		case SP_BASE_ATK:
@@ -10746,6 +10850,12 @@ bool pc_setparam(map_session_data *sd,int64 type,int64 val_tmp)
 		if (!sd->state.connect_new && sd->die_counter == 1 && (sd->class_&MAPID_SECONDMASK) == MAPID_SUPER_NOVICE)
 			status_calc_pc(sd, SCO_NONE); // Lost the bonus.
 		pc_setglobalreg(sd, add_str(PCDIECOUNTER_VAR), sd->die_counter);
+		return true;
+	case SP_GOLDPC_POINTS:
+		// Preserve accrued time without crediting between an expression's read/write.
+		pc_goldpc_pause(*sd, false);
+		pc_setreg2(sd, GOLDPC_POINT_VAR, cap_value(val_tmp, int64(0), int64(battle_config.feature_goldpc_max_points > 0 ? battle_config.feature_goldpc_max_points : INT_MAX)));
+		pc_goldpc_refresh(*sd);
 		return true;
 	case SP_COOKMASTERY:
 		if (sd->cook_mastery == val)
@@ -16279,6 +16389,7 @@ void do_init_pc(void) {
 	add_timer_func_list(pc_autotrade_timer, "pc_autotrade_timer");
 	add_timer_func_list(pc_on_expire_active, "pc_on_expire_active");
 	add_timer_func_list(pc_macro_detector_timeout, "pc_macro_detector_timeout");
+	add_timer_func_list(pc_goldpc_update, "pc_goldpc_update");
 
 	add_timer(gettick() + autosave_interval, pc_autosave, 0, 0);
 

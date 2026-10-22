@@ -316,6 +316,9 @@ int32 chrif_save(map_session_data *sd, int32 flag) {
 	if (flag&CSAVE_QUITTING)
 		sd->state.storage_flag = 0; //Force close it.
 
+	// Snapshot progress before registry saving (also covers logout/map-server transfer).
+	pc_goldpc_save(*sd, (flag & CSAVE_QUITTING) != 0);
+
 	//Saving of registry values.
 	if (sd->vars_dirty)
 		intif_saveregistry(sd);
@@ -1588,6 +1591,8 @@ void chrif_parse_ack_vipActive(int32 fd) {
 			clif_displaymessage(sd->fd,msg_txt(sd,438)); // You are no longer VIP.
 		}
 	}
+	pc_goldpc_refresh(*sd);
+
 	// Show info if status changed
 	if (((flag&0x4) || changed) && !sd->vip.disableshowrate) {
 		clif_display_pinfo( *sd );

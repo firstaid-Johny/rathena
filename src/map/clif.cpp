@@ -11233,6 +11233,7 @@ void clif_parse_LoadEndAck(int32 fd,map_session_data *sd)
 	guild_donate_refresh_icon(*sd, true);
 	sd->state.connect_new = 0;
 	sd->state.changemap = false;
+	pc_goldpc_refresh(*sd);
 	party_bonus_refresh(party_search(sd->status.party_id));
 }
 
@@ -25736,6 +25737,49 @@ void clif_parse_MoveFromKafraFav( int32 fd, map_session_data* sd ){
 	}else if( sd->state.storage_flag == 3 ){
 		storage_storageget( sd, &sd->premiumStorage, item_index, item_amount, true );
 	}
+#endif
+}
+
+void clif_goldpc_info(map_session_data& sd) {
+#if PACKETVER >= 20140611
+	if (!sd.goldpc_ready || sd.fd <= 0)
+		return;
+	PACKET_ZC_GOLDPCCAFE_POINT p{};
+	p.PacketType = HEADER_ZC_GOLDPCCAFE_POINT;
+	const bool capped = battle_config.feature_goldpc_max_points > 0 && pc_readreg2(&sd, GOLDPC_POINT_VAR) >= battle_config.feature_goldpc_max_points;
+	p.isActive = battle_config.feature_goldpc_active && (sd.goldpc_tid != INVALID_TIMER || capped);
+	p.mode = battle_config.feature_goldpc_vip && pc_isvip(&sd) ? 2 : 1;
+	p.point = static_cast<int32>(pc_readreg2(&sd, GOLDPC_POINT_VAR));
+	// This Client UI has a fixed one-hour scale. Scale the configured interval to it.
+	const t_tick period = t_tick(battle_config.feature_goldpc_time) * 1000;
+	p.playedTime = capped ? 3600 : static_cast<int32>(std::min<t_tick>(3600, pc_goldpc_elapsed(sd) * 3600 / period));
+	clif_send(&p, sizeof(p), &sd, SELF);
+#endif
+}
+
+void clif_parse_dynamic_npc(int32 fd, map_session_data* sd) {
+#if PACKETVER >= 20140430
+	if (sd == nullptr)
+		return;
+	const auto* p = reinterpret_cast<const PACKET_CZ_DYNAMICNPC_CREATE_REQUEST*>(RFIFOP(fd, 0));
+	char name[sizeof(p->name) + 1];
+	memcpy(name, p->name, sizeof(p->name));
+	name[sizeof(p->name)] = '\0';
+	// Never let client-provided names spawn arbitrary NPCs.
+	if (strcmpi(name, "GOLDPCCAFE") != 0 || !battle_config.feature_goldpc_active || sd->state.autotrade)
+		return;
+	if (sd->npc_id != 0) {
+		clif_dynamicnpc_result(*sd, DYNAMICNPC_RESULT_UNKNOWN);
+		return;
+	}
+	npc_data* nd = npc_name2id("GOLDPCCAFE");
+	if (nd == nullptr) {
+		ShowWarning("Gold PC: NPC GOLDPCCAFE is not loaded.\n");
+		clif_dynamicnpc_result(*sd, DYNAMICNPC_RESULT_UNKNOWNNPC);
+		return;
+	}
+	if (npc_duplicate_npc_for_player(*nd, *sd) != nullptr)
+		clif_dynamicnpc_result(*sd, DYNAMICNPC_RESULT_SUCCESS);
 #endif
 }
 

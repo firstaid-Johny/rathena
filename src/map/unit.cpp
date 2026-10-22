@@ -3863,6 +3863,7 @@ void unit_refresh( const block_list* bl, bool walking ) {
  */
 void unit_remove_map_pc(map_session_data *sd, clr_type clrtype)
 {
+	pc_goldpc_pause(*sd);
 	unit_remove_map(sd,clrtype);
 
 	//CLR_RESPAWN is the warp from logging out, CLR_TELEPORT is the warp from teleporting, but pets/homunc need to just 'vanish' instead of showing the warping animation.
@@ -3889,6 +3890,7 @@ void unit_remove_map_pc(map_session_data *sd, clr_type clrtype)
  */
 void unit_free_pc(map_session_data *sd)
 {
+	pc_goldpc_pause(*sd);
 	if (sd->pd)
 		unit_free(sd->pd,CLR_OUTSIGHT);
 

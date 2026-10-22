@@ -5,6 +5,8 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <set>
+#include <sstream>
 
 #include <common/cbasetypes.hpp>
 #include <common/ers.hpp>
@@ -38,6 +40,30 @@
 using namespace rathena;
 
 struct Battle_Config battle_config;
+
+// Keep string settings outside Battle_Config, which existing code copies with memcpy.
+static std::set<std::string> goldpc_maps{ "prontera" };
+static int goldpc_config_depth = 0;
+static bool goldpc_config_loaded = false;
+
+bool battle_goldpc_map_allowed(const char* name) {
+	return name != nullptr && goldpc_maps.find(name) != goldpc_maps.end();
+}
+
+static void battle_goldpc_set_maps(const char* value) {
+	goldpc_maps.clear();
+	std::istringstream input(value ? value : "");
+	std::string name;
+	while (std::getline(input, name, ',')) {
+		if (name.empty() || name == "none")
+			continue;
+		if (name.size() >= MAP_NAME_LENGTH || name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@#-") != std::string::npos) {
+			ShowWarning("Invalid Gold PC map name '%s'; ignored.\n", name.c_str());
+			continue;
+		}
+		goldpc_maps.insert(name);
+	}
+}
 static struct eri *delay_damage_ers; //For battle delay damage structures.
 
 #ifndef MAX_ENEMY_SEARCH_COUNT
@@ -8940,6 +8966,13 @@ static const struct _battle_data {
  *--------------------------*/
 int32 battle_set_value(const char* w1, const char* w2)
 {
+	const bool goldpc_live = goldpc_config_loaded && goldpc_config_depth == 0 && strncasecmp(w1, "feature.goldpc_", 15) == 0;
+	if (strcmpi(w1, "feature.goldpc_maps") == 0) {
+		if (goldpc_live) pc_goldpc_config_reload(true);
+		battle_goldpc_set_maps(w2);
+		if (goldpc_live) pc_goldpc_config_reload(false);
+		return 1;
+	}
 	int32 val = config_switch(w2);
 
 	int32 i;
@@ -8952,7 +8985,9 @@ int32 battle_set_value(const char* w1, const char* w2)
 		val = battle_data[i].defval;
 	}
 
+	if (goldpc_live) pc_goldpc_config_reload(true);
 	*battle_data[i].val = val;
+	if (goldpc_live) pc_goldpc_config_reload(false);
 	return 1;
 }
 
@@ -8974,6 +9009,7 @@ int32 battle_get_value(const char* w1)
  *----------------------*/
 void battle_set_defaults()
 {
+	goldpc_maps = { "prontera" };
 	int32 i;
 	for (i = 0; i < ARRAYLENGTH(battle_data); i++)
 		*battle_data[i].val = battle_data[i].defval;
@@ -9183,10 +9219,13 @@ int32 battle_config_read(const char* cfgName)
 	FILE* fp;
 	static int32 count = 0;
 
-	if (count == 0)
+	if (count == 0) {
+		if (goldpc_config_loaded) pc_goldpc_config_reload(true);
 		battle_set_defaults();
+	}
 
 	count++;
+	goldpc_config_depth++;
 
 	fp = fopen(cfgName,"r");
 	if (fp == nullptr)
@@ -9227,9 +9266,13 @@ int32 battle_config_read(const char* cfgName)
 	}
 
 	count--;
+	goldpc_config_depth--;
 
-	if (count == 0)
+	if (count == 0) {
 		battle_adjust_conf();
+		if (goldpc_config_loaded) pc_goldpc_config_reload(false);
+		goldpc_config_loaded = true;
+	}
 
 	return 0;
 }
