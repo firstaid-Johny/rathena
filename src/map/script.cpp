@@ -4632,6 +4632,11 @@ void script_run_refine_announce(map_session_data& sd, const item& target, int32 
 	auto code = static_cast<script_code*>(strdb_get(autobonus_db, runner));
 	if (code == nullptr)
 		return;
+	// Snapshot the actual result before failure handling can delete/downgrade it.
+	// Use the same encoder as itemlink: refine, four cards, grade and all options.
+	item announced = target;
+	const std::string item_link = item_db.create_item_link(announced);
+	pc_setregstr(&sd, add_str("@RefineAnnounceItemLink$"), item_link.c_str());
 	pc_setreg(&sd, add_str("@RefineAnnounceItemID"), target.nameid);
 	pc_setreg(&sd, add_str("@RefineAnnounceLevel"), level);
 	pc_setreg(&sd, add_str("@RefineAnnounceSuccess"), success);
@@ -12279,55 +12284,57 @@ BUILDIN_FUNC(announce)
 
 BUILDIN_FUNC(announceplayer)
 {
-	const char* message = script_getstr(st,2);
-	const char* sender = script_getstr(st,3);
-	std::string payload = clif_announceplayer_message(message, sender);
+	std::string payload = clif_announceplayer_message(script_getstr(st,2), script_getstr(st,3));
 	if (payload.empty()) {
-		ShowError("announceplayer: Invalid sender/message; the complete chat row must fit in 255 bytes.\n");
+		ShowError("announceplayer: Invalid sender/message or visible text exceeds 255 bytes.\n");
 		return SCRIPT_CMD_FAILURE;
 	}
-	int32 flag = script_getnum(st,4);
-	const char* fontColor = script_hasdata(st,5) ? script_getstr(st,5) : nullptr;
-	int32 fontType = script_hasdata(st,6) ? script_getnum(st,6) : FW_NORMAL;
-	int32 fontSize = script_hasdata(st,7) ? script_getnum(st,7) : 12;
-	int32 fontAlign = script_hasdata(st,8) ? script_getnum(st,8) : 0;
-	int32 fontY = script_hasdata(st,9) ? script_getnum(st,9) : 0;
-	send_target target = ALL_CLIENT;
-	const block_list* source = nullptr;
-	if (flag & (BC_TARGET_MASK | BC_SOURCE_MASK)) {
-		if (flag & BC_NPC)
-			source = map_id2bl(st->oid);
-		else {
+	const char* mes = payload.c_str();
+	int32         flag      = script_getnum(st,4);
+	const char *fontColor = script_hasdata(st,5) ? script_getstr(st,5) : nullptr;
+	int32         fontType  = script_hasdata(st,6) ? script_getnum(st,6) : FW_NORMAL; // default fontType
+	int32         fontSize  = script_hasdata(st,7) ? script_getnum(st,7) : 12;    // default fontSize
+	int32         fontAlign = script_hasdata(st,8) ? script_getnum(st,8) : 0;     // default fontAlign
+	int32         fontY     = script_hasdata(st,9) ? script_getnum(st,9) : 0;     // default fontY
+
+	if (flag&(BC_TARGET_MASK|BC_SOURCE_MASK)) // Broadcast source or broadcast region defined
+	{
+		send_target target;
+		block_list *bl;
+
+		// If bc_npc flag is set, use NPC as broadcast source
+		if(flag&BC_NPC){
+			bl = map_id2bl(st->oid);
+		}else{
 			map_session_data* sd;
-			if (script_charid2sd(10, sd))
-				source = sd;
-		}
-		switch (flag & BC_TARGET_MASK) {
-			case BC_MAP: target = ALL_SAMEMAP; break;
-			case BC_AREA: target = AREA; break;
-			case BC_SELF: target = SELF; break;
-		}
-	}
-	if (target != ALL_CLIENT && source == nullptr)
-		return SCRIPT_CMD_FAILURE;
 
-	if (target == ALL_CLIENT)
-		intif_broadcast2(payload.c_str(), payload.size() + 1, ANNOUNCEPLAYER_CHAT_COLOR, 0, 0, 0, 0);
-	else
-		clif_announceplayer_chat(payload.c_str(), source, target);
-
-	// Ordinary chat has no custom-color fields. Explicit color requests additionally
-	// use an ordinary broadcast; the selectable player-chat row is always sent.
-	if (fontColor || (flag & BC_COLOR_MASK)) {
-		if (target == ALL_CLIENT) {
-			if (fontColor)
-				intif_broadcast2(message, strlen(message) + 1, strtol(fontColor, nullptr, 0), fontType, fontSize, fontAlign, fontY);
+			if(script_charid2sd(10, sd))
+				bl = sd;
 			else
-				intif_broadcast(message, strlen(message) + 1, flag & BC_COLOR_MASK);
-		} else if (fontColor)
-			clif_broadcast2(source, message, strlen(message) + 1, strtol(fontColor, nullptr, 0), fontType, fontSize, fontAlign, fontY, target);
+				bl = nullptr;
+		}
+
+		if (bl == nullptr)
+			return SCRIPT_CMD_SUCCESS;
+
+		switch (flag&BC_TARGET_MASK) {
+			case BC_MAP:	target = ALL_SAMEMAP;	break;
+			case BC_AREA:	target = AREA;			break;
+			case BC_SELF:	target = SELF;			break;
+			default:		target = ALL_CLIENT;	break; // BC_ALL
+		}
+
+		if (fontColor)
+			clif_broadcast2(bl, mes, (int32)strlen(mes)+1, strtol(fontColor, (char **)nullptr, 0), fontType, fontSize, fontAlign, fontY, target);
 		else
-			clif_broadcast(source, message, strlen(message) + 1, flag & BC_COLOR_MASK, target);
+			clif_broadcast(bl, mes, (int32)strlen(mes)+1, flag&BC_COLOR_MASK, target);
+	}
+	else
+	{
+		if (fontColor)
+			intif_broadcast2(mes, (int32)strlen(mes)+1, strtol(fontColor, (char **)nullptr, 0), fontType, fontSize, fontAlign, fontY);
+		else
+			intif_broadcast(mes, (int32)strlen(mes)+1, flag&BC_COLOR_MASK);
 	}
 	return SCRIPT_CMD_SUCCESS;
 }

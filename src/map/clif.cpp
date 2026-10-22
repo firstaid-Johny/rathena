@@ -6726,7 +6726,8 @@ void clif_displaymessage(const int32 fd, const char* mes)
 
 /// Send broadcast message in yellow or blue without font formatting.
 /// 009a <packet len>.W <message>.?B (ZC_BROADCAST)
-// Use the same "name : message" representation as ordinary player chat.
+// AP2 is decoded by the matching native client patch before normal broadcast rendering.
+// Limit visible text to the native custom-broadcast buffer (255 bytes + NUL).
 std::string clif_announceplayer_message(const char* message, const char* sender)
 {
 	if (message == nullptr || sender == nullptr)
@@ -6736,27 +6737,23 @@ std::string clif_announceplayer_message(const char* message, const char* sender)
 		name_length + 3 + message_length >= CHAT_SIZE_MAX)
 		return {};
 	for (size_t i = 0; i < name_length; ++i)
-		if (static_cast<unsigned char>(sender[i]) < 32 || sender[i] == 127)
+		if (static_cast<unsigned char>(sender[i]) < 32 || sender[i] == 127 ||
+			sender[i] == '^' || sender[i] == '<' || sender[i] == '>')
 			return {};
-	// Keep one announcement in one chat row and prevent ambiguous sender prefixes.
-	if (strstr(sender, " : ") != nullptr || strchr(message, '\n') || strchr(message, '\r'))
+	if (strchr(message, '\n') || strchr(message, '\r'))
 		return {};
-	return std::string(sender) + " : " + message;
-}
-
-void clif_announceplayer_chat(const char* message, const block_list* source, enum send_target target)
-{
-	if (message == nullptr)
-		return;
-	size_t length = strlen(message);
-	if (length == 0 || length >= CHAT_SIZE_MAX)
-		return;
-	// 008e carries text only, so recipients need no actor/name cache or map visibility.
-	unsigned char packet[4 + CHAT_SIZE_MAX];
-	WBUFW(packet, 0) = 0x008e;
-	WBUFW(packet, 2) = static_cast<uint16>(4 + length + 1);
-	memcpy(WBUFP(packet, 4), message, length + 1);
-	clif_send(packet, static_cast<int32>(4 + length + 1), source, target);
+	static const char hex[] = "0123456789ABCDEF";
+	std::string wire = "\x1e" "AP2|";
+	for (size_t i = 0; i < NAME_LENGTH; ++i) {
+		unsigned char c = i < name_length ? static_cast<unsigned char>(sender[i]) : 0;
+		wire += hex[c >> 4]; wire += hex[c & 15];
+	}
+	wire += '|';
+	std::string visible = std::string(sender) + " : " + message;
+	for (unsigned char c : visible) {
+		wire += hex[c >> 4]; wire += hex[c & 15];
+	}
+	return wire;
 }
 
 void clif_broadcast( const block_list* bl, const char* mes, size_t len, int32 type, enum send_target target )

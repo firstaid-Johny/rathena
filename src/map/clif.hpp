@@ -1145,7 +1145,6 @@ void clif_font(const map_session_data* sd);
 void clif_displaymessage( const int32 fd, const char* mes );
 void clif_disp_message( const block_list* src, const char* mes, size_t len, enum send_target target );
 std::string clif_announceplayer_message(const char* message, const char* sender);
-void clif_announceplayer_chat(const char* message, const block_list* source, enum send_target target);
 void clif_broadcast( const block_list* bl, const char* mes, size_t len, int32 type, enum send_target target );
 void clif_broadcast2( const block_list* bl, const char* mes, size_t len, unsigned long fontColor, int16 fontType, int16 fontSize, int16 fontAlign, int16 fontY, enum send_target target );
 void clif_heal( const map_session_data& sd, int32 type, uint32 val );

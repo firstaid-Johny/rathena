@@ -4,12 +4,9 @@
 
 prontera,155,172,0	script	asd	800,{
 	
-	.@optidna = getequiprandomoption(EQI_ARMOR,0,ROA_ID);
-	.@optvalna = getequiprandomoption(EQI_ARMOR,0,ROA_VALUE);
-	.@options$ += callfunc("F_GetRDMOPT_Name",.@optidna) + " : "+ callfunc("F_GetRDMOPT_Value",.@optidna,.@optvalna);
-	//.@options$ += .@optidna + " : " + .@optvalna;
-	mes "ID:"+.@optidna+",Val:"+optvalna+" [" + .@options$ + "]";
-	close;
+	announce "ไม่เทส",bc_all;
+	announceplayer "นั่งเทส",strcharinfo(0),bc_all,0xFFF618;
+	end;
 }
 
 prontera,149,175,0	script	Re-Option	800,{
@@ -23,7 +20,6 @@ prontera,149,175,0	script	Re-Option	800,{
 		next;
 		break;
 	case 2:
-		mes "เลือกไอเท็มที่จะแลกเป็นแต้ม";
 		close2;
 		@ReOptionSellSession = 1;
 		callshop "ReOptionExchange",2;
@@ -123,7 +119,7 @@ prontera,149,175,0	script	Re-Option	800,{
 		.@optidna = getequiprandomoption(.@pos,0,ROA_ID);
 		.@optvalna = getequiprandomoption(.@pos,0,ROA_VALUE);
 		.@options$ += callfunc("F_GetRDMOPT_Name",.@optidna) + callfunc("F_GetRDMOPT_Value",.@optidna,.@optvalna);
-		announce "["+strcharinfo(0)+"] รีออฟชั่น [+"+.@refine + getitemname(.@id)+"] ได้รับ [" + .@options$ + "]",bc_all;
+		announce "["+strcharinfo(0)+"] รีออฟชั่น ["+ itemlink(.@id,.@refine,0,0,0,0,0,.@optidna,.@optvalna,.@optramamna)+"] ได้รับ [" + .@options$ + "]",bc_all;
 	}
 	else if (.@result == -1) mes "อุปกรณ์เปลี่ยนไปหรือไม่ผ่านเงื่อนไข กรุณาเลือกใหม่";
 	else if (.@result == -2) mes "ข้อมูลสูตรหรือกลุ่มสุ่มไม่สมบูรณ์";

@@ -6623,7 +6623,11 @@ int32 pc_useitem(map_session_data *sd,int32 n)
 
 	run_script( script, 0, sd->id, fake_nd->id );
 
-	if( sd->st != nullptr ){
+	// A standalone item may be waiting for input/next/close. Keep its state
+	// attached so the client's reply can resume it through npc_scriptcont.
+	// If an NPC was already active, dispose of the item's suspended state
+	// before restoring that conversation: two dialogs cannot own one player.
+	if( previous_st != nullptr && sd->st != nullptr ){
 		script_free_state( sd->st );
 		sd->st = nullptr;
 	}

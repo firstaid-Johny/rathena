@@ -104,6 +104,7 @@ Thumbs.db
 /src/tool/obj_all
 
 # /tools/
+/tools/
 /tools/convert
 /tools/adduser
 /tools/*.exe

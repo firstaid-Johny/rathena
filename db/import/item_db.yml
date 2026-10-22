@@ -136,6 +136,10 @@ Body:
     Jobs:
       Acolyte: true
       Priest: true
+  - Id: 12221
+    Script: |
+      input @megaphone$;
+      announceplayer "" + @megaphone$,strcharinfo(0),bc_all,0xFF0000;
   - Id: 604
     AegisName: Branch_Of_Dead_Tree
     Name: Dead Branch

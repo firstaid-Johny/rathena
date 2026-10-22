@@ -569,7 +569,7 @@ function	script	F_GetRDMOPT_Value	{
 function	script	F_RefineAnnounce	{
 	// Always announce the full attached character name, regardless of broadcast_hide_name.
 	@RefineAnnounceName$ = strcharinfo(0);
-	.@message$ = "[" + @RefineAnnounceName$ + "] ตีบวก [" + getitemname(@RefineAnnounceItemID) + "] +" + @RefineAnnounceLevel;
+	.@message$ = "[" + @RefineAnnounceName$ + "] ตีบวก [" + @RefineAnnounceItemLink$ + "] ขึ้น +" + @RefineAnnounceLevel;
 	if (!@RefineAnnounceSuccess) {
 		announce .@message$ + " ล้มเหลว",bc_all;
 		return;

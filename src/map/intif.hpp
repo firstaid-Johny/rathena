@@ -23,8 +23,7 @@ class map_session_data;
 
 int32 intif_parse(int32 fd);
 
-// Reserved relay marker; never forwarded to game clients as a font color.
-constexpr unsigned long ANNOUNCEPLAYER_CHAT_COLOR = 0xFD000000;
+// Broadcast with sender metadata for the matching native Client patch.
 int32 intif_broadcast_player(const char* message, const char* sender, int32 type);
 int32 intif_broadcast( const char* mes, size_t len, int32 type );
 int32 intif_broadcast2( const char* mes, size_t len, unsigned long fontColor, int16 fontType, int16 fontSize, int16 fontAlign, int16 fontY );
