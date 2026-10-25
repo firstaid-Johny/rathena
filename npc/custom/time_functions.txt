@@ -1,0 +1,45 @@
+//===== rAthena Script =======================================
+//= Convert a duration in seconds to Thai month/day/hour/minute/second text.
+//============================================================
+// Usage:
+//   mes callfunc("F_SecondsToTime", 3661);
+//   // 1 ชั่วโมง 1 นาที 1 วินาที
+//
+//   .@duration$ = callfunc("F_SecondsToTime", 2768523);
+//   // 1 เดือน 2 วัน 1 ชั่วโมง 2 นาที 3 วินาที
+//
+// Rules:
+//   1 month = 30 days, 1 day = 24 hours.
+//   Months/days/hours/minutes are omitted when zero. Seconds always display.
+//   A missing or negative argument is treated as zero seconds.
+//   This is a duration, not a calendar-month/date calculation.
+//   No player attachment, timer, SQL or loop is required.
+//============================================================
+
+function	script	F_SecondsToTime	{
+	.@seconds = max(0, getarg(0, 0));
+
+	.@months = .@seconds / 2592000;
+	.@seconds = .@seconds % 2592000;
+
+	.@days = .@seconds / 86400;
+	.@seconds = .@seconds % 86400;
+
+	.@hours = .@seconds / 3600;
+	.@seconds = .@seconds % 3600;
+
+	.@minutes = .@seconds / 60;
+	.@seconds = .@seconds % 60;
+
+	.@text$ = "";
+	if (.@months > 0)
+		.@text$ += .@months + " เดือน ";
+	if (.@days > 0)
+		.@text$ += .@days + " วัน ";
+	if (.@hours > 0)
+		.@text$ += .@hours + " ชั่วโมง ";
+	if (.@minutes > 0)
+		.@text$ += .@minutes + " นาที ";
+
+	return .@text$ + .@seconds + " วินาที";
+}

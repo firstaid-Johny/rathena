@@ -18,26 +18,86 @@ Header:
 Body:
   - Level: 1
     RequiredZeny: 100000
-    Icon: EFST_BLANK
+    Icon: EFST_GUILD_DONATE_1
     Script: |
-      bonus bAllStats,1;
+      bonus2 bExpAddRace,RC_All,6;
+      bonus2 bDropAddRace,RC_All,4;
+      bonus2 bAddClass,Class_Boss,5;
+      bonus2 bMagicAddClass,Class_Boss,5;
+      bonus2 bAddRace,RC_DemiHuman,1;
+      bonus2 bAddrace,RC_Player_Human,1;
+      bonus2 bMagicAddRace,RC_DemiHuman,1;
+      bonus2 bMagicAddrace,RC_Player_Human,1;
+      skill "MC_OVERCHARGE",2;
+      skill "MC_DISCOUNT",2;
+      bonus bAddMaxWeight,2000;
+      bonus bBaseAtk,6;
+      bonus bMatk,6;
   - Level: 2
     RequiredZeny: 200000
-    Icon: EFST_BLANK
+    Icon: EFST_GUILD_DONATE_2
     Script: |
-      bonus bAllStats,2;
+      bonus2 bExpAddRace,RC_All,12;
+      bonus2 bDropAddRace,RC_All,8;
+      bonus2 bAddClass,Class_Boss,10;
+      bonus2 bMagicAddClass,Class_Boss,10;
+      bonus2 bAddRace,RC_DemiHuman,2;
+      bonus2 bAddrace,RC_Player_Human,2;
+      bonus2 bMagicAddRace,RC_DemiHuman,2;
+      bonus2 bMagicAddrace,RC_Player_Human,2;
+      skill "MC_OVERCHARGE",4;
+      skill "MC_DISCOUNT",4;
+      bonus bAddMaxWeight,4000;
+      bonus bBaseAtk,12;
+      bonus bMatk,12;
   - Level: 3
     RequiredZeny: 300000
-    Icon: EFST_BLANK
+    Icon: EFST_GUILD_DONATE_3
     Script: |
-      bonus bAllStats,5;
+      bonus2 bExpAddRace,RC_All,18;
+      bonus2 bDropAddRace,RC_All,12;
+      bonus2 bAddClass,Class_Boss,15;
+      bonus2 bMagicAddClass,Class_Boss,15;
+      bonus2 bAddRace,RC_DemiHuman,3;
+      bonus2 bAddrace,RC_Player_Human,3;
+      bonus2 bMagicAddRace,RC_DemiHuman,3;
+      bonus2 bMagicAddrace,RC_Player_Human,3;
+      skill "MC_OVERCHARGE",6;
+      skill "MC_DISCOUNT",6;
+      bonus bAddMaxWeight,6000;
+      bonus bBaseAtk,18;
+      bonus bMatk,18;
   - Level: 4
     RequiredZeny: 400000
-    Icon: EFST_BLANK
+    Icon: EFST_GUILD_DONATE_4
     Script: |
-      bonus bAllStats,10;
+      bonus2 bExpAddRace,RC_All,24;
+      bonus2 bDropAddRace,RC_All,16;
+      bonus2 bAddClass,Class_Boss,20;
+      bonus2 bMagicAddClass,Class_Boss,20;
+      bonus2 bAddRace,RC_DemiHuman,4;
+      bonus2 bAddrace,RC_Player_Human,4;
+      bonus2 bMagicAddRace,RC_DemiHuman,4;
+      bonus2 bMagicAddrace,RC_Player_Human,4;
+      skill "MC_OVERCHARGE",8;
+      skill "MC_DISCOUNT",8;
+      bonus bAddMaxWeight,8000;
+      bonus bBaseAtk,24;
+      bonus bMatk,24;
   - Level: 5
     RequiredZeny: 500000
-    Icon: EFST_BLANK
+    Icon: EFST_GUILD_DONATE_5
     Script: |
-      bonus bAllStats,15;
+      bonus2 bExpAddRace,RC_All,30;
+      bonus2 bDropAddRace,RC_All,20;
+      bonus2 bAddClass,Class_Boss,25;
+      bonus2 bMagicAddClass,Class_Boss,25;
+      bonus2 bAddRace,RC_DemiHuman,5;
+      bonus2 bAddrace,RC_Player_Human,5;
+      bonus2 bMagicAddRace,RC_DemiHuman,5;
+      bonus2 bMagicAddrace,RC_Player_Human,5;
+      skill "MC_OVERCHARGE",10;
+      skill "MC_DISCOUNT",10;
+      bonus bAddMaxWeight,10000;
+      bonus bBaseAtk,30;
+      bonus bMatk,30;

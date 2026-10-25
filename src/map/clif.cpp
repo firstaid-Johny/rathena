@@ -11233,6 +11233,7 @@ void clif_parse_LoadEndAck(int32 fd,map_session_data *sd)
 	guild_donate_refresh_icon(*sd, true);
 	sd->state.connect_new = 0;
 	sd->state.changemap = false;
+	clif_vip_status(*sd);
 	pc_goldpc_refresh(*sd);
 	party_bonus_refresh(party_search(sd->status.party_id));
 }
@@ -25737,6 +25738,20 @@ void clif_parse_MoveFromKafraFav( int32 fd, map_session_data* sd ){
 	}else if( sd->state.storage_flag == 3 ){
 		storage_storageget( sd, &sd->premiumStorage, item_index, item_amount, true );
 	}
+#endif
+}
+
+// A display-only icon: VIP permissions and expiration remain owned by login-server.
+void clif_vip_status(map_session_data& sd) {
+#ifdef VIP_ENABLE
+    // VIP data can arrive before LoadEndAck. Defer until the Client can keep it.
+    if (sd.state.connect_new || !sd.state.pc_loaded || sd.fd <= 0)
+        return;
+    const bool active = pc_isvip(&sd) && sd.vip.time > time(nullptr);
+    // Infinite display avoids the packet's 32-bit duration limit for long VIP terms.
+    // The existing login-server expiry notification explicitly removes the icon.
+    clif_status_change_sub(&sd, sd.id, EFST_VIP_ACCOUNT, active ? 1 : 0,
+        active ? INFINITE_TICK : 0, 0, 0, 0, SELF);
 #endif
 }
 

@@ -339,3 +339,250 @@ Body:
     Script: |
       bonus bMaxSPrate,20;
       bonus2 bAddEff2,Eff_Curse,20;
+
+  # VIP membership cards. vip_time uses minutes; displayed remaining time is calculated.
+  - Id: 100012
+    AegisName: vip_black_card_1d
+    Name: VIP Member 1 Day
+    Type: Usable
+    Trade:
+      NoDrop: true
+      NoSell: true
+    Script: |
+      .@remaining = vip_status(VIP_STATUS_REMAINING) + 86400;
+      vip_time 1440;
+      dispbottom "ท่านเปิดใช้งาน VIP เพิ่ม 1 วัน";
+      dispbottom "คงเหลือ VIP (คำนวณหลังเพิ่ม): " + callfunc("F_SecondsToTime", .@remaining);
+
+  - Id: 100013
+    AegisName: vip_black_card_3d
+    Name: VIP Member 3 Day
+    Type: Usable
+    Trade:
+      NoDrop: true
+      NoSell: true
+    Script: |
+      .@remaining = vip_status(VIP_STATUS_REMAINING) + 259200;
+      vip_time 4320;
+      dispbottom "ท่านเปิดใช้งาน VIP เพิ่ม 3 วัน";
+      dispbottom "คงเหลือ VIP (คำนวณหลังเพิ่ม): " + callfunc("F_SecondsToTime", .@remaining);
+
+  - Id: 100014
+    AegisName: vip_black_card_7d
+    Name: VIP Member 7 Day
+    Type: Usable
+    Trade:
+      NoDrop: true
+      NoSell: true
+    Script: |
+      .@remaining = vip_status(VIP_STATUS_REMAINING) + 604800;
+      vip_time 10080;
+      dispbottom "ท่านเปิดใช้งาน VIP เพิ่ม 7 วัน";
+      dispbottom "คงเหลือ VIP (คำนวณหลังเพิ่ม): " + callfunc("F_SecondsToTime", .@remaining);
+
+  - Id: 100015
+    AegisName: vip_black_card_15d
+    Name: VIP Member 15 Day
+    Type: Usable
+    Trade:
+      NoDrop: true
+      NoSell: true
+    Script: |
+      .@remaining = vip_status(VIP_STATUS_REMAINING) + 1296000;
+      vip_time 21600;
+      dispbottom "ท่านเปิดใช้งาน VIP เพิ่ม 15 วัน";
+      dispbottom "คงเหลือ VIP (คำนวณหลังเพิ่ม): " + callfunc("F_SecondsToTime", .@remaining);
+
+  - Id: 100016
+    AegisName: vip_black_card_30d
+    Name: VIP Member 30 Day
+    Type: Usable
+    Trade:
+      NoDrop: true
+      NoSell: true
+    Script: |
+      .@remaining = vip_status(VIP_STATUS_REMAINING) + 2592000;
+      vip_time 43200;
+      dispbottom "ท่านเปิดใช้งาน VIP เพิ่ม 30 วัน";
+      dispbottom "คงเหลือ VIP (คำนวณหลังเพิ่ม): " + callfunc("F_SecondsToTime", .@remaining);
+
+  # Re-Option materials +5 through +10 (Type defaults to Etc).
+  - Id: 100017
+    AegisName: heros_iron_bar_5
+    Name: Re-Option +5
+  - Id: 100018
+    AegisName: heros_iron_bar_6
+    Name: Re-Option +6
+  - Id: 100019
+    AegisName: heros_iron_bar_7
+    Name: Re-Option +7
+  - Id: 100020
+    AegisName: heros_iron_bar_8
+    Name: Re-Option +8
+  - Id: 100021
+    AegisName: heros_iron_bar_9
+    Name: Re-Option +9
+  - Id: 100022
+    AegisName: heros_iron_bar_10
+    Name: Re-Option +10
+
+  # Usable range 110001+: NT EXP consumables and one-day rental ring boxes.
+  - Id: 110001
+    AegisName: NT_Exp_Potion
+    Name: "[NT] Exp Potion"
+    Type: Usable
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      getexp2 1000000,500000;
+
+  - Id: 110002
+    AegisName: NT_Field_Manual
+    Name: "[NT] Field Manual"
+    Type: Usable
+    Weight: 10
+    Delay:
+      Duration: 60000
+      Status: Reuse_Limit_C
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      sc_start SC_EXPBOOST,1800000,50;
+
+  - Id: 110003
+    AegisName: NT_Decussate_Ring_Box_1D
+    Name: "[NT] Decussate Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2759,86400;
+
+  - Id: 110004
+    AegisName: NT_Dragon_Ring_Box_1D
+    Name: "[NT] Dragon Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2762,86400;
+
+  - Id: 110005
+    AegisName: NT_Chemical_Ring_Box_1D
+    Name: "[NT] Chemical Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2756,86400;
+
+  - Id: 110006
+    AegisName: NT_Insecticide_Ring_Box_1D
+    Name: "[NT] Insecticide Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2757,86400;
+
+  - Id: 110007
+    AegisName: NT_Fisher_Ring_Box_1D
+    Name: "[NT] Fisher Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2758,86400;
+
+  - Id: 110008
+    AegisName: NT_Bloody_Ring_Box_1D
+    Name: "[NT] Bloody Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2760,86400;
+
+  - Id: 110009
+    AegisName: NT_Satanic_Ring_Box_1D
+    Name: "[NT] Satanic Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2761,86400;
+
+  - Id: 110010
+    AegisName: NT_Beholder_Ring_Box_1D
+    Name: "[NT] Beholder Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2753,86400;
+
+  - Id: 110011
+    AegisName: NT_Hallow_Ring_Box_1D
+    Name: "[NT] Hallow Ring Box 1 day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2754,86400;
+
+  - Id: 110012
+    AegisName: NT_Clamorous_Ring_Box_1D
+    Name: "[NT] Clamorous Ring Box 1day"
+    Type: Usable
+    Weight: 10
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      rentitem 2755,86400;
+
+  - Id: 110013
+    AegisName: NT_JOB_Battle_Manual
+    Name: "[NT] JOB Battle Manual"
+    Type: Usable
+    Weight: 10
+    NoUse:
+      Sitting: true
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Script: |
+      sc_start SC_JEXPBOOST,1800000,25;

@@ -3486,6 +3486,13 @@
 	export_constant(EFST_PJ_MERCHANT);
 	export_constant(EFST_PJ_SWORDMAN);
 	export_constant(EFST_PJ_THIEF);
+	export_constant(EFST_VIP_ACCOUNT);
+	export_constant(EFST_GUILD_DONATE_1);
+	export_constant(EFST_GUILD_DONATE_2);
+	export_constant(EFST_GUILD_DONATE_3);
+	export_constant(EFST_GUILD_DONATE_4);
+	export_constant(EFST_GUILD_DONATE_5);
+
 
 	/* elements */
 	export_constant(ELE_NEUTRAL);

@@ -1591,6 +1591,7 @@ void chrif_parse_ack_vipActive(int32 fd) {
 			clif_displaymessage(sd->fd,msg_txt(sd,438)); // You are no longer VIP.
 		}
 	}
+	clif_vip_status(*sd);
 	pc_goldpc_refresh(*sd);
 
 	// Show info if status changed
