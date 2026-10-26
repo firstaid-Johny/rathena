@@ -5224,6 +5224,31 @@ Note: 'countitem' will not count any item with a rental timer. Use 'rentalcounti
 
 ---------------------------------------
 
+*rentitemextend(<item id>,<additional seconds>);
+*rentitemextend("<item name>",<additional seconds>);
+
+Returns 1 when a rental was created or extended, or 0 when it could not be
+received/extended. Only the attached character's inventory is searched.
+If a live rental of this ID exists, add the duration to its existing expiration
+without replacing the item or changing its refine, cards, options or unique ID.
+If several live rentals exist, extend the one that expires first.
+Otherwise create one rental using the normal inventory/Charm checks.
+Normal permanent items are never converted into rentals.
+Expired copies are removed before trying to create a new rental.
+Durations must be positive and fit the rental timestamp and client timer fields.
+Stacked legacy rentals cannot be extended.
+
+Retrieve an item from normal storage before opening a box to extend it.
+The rental countdown continues while stored. Existing trade/mail/guild-storage
+restrictions on rentals are unchanged; normal storage still follows NoStorage.
+
+Example of a box with Flags.NoConsume: true:
+
+    if (rentitemextend(190001,86400))
+        delitem 110006,1;
+
+---------------------------------------
+
 *rentitem2 <item id>,<time>,<identify>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<account_id>};
 *rentitem2 "<item name>",<time>,<identify>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<account_id>};
 *rentitem3 <item id>,<time>,<identify>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>,<RandomIDArray>,<RandomValueArray>,<RandomParamArray>{,<account_id>};

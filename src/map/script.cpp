@@ -7997,6 +7997,78 @@ BUILDIN_FUNC(rentitem) {
 }
 
 /**
+ * Create a rental or extend the earliest live rental of the same ID in inventory.
+ * rentitemextend(<item id or name>, <additional seconds>) -> success (0/1).
+ * Extension preserves the existing instance, equipment state and all item metadata.
+ */
+BUILDIN_FUNC(rentitemextend) {
+	map_session_data* sd;
+	if (!script_rid2sd(sd)) {
+		script_pushint(st, 0);
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	std::shared_ptr<item_data> data;
+	if (script_isstring(st, 2)) {
+		data = item_db.searchname(script_getstr(st, 2));
+	} else {
+		const int64 nameid = script_getnum64(st, 2);
+		if (nameid > 0 && nameid <= UINT32_MAX)
+			data = item_db.find(static_cast<t_itemid>(nameid));
+	}
+	const int64 seconds = script_getnum64(st, 3);
+	const int64 now = time(nullptr);
+	if (data == nullptr || seconds <= 0 || seconds > INT32_MAX || now < 0 || now + seconds > UINT32_MAX) {
+		ShowWarning("buildin_rentitemextend: Invalid item or rental duration.\n");
+		script_pushint(st, 0);
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	// Remove expired copies before the one-per-ID Charm check in pc_additem.
+	for (const auto& held : sd->inventory.u.items_inventory) {
+		if (held.nameid == data->nameid && held.amount > 0 && held.expire_time && held.expire_time <= now) {
+			pc_inventory_rental_clear(sd);
+			pc_inventory_rentals(sd);
+			break;
+		}
+	}
+
+	struct item* rental = nullptr;
+	for (auto& held : sd->inventory.u.items_inventory) {
+		if (held.nameid != data->nameid || held.amount <= 0 || held.expire_time <= now)
+			continue;
+		if (rental == nullptr || held.expire_time < rental->expire_time)
+			rental = &held;
+	}
+	if (rental != nullptr) {
+		const int64 expiry = static_cast<int64>(rental->expire_time) + seconds;
+		// Reject stacked legacy rentals and overflow rather than changing or losing them.
+		if (rental->amount != 1 || expiry > UINT32_MAX || expiry - now > INT32_MAX) {
+			script_pushint(st, 0);
+			return SCRIPT_CMD_SUCCESS;
+		}
+		rental->expire_time = static_cast<uint32>(expiry);
+		pc_inventory_rental_clear(sd);
+		pc_inventory_rentals(sd); // Refresh client times and schedule the earliest expiration.
+		script_pushint(st, 1);
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	struct item created = {};
+	created.nameid = data->nameid;
+	created.identify = 1;
+	created.expire_time = static_cast<uint32>(now + seconds);
+	const auto result = pc_additem(sd, &created, 1, LOG_TYPE_SCRIPT);
+	if (result != ADDITEM_SUCCESS) {
+		clif_additem(sd, 0, 0, result);
+		script_pushint(st, 0);
+		return SCRIPT_CMD_SUCCESS;
+	}
+	script_pushint(st, 1);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+/**
  * Gives rental item to player with advanced option
  * rentitem2 <item id>,<time>,<identify>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<account_id>};
  * rentitem2 "<item name>",<time>,<identify>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<account_id>};
@@ -28422,6 +28494,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(countinarray,"rr"),
 	BUILDIN_DEF(getitem,"vi?"),
 	BUILDIN_DEF(rentitem,"vi?"),
+	BUILDIN_DEF(rentitemextend,"vi"),
 	BUILDIN_DEF(rentitem2,"viiiiiiii?"),
 	BUILDIN_DEF(getitem2,"viiiiiiii?"),
 	BUILDIN_DEF(getnameditem,"vv"),

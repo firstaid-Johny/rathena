@@ -261,6 +261,23 @@ int32 trade_check(map_session_data *sd, map_session_data *tsd)
 	memcpy(&inventory, &sd->inventory.u.items_inventory, sizeof(struct item) * MAX_INVENTORY);
 	memcpy(&inventory2, &tsd->inventory.u.items_inventory, sizeof(struct item) * MAX_INVENTORY);
 
+	// Validate against the actual receiving inventory before any money or items move.
+	// Even exchanging the same Charm ID is rejected while the recipient still holds it.
+	for (int32 slot = 0; slot < 10; ++slot) {
+		if (sd->deal.item[slot].amount) {
+			const auto& offered = sd->inventory.u.items_inventory[sd->deal.item[slot].index];
+			if (itemdb_type(offered.nameid) == IT_CHARM &&
+				pc_checkadditem(tsd, offered.nameid, sd->deal.item[slot].amount) == CHKADDITEM_OVERAMOUNT)
+				return 0;
+		}
+		if (tsd->deal.item[slot].amount) {
+			const auto& offered = tsd->inventory.u.items_inventory[tsd->deal.item[slot].index];
+			if (itemdb_type(offered.nameid) == IT_CHARM &&
+				pc_checkadditem(sd, offered.nameid, tsd->deal.item[slot].amount) == CHKADDITEM_OVERAMOUNT)
+				return 0;
+		}
+	}
+
 	// check free slot in both inventory
 	for(trade_i = 0; trade_i < 10; trade_i++) {
 		int16 amount;
@@ -274,6 +291,11 @@ int32 trade_check(map_session_data *sd, map_session_data *tsd)
 				return 0; // Quantity Exploit?
 
 			data = itemdb_search(inventory[n].nameid);
+			if (data->type == IT_CHARM) {
+				for (const auto& held : inventory2)
+					if (held.nameid == inventory[n].nameid && held.amount > 0)
+						return 0;
+			}
 			i = MAX_INVENTORY;
 			if (itemdb_isstackable2(data)) { // Stackable item.
 				for(i = 0; i < MAX_INVENTORY; i++)
@@ -312,6 +334,11 @@ int32 trade_check(map_session_data *sd, map_session_data *tsd)
 
 		// search if it's possible to add item (for full inventory)
 		data = itemdb_search(inventory2[n].nameid);
+		if (data->type == IT_CHARM) {
+			for (const auto& held : inventory)
+				if (held.nameid == inventory2[n].nameid && held.amount > 0)
+					return 0;
+		}
 		i = MAX_INVENTORY;
 
 		if (itemdb_isstackable2(data)) {

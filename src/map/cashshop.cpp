@@ -507,6 +507,14 @@ bool cashshop_buylist( map_session_data* sd, uint32 kafrapoints, int32 n, const 
 #endif
 		}
 
+		if (id->type == IT_CHARM) {
+			for (int32 previous = 0; previous < i; ++previous) {
+				if (item_list[previous].itemId == nameid) {
+					clif_cashshop_result(sd, nameid, CASHSHOP_RESULT_ERROR_OVER_PRODUCT_TOTAL_CNT);
+					return false;
+				}
+			}
+		}
 		switch( pc_checkadditem( sd, nameid, quantity ) ){
 			case CHKADDITEM_EXIST:
 				break;

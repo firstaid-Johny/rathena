@@ -1529,15 +1529,22 @@ int32 pc_equippoint( const map_session_data* sd, int32 n ){
  * @param sd : player session
  */
 void pc_setinventorydata( map_session_data& sd ){
+	bool favorite_changed = false;
 	for( size_t i = 0; i < MAX_INVENTORY; i++ ){
 		t_itemid id = sd.inventory.u.items_inventory[i].nameid;
 
 		if( id != 0 ){
 			sd.inventory_data[i] = itemdb_search( id );
+			if (sd.inventory_data[i]->type == IT_CHARM && !sd.inventory.u.items_inventory[i].favorite) {
+				sd.inventory.u.items_inventory[i].favorite = 1;
+				favorite_changed = true;
+			}
 		}else{
 			sd.inventory_data[i] = nullptr;
 		}
 	}
+	if (favorite_changed && sd.state.active)
+		clif_inventorylist(&sd);
 }
 
 /**
@@ -5907,6 +5914,16 @@ char pc_checkadditem( const map_session_data* sd, t_itemid nameid, int32 amount 
 
 	data = itemdb_search(nameid);
 
+	// The limit is per Item ID, regardless of cards, options, binding or rental time.
+	if (data->type == IT_CHARM) {
+		if (amount != 1)
+			return CHKADDITEM_OVERAMOUNT;
+		for (const auto& held : sd->inventory.u.items_inventory) {
+			if (held.nameid == nameid && held.amount > 0)
+				return CHKADDITEM_OVERAMOUNT;
+		}
+	}
+
 	if(!itemdb_isstackable2(data))
 		return CHKADDITEM_NEW;
 
@@ -6172,6 +6189,9 @@ enum e_additem_result pc_additem(map_session_data *sd,struct item *item,int32 am
 
 	id = itemdb_search(item->nameid);
 
+	if (id->type == IT_CHARM && pc_checkadditem(sd, item->nameid, amount) == CHKADDITEM_OVERAMOUNT)
+		return ADDITEM_OVERAMOUNT;
+
 	if( id->stack.inventory && amount > id->stack.amount )
 	{// item stack limitation
 		return ADDITEM_STACKLIMIT;
@@ -6223,7 +6243,7 @@ enum e_additem_result pc_additem(map_session_data *sd,struct item *item,int32 am
 			sd->inventory.u.items_inventory[i].equipSwitch = 0;
 
 		sd->inventory.u.items_inventory[i].amount = amount;
-		sd->inventory.u.items_inventory[i].favorite = favorite;
+		sd->inventory.u.items_inventory[i].favorite = id->type == IT_CHARM || favorite;
 		sd->inventory_data[i] = id;
 		sd->last_addeditem_index = i;
 
@@ -6253,6 +6273,10 @@ enum e_additem_result pc_additem(map_session_data *sd,struct item *item,int32 am
 		}
 	}
 
+	// The item must already be visible to scripts; expired rentals have been removed above.
+	if (id->type == IT_CHARM && sd->state.active && sd->inventory_data[i] == id)
+		status_calc_pc(sd, SCO_NONE);
+
 	achievement_update_objective(sd, AG_GET_ITEM, 1, id->value_sell);
 	pc_show_questinfo(sd);
 
@@ -6276,6 +6300,7 @@ char pc_delitem(map_session_data *sd,int32 n,int32 amount,int32 type, int16 reas
 	if(n < 0 || sd->inventory.u.items_inventory[n].nameid == 0 || amount <= 0 || sd->inventory.u.items_inventory[n].amount<amount || sd->inventory_data[n] == nullptr)
 		return 1;
 
+	const bool charm = sd->inventory_data[n]->type == IT_CHARM;
 	log_pick_pc(sd, log_type, -amount, &sd->inventory.u.items_inventory[n]);
 
 	sd->inventory.u.items_inventory[n].amount -= amount;
@@ -6290,6 +6315,10 @@ char pc_delitem(map_session_data *sd,int32 n,int32 amount,int32 type, int16 reas
 		clif_delitem( *sd, n, amount, reason );
 	if(!(type&2))
 		clif_updatestatus(*sd,SP_WEIGHT);
+
+	// Charm bonuses are inventory-based, independent of the equipment recalc flag.
+	if (charm && sd->state.active)
+		status_calc_pc(sd, SCO_NONE);
 
 	pc_show_questinfo(sd);
 

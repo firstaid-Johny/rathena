@@ -109,6 +109,9 @@ enum e_inventory_type{
 static inline int32 itemtype(t_itemid nameid) {
 	struct item_data* id = itemdb_search(nameid); //Use itemdb_search, so non-existence item will use dummy data and won't crash the server. bugreport:8468
 	int32 type = id->type;
+	// Keep the custom type server-side. Pet accessories use the non-stackable packet layout.
+	if (type == IT_CHARM)
+		return IT_PETARMOR;
 	if( type == IT_SHADOWGEAR ) {
 		if( id->equip&EQP_SHADOW_WEAPON )
 			return IT_WEAPON;
@@ -4795,7 +4798,7 @@ void clif_tradeadditem( map_session_data* sd, map_session_data* tsd, int32 index
 
 		p.itemId = client_nameid( sd->inventory.u.items_inventory[index].nameid );
 #if PACKETVER >= 20100223
-		p.itemType = sd->inventory_data[index]->type;
+		p.itemType = itemtype(sd->inventory.u.items_inventory[index].nameid);
 #endif
 		p.identified = sd->inventory.u.items_inventory[index].identify;
 		p.damaged = sd->inventory.u.items_inventory[index].attribute;
@@ -7394,7 +7397,7 @@ void clif_cart_additem( const map_session_data* sd, int32 n, int32 amount ){
 	p.amount = amount;
 	p.itemId = client_nameid( sd->cart.u.items_cart[n].nameid );
 #if PACKETVER >= 5
-	p.itemType = itemdb_type( sd->cart.u.items_cart[n].nameid );
+	p.itemType = itemtype( sd->cart.u.items_cart[n].nameid );
 #endif
 	p.identified = sd->cart.u.items_cart[n].identify;
 	p.damaged  = sd->cart.u.items_cart[n].attribute;
@@ -17192,7 +17195,7 @@ void clif_parse_Auction_register( int32 fd, map_session_data* sd ){
 	}
 
 	safestrncpy(auction.item_name, id->ename.c_str(), sizeof(auction.item_name));
-	auction.type = id->type;
+	auction.type = itemtype(id->nameid);
 	memcpy(&auction.item, &sd->inventory.u.items_inventory[sd->auction.index], sizeof(struct item));
 	auction.item.amount = 1;
 	auction.timestamp = 0;
@@ -19965,6 +19968,13 @@ void clif_parse_MoveItem( int32 fd, map_session_data* sd ){
 	uint16 index = server_index( p->index );
 
 	if( index >= MAX_INVENTORY ){
+		return;
+	}
+
+	// Charms always remain in the Favorite tab, including forged move packets.
+	if (sd->inventory_data[index] && sd->inventory_data[index]->type == IT_CHARM) {
+		sd->inventory.u.items_inventory[index].favorite = 1;
+		clif_favorite_item(*sd, index);
 		return;
 	}
 

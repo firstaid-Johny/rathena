@@ -2544,6 +2544,13 @@ int32 npc_cashshop_buylist( map_session_data *sd, int32 points, std::vector<s_np
 			return ERROR_TYPE_ITEM_ID;
 
 		nameid = item_list[i].nameid = nd->u.shop.shop_item[j].nameid; //item_avail replacement
+		if (itemdb_type(nameid) == IT_CHARM) {
+			if (pc_checkadditem(sd, nameid, amount) == CHKADDITEM_OVERAMOUNT)
+				return ERROR_TYPE_INVENTORY_WEIGHT;
+			for (int32 previous = 0; previous < i; ++previous)
+				if (item_list[previous].nameid == nameid)
+					return ERROR_TYPE_INVENTORY_WEIGHT;
+		}
 
 		if( !itemdb_isstackable2(id.get()) && amount > 1 )
 		{
@@ -2843,6 +2850,13 @@ e_purchase_result npc_buylist( map_session_data* sd, std::vector<s_npc_buy_list>
 
 		amount = item_list[i].qty;
 		nameid = item_list[i].nameid = shop[j].nameid; //item_avail replacement
+		if (itemdb_type(nameid) == IT_CHARM) {
+			if (pc_checkadditem(sd, nameid, amount) == CHKADDITEM_OVERAMOUNT)
+				return e_purchase_result::PURCHASE_FAIL_COUNT;
+			for (int32 previous = 0; previous < i; ++previous)
+				if (item_list[previous].nameid == nameid)
+					return e_purchase_result::PURCHASE_FAIL_COUNT;
+		}
 		value = shop[j].value;
 
 		std::shared_ptr<item_data> id = item_db.find(nameid);
@@ -3152,6 +3166,7 @@ e_purchase_result npc_barter_purchase( map_session_data& sd, std::shared_ptr<s_n
 	uint32 reducedWeight = 0;
 	uint16 requiredSlots = 0;
 	uint32 requiredItems[MAX_INVENTORY] = { 0 };
+	std::vector<t_itemid> purchased_charms;
 
 	for( s_barter_purchase& purchase : purchases ){
 		purchase.data = item_db.find( purchase.item->nameid ).get();
@@ -3167,6 +3182,11 @@ e_purchase_result npc_barter_purchase( map_session_data& sd, std::shared_ptr<s_n
 		}
 
 		char result = pc_checkadditem( &sd, purchase.item->nameid, amount );
+		if (purchase.data->type == IT_CHARM) {
+			if (util::vector_exists(purchased_charms, purchase.item->nameid))
+				return e_purchase_result::PURCHASE_FAIL_COUNT;
+			purchased_charms.push_back(purchase.item->nameid);
+		}
 
 		if( result == CHKADDITEM_OVERAMOUNT ){
 			return e_purchase_result::PURCHASE_FAIL_COUNT;

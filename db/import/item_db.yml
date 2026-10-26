@@ -26,6 +26,8 @@
 #   AegisName               Server name to reference the item in scripts and lookups, should use no spaces.
 #   Name                    Name in English for displaying as output.
 #   Type                    Item type. (Default: Etc)
+#                           Charm: passive Script in Inventory; always Favorite, one per ID.
+#                           See doc/item_charm.txt for settings and example.
 #   SubType                 Weapon, Ammo or Card type. (Default: 0)
 #   Buy                     Buying price. When not specified, becomes double the sell price. (Default: 0)
 #   Sell                    Selling price. When not specified, becomes half the buy price. (Default: 0)
@@ -89,57 +91,28 @@ Header:
   Version: 3
 
 Body:
-  - Id: 985
-    Flags:
-      DropEffect: BLUE_PILLAR
-  - Id: 984
-    Flags:
-      DropEffect: BLUE_PILLAR
-  - Id: 756
-    Flags:
-      DropEffect: BLUE_PILLAR
-  - Id: 757
-    Flags:
-      DropEffect: BLUE_PILLAR
-  - Id: 617
+
+  # Consumables and materials: NPC sell price overrides.
+  - Id: 501    # Red Potion
+    Sell: 1
+  - Id: 502    # Orange Potion
+    Sell: 1
+  - Id: 503    # Yellow Potion
+    Sell: 1
+  - Id: 504    # White Potion
+    Sell: 1
+  - Id: 505    # Blue Potion
+    Sell: 1
+  - Id: 522    # Mastela Fruit
+    Sell: 500
+  - Id: 526    # Royal Jelly
+    Sell: 500
+  - Id: 603
     Flags:
       DropEffect: GREEN_PILLAR
   - Id: 603
     Flags:
       DropEffect: GREEN_PILLAR
-  - Id: 616
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 644
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 603
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 617
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 616
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 749
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 748
-    Flags:
-      DropEffect: GREEN_PILLAR
-  - Id: 656
-    Jobs:
-      Acolyte: true
-      Priest: true
-  - Id: 657
-    Jobs:
-      Acolyte: true
-      Priest: true
-  - Id: 12221
-    Script: |
-      input @megaphone$;
-      announceplayer "" + @megaphone$,strcharinfo(0),bc_all,0xFF0000;
   - Id: 604
     AegisName: Branch_Of_Dead_Tree
     Name: Dead Branch
@@ -156,22 +129,68 @@ Body:
       announce strcharinfo(0)+" ใช้ Dead Branch หักได้ "+getunitname($@mobid[0])+" ที่แผนที่ "+strcharinfo(3),bc_all;
       if ($@mobid[0])
         setunitname $@mobid[0],strcharinfo(0)+" : "+getunitname($@mobid[0]);
-  - Id: 12103
-    AegisName: Bloody_Dead_Branch
-    Name: Bloody Branch
-    Type: Usable
-    Buy: 10000
-    Weight: 200
+  - Id: 610    # Yggdrasil Leaf
+    Sell: 1000
+  - Id: 616
     Flags:
-      BuyingStore: true
-      DeadBranch: true
       DropEffect: GREEN_PILLAR
-    Script: |
-      $@mobid[0] = 0;
-      monster "this",-1,-1,"--ja--",-1-MOBG_BLOODY_DEAD_BRANCH,1,"";
-      announce strcharinfo(0)+" ใช้ Dead Branch หักได้ "+getunitname($@mobid[0])+" ที่แผนที่ "+strcharinfo(3),bc_all;
-      if ($@mobid[0])
-        setunitname $@mobid[0],strcharinfo(0)+" : "+getunitname($@mobid[0]);
+  - Id: 616
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 617
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 617
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 644
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 656
+    Jobs:
+      Acolyte: true
+      Priest: true
+  - Id: 657
+    Jobs:
+      Acolyte: true
+      Priest: true
+  - Id: 748
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 748    # Witherless Rose
+    Sell: 17500
+  - Id: 749
+    Flags:
+      DropEffect: GREEN_PILLAR
+  - Id: 756
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 757
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 984
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 985
+    Flags:
+      DropEffect: BLUE_PILLAR
+  - Id: 990    # Red Blood
+    Sell: 500
+  - Id: 991    # Crystal Blue
+    Sell: 500
+  - Id: 992    # Wind of Verdure
+    Sell: 500
+  - Id: 993    # Green Live
+    Sell: 500
+
+  - Id: 994    # Flame Heart
+    Sell: 1000
+  - Id: 995    # Mystic Frozen
+    Sell: 1000
+  - Id: 996    # Rough Wind
+    Sell: 1000
+  - Id: 997    # Great Nature
+    Sell: 1000
 
   # Pre-Renewal arrows: NPC sell price overrides.
   - Id: 1750    # Arrow
@@ -240,43 +259,40 @@ Body:
   - Id: 1772    # Holy Arrow
     Buy: 10
     Sell: 0
-
-  # Consumables and materials: NPC sell price overrides.
-  - Id: 501    # Red Potion
-    Sell: 1
-  - Id: 502    # Orange Potion
-    Sell: 1
-  - Id: 503    # Yellow Potion
-    Sell: 1
-  - Id: 504    # White Potion
-    Sell: 1
-  - Id: 505    # Blue Potion
-    Sell: 1
-  - Id: 522    # Mastela Fruit
-    Sell: 500
-  - Id: 526    # Royal Jelly
-    Sell: 500
-  - Id: 610    # Yggdrasil Leaf
-    Sell: 1000
-  - Id: 994    # Flame Heart
-    Sell: 1000
-  - Id: 995    # Mystic Frozen
-    Sell: 1000
-  - Id: 996    # Rough Wind
-    Sell: 1000
-  - Id: 997    # Great Nature
-    Sell: 1000
-  - Id: 748    # Witherless Rose
-    Sell: 17500
-  - Id: 990    # Red Blood
-    Sell: 500
-  - Id: 992    # Wind of Verdure
-    Sell: 500
-  - Id: 991    # Crystal Blue
-    Sell: 500
-  - Id: 993    # Green Live
-    Sell: 500
-
+  - Id: 12103
+    AegisName: Bloody_Dead_Branch
+    Name: Bloody Branch
+    Type: Usable
+    Buy: 10000
+    Weight: 200
+    Flags:
+      BuyingStore: true
+      DeadBranch: true
+      DropEffect: GREEN_PILLAR
+    Script: |
+      $@mobid[0] = 0;
+      monster "this",-1,-1,"--ja--",-1-MOBG_BLOODY_DEAD_BRANCH,1,"";
+      announce strcharinfo(0)+" ใช้ Dead Branch หักได้ "+getunitname($@mobid[0])+" ที่แผนที่ "+strcharinfo(3),bc_all;
+      if ($@mobid[0])
+        setunitname $@mobid[0],strcharinfo(0)+" : "+getunitname($@mobid[0]);
+  - Id: 12221
+    Script: |
+      input @megaphone$;
+      announceplayer "" + @megaphone$,strcharinfo(0),bc_all,0xFF0000;
+  - Id: 18716
+    AegisName: Strawberry_In_Mouth
+    Name: Strawberry In Mouth
+    Type: Armor
+    Buy: 20
+    Weight: 50
+    Defense: 2
+    Locations:
+      Head_Low: true
+    ArmorLevel: 1
+    EquipLevelMin: 10
+    View: 861
+    Script: |
+      bonus2 bAddMonsterDropItem,578,100;
   - Id: 27126
     AegisName: Boitata_Card
     Name: Boitata Card
@@ -339,6 +355,13 @@ Body:
     Script: |
       bonus bMaxSPrate,20;
       bonus2 bAddEff2,Eff_Curse,20;
+
+  # Custom ranges: Etc 100001+, Usable 110001+, NT Usable 120001+, Charm 180001+, NT Charm 190001+.
+  # Rental Fly Wings, Strawberry headgear, and Charm boxes (timer starts on opening the inner box).
+  - Id: 100001
+    AegisName: High_Petfood_Potion
+    Name: High Petfood Potion
+    Weight: 10
 
   # VIP membership cards. vip_time uses minutes; displayed remaining time is calculated.
   - Id: 100012
@@ -425,9 +448,128 @@ Body:
   - Id: 100022
     AegisName: heros_iron_bar_10
     Name: Re-Option +10
-
-  # Usable range 110001+: NT EXP consumables and one-day rental ring boxes.
   - Id: 110001
+    AegisName: Fly_Wing_Box_2H
+    Name: Fly Wing Box 2 Hr.
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(110013,7200))
+          delitem 110001,1;
+  - Id: 110002
+    AegisName: Fly_Wing_Box_5H
+    Name: Fly Wing Box 5 Hr.
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(110013,18000))
+          delitem 110002,1;
+  - Id: 110003
+    AegisName: Strawberry_Mouth_Box_2H
+    Name: Strawberry In Mouth Box 2 Hr
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(18716,7200))
+          delitem 110003,1;
+  - Id: 110004
+    AegisName: Strawberry_Mouth_Box_5H
+    Name: Strawberry In Mouth Box 5 Hr
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(18716,18000))
+          delitem 110004,1;
+  - Id: 110005
+    AegisName: Charm_Random_Box_1D
+    Name: 1day Charm Random Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      .@box = 110006 + rand(7);
+      .@before = countitem(.@box);
+      getitem .@box,1;
+      if (countitem(.@box) > .@before)
+          delitem 110005,1;
+  - Id: 110006
+    AegisName: Dokebi_Horn_Charm_1D_Box
+    Name: Dokebi Horn Charm 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190001,86400))
+          delitem 110006,1;
+  - Id: 110007
+    AegisName: Jellopy_Charm_1D_Box
+    Name: Jellopy Charm 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190002,86400))
+          delitem 110007,1;
+  - Id: 110008
+    AegisName: Ancient_Grudge_Charm_1D_Box
+    Name: Ancient Grudge 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190003,86400))
+          delitem 110008,1;
+  - Id: 110009
+    AegisName: Field_Shovel_Charm_1D_Box
+    Name: Field Shovel 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190004,86400))
+          delitem 110009,1;
+  - Id: 110010
+    AegisName: Herbal_Medicine_Charm_1D_Box
+    Name: Herbal Medicine 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190005,86400))
+          delitem 110010,1;
+  - Id: 110011
+    AegisName: Invitation_Ticket_Charm_1D_Box
+    Name: Invitation Ticket 1day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190006,86400))
+          delitem 110011,1;
+  - Id: 110012
+    AegisName: Melange_Pot_Charm_1D_Box
+    Name: Melange Pot 1 day Box
+    Type: Usable
+    Flags:
+      NoConsume: true
+    Script: |
+      if (rentitemextend(190007,86400))
+          delitem 110012,1;
+  - Id: 110013
+    AegisName: Rental_Fly_Wing
+    Name: Rental Fly Wing
+    Type: Delayconsume
+    Flags:
+      NoConsume: true
+    Script: |
+      itemskill "AL_TELEPORT",1;
+
+  # NT Usable range 120001+: EXP consumables and one-day rental ring boxes.
+  - Id: 120001
     AegisName: NT_Exp_Potion
     Name: "[NT] Exp Potion"
     Type: Usable
@@ -438,7 +580,7 @@ Body:
     Script: |
       getexp2 1000000,500000;
 
-  - Id: 110002
+  - Id: 120002
     AegisName: NT_Field_Manual
     Name: "[NT] Field Manual"
     Type: Usable
@@ -453,7 +595,7 @@ Body:
     Script: |
       sc_start SC_EXPBOOST,1800000,50;
 
-  - Id: 110003
+  - Id: 120003
     AegisName: NT_Decussate_Ring_Box_1D
     Name: "[NT] Decussate Ring Box 1 day"
     Type: Usable
@@ -465,7 +607,7 @@ Body:
     Script: |
       rentitem 2759,86400;
 
-  - Id: 110004
+  - Id: 120004
     AegisName: NT_Dragon_Ring_Box_1D
     Name: "[NT] Dragon Ring Box 1 day"
     Type: Usable
@@ -477,7 +619,7 @@ Body:
     Script: |
       rentitem 2762,86400;
 
-  - Id: 110005
+  - Id: 120005
     AegisName: NT_Chemical_Ring_Box_1D
     Name: "[NT] Chemical Ring Box 1 day"
     Type: Usable
@@ -489,7 +631,7 @@ Body:
     Script: |
       rentitem 2756,86400;
 
-  - Id: 110006
+  - Id: 120006
     AegisName: NT_Insecticide_Ring_Box_1D
     Name: "[NT] Insecticide Ring Box 1 day"
     Type: Usable
@@ -501,7 +643,7 @@ Body:
     Script: |
       rentitem 2757,86400;
 
-  - Id: 110007
+  - Id: 120007
     AegisName: NT_Fisher_Ring_Box_1D
     Name: "[NT] Fisher Ring Box 1 day"
     Type: Usable
@@ -513,7 +655,7 @@ Body:
     Script: |
       rentitem 2758,86400;
 
-  - Id: 110008
+  - Id: 120008
     AegisName: NT_Bloody_Ring_Box_1D
     Name: "[NT] Bloody Ring Box 1 day"
     Type: Usable
@@ -525,7 +667,7 @@ Body:
     Script: |
       rentitem 2760,86400;
 
-  - Id: 110009
+  - Id: 120009
     AegisName: NT_Satanic_Ring_Box_1D
     Name: "[NT] Satanic Ring Box 1 day"
     Type: Usable
@@ -537,7 +679,7 @@ Body:
     Script: |
       rentitem 2761,86400;
 
-  - Id: 110010
+  - Id: 120010
     AegisName: NT_Beholder_Ring_Box_1D
     Name: "[NT] Beholder Ring Box 1 day"
     Type: Usable
@@ -549,7 +691,7 @@ Body:
     Script: |
       rentitem 2753,86400;
 
-  - Id: 110011
+  - Id: 120011
     AegisName: NT_Hallow_Ring_Box_1D
     Name: "[NT] Hallow Ring Box 1 day"
     Type: Usable
@@ -561,7 +703,7 @@ Body:
     Script: |
       rentitem 2754,86400;
 
-  - Id: 110012
+  - Id: 120012
     AegisName: NT_Clamorous_Ring_Box_1D
     Name: "[NT] Clamorous Ring Box 1day"
     Type: Usable
@@ -573,7 +715,7 @@ Body:
     Script: |
       rentitem 2755,86400;
 
-  - Id: 110013
+  - Id: 120013
     AegisName: NT_JOB_Battle_Manual
     Name: "[NT] JOB Battle Manual"
     Type: Usable
@@ -586,3 +728,81 @@ Body:
       NoGuildStorage: true
     Script: |
       sc_start SC_JEXPBOOST,1800000,25;
+  - Id: 190001
+    AegisName: NT_Dokebi_Horn_Charm_1D
+    Name: '[NT] Dokebi Horn Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus2 bDropAddRace,RC_All,3;
+  - Id: 190002
+    AegisName: NT_Jellopy_Charm_1D
+    Name: '[NT] Jellopy Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus2 bExpAddRace,RC_All,3;
+  - Id: 190003
+    AegisName: NT_Ancient_Grudge_Charm_1D
+    Name: '[NT] Ancient Grudge Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus bMatk,10;
+  - Id: 190004
+    AegisName: NT_Field_Shovel_Charm_1D
+    Name: '[NT] Field Shovel Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus bAtk,10;
+  - Id: 190005
+    AegisName: NT_Herbal_Medicine_Charm_1D
+    Name: '[NT] Herbal Medicine Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus2 bSubRace,RC_DemiHuman,3;
+      bonus2 bSubRace,RC_Player_Human,3;
+  - Id: 190006
+    AegisName: NT_Invitation_Ticket_Charm_1D
+    Name: '[NT] Invitation Ticket Charm 1day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus bLongAtkRate,3;
+  - Id: 190007
+    AegisName: NT_Melange_Pot_Charm_1D
+    Name: '[NT] Melange Pot 1 day'
+    Type: Charm
+    Trade:
+      NoTrade: true
+      NoCart: true
+      NoGuildStorage: true
+    Weight: 10
+    Script: |
+      bonus bAspdRate,3;

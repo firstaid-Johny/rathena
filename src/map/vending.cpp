@@ -205,6 +205,14 @@ void vending_purchasereq(map_session_data* sd, int32 aid, int32 uid, const uint8
 
 		vending[j].amount -= amount;
 
+		// Different cart slots can contain the same non-stackable Charm ID.
+		if (itemdb_type(vsd->cart.u.items_cart[idx].nameid) == IT_CHARM) {
+			for (int32 previous = 0; previous < i; ++previous) {
+				const int16 previous_idx = *(uint16*)(data + 4*previous + 2) - 2;
+				if (vsd->cart.u.items_cart[previous_idx].nameid == vsd->cart.u.items_cart[idx].nameid)
+					return;
+			}
+		}
 		switch( pc_checkadditem(sd, vsd->cart.u.items_cart[idx].nameid, amount) ) {
 		case CHKADDITEM_EXIST:
 			break;	//We'd add this item to the existing one (in buyers inventory)

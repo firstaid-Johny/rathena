@@ -4525,6 +4525,29 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 		current_equip_opt_index = -1;
 	}
 
+	// Charms apply their Script once per Item ID while held in inventory.
+	// A bounded inventory scan runs only on status calculation, never on a timer.
+	current_equip_card_id = 0;
+	current_equip_combo_pos = 0;
+	current_equip_opt_index = -1;
+	sd->state.lr_flag = LR_FLAG_NONE;
+	std::vector<t_itemid> applied_charms;
+	for (int32 charm_index = 0; charm_index < MAX_INVENTORY; ++charm_index) {
+		const auto* data = sd->inventory_data[charm_index];
+		const auto& held = sd->inventory.u.items_inventory[charm_index];
+		if (!data || data->type != IT_CHARM || held.amount <= 0 || !data->script)
+			continue;
+		if (held.expire_time && held.expire_time <= time(nullptr))
+			continue;
+		if (util::vector_exists(applied_charms, held.nameid))
+			continue;
+		applied_charms.push_back(held.nameid);
+		current_equip_item_index = charm_index;
+		run_script(data->script, 0, sd->id, 0);
+		if (!calculating)
+			return 1;
+	}
+
 	// Collection bonuses have no equipped-item context. Snapshot IDs in case a script reloads data.
 	current_equip_item_index = -1;
 	current_equip_card_id = 0;

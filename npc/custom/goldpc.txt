@@ -12,7 +12,7 @@
 // Timer/map settings: conf/import/battle_conf.txt, feature.goldpc_*.
 // Points and saved progress are shared by all characters on the account.
 //============================================================
--	pointshop	#onlineshop	-1,#Goldpc_Points:no,110001:10,110002:1,110003:5,110004:5,110005:5,110006:5,110007:5,110008:5,110009:5,110010:5,110011:5,110012:5,110013:1
+-	pointshop	#onlineshop	-1,#Goldpc_Points:no,120001:10,120002:1,120003:5,120004:5,120005:5,120006:5,120007:5,120008:5,120009:5,120010:5,120011:5,120012:5,120013:1
 
 
 prontera,0,0,0	script	ÕÕπ‰≈πÏ‚∫π— ::GOLDPCCAFE	4_F_02,{

@@ -235,6 +235,7 @@ enum item_types {
 	IT_DELAYCONSUME,//11
 	IT_SHADOWGEAR,  //12
 	IT_CASH = 18,
+	IT_CHARM = 19, // Passive inventory item; client receives IT_PETARMOR.
 	IT_MAX
 };
 

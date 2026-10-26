@@ -3187,6 +3187,7 @@ const char* itemdb_typename(enum item_types type)
 		case IT_DELAYCONSUME:   return "Delay-Consume Usable";
 		case IT_SHADOWGEAR:     return "Shadow Equipment";
 		case IT_CASH:           return "Cash Usable";
+		case IT_CHARM:          return "Charm";
 	}
 	return "Unknown Type";
 }
@@ -4931,6 +4932,7 @@ static void itemdb_read(void) {
 
 bool item_data::isStackable() const{
 	switch (this->type) {
+		case IT_CHARM:
 		case IT_WEAPON:
 		case IT_ARMOR:
 		case IT_PETEGG:

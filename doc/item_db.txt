@@ -37,6 +37,8 @@ DelayConsume - Usable with delayed consumption (intended for 'itemskill').
                Items using the 'itemskill' script command are consumed after selecting a target. Any other command will NOT consume the item.
 ShadowGear   - Shadow Equipment item.
 Cash         - Another delayed consume that requires user confirmation before using the item.
+Charm        - Passive inventory Script (IT_CHARM = 19). Always Favorite, non-stackable,
+               at most one of each Item ID per character inventory. See doc/item_charm.txt.
 
 ---------------------------------------
 
