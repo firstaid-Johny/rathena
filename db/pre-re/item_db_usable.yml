@@ -97,6 +97,7 @@ Body:
     Weight: 70
     Script: |
       itemheal rand(45,65),0;
+      vip_time 5;
   - Id: 502
     AegisName: Orange_Potion
     Name: Orange Potion
@@ -5015,7 +5016,7 @@ Body:
       NoAuction: true
     Script: |
       input @megaphone$;
-      announce strcharinfo(0) + ": " + @megaphone$,bc_all,0xFF0000;
+      announceplayer ""+strcharinfo(0) + ": " + @megaphone$,strcharinfo(0),bc_all,0xFF0000;
   - Id: 12225
     AegisName: Sweet_Candy_Striper
     Name: Sweet Candy Cane
