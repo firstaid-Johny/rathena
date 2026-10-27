@@ -4,14 +4,21 @@
 // Settings / usage:
 //   Map: guild_vs5. Arrival: @warp guild_vs5 50 50
 //   One statue per unique effect ID; NPC name is the exact effect constant.
-//   Sprite: 4_F_08_STATUE. Direction: 4 (south).
-//   266 Hat Effect statues + 26 Footprint choices from enum e_hat_effects.
+//   Sprite: 4_F_08_STATUE. North wings face south; south wings face north.
+//   Layout: four wings on a regular 4-by-3 grid; central cross kept clear.
+//   NW 28 / NE 23 / SE 27 / SW 28 statues, ordered by effect ID.
+//   Arrival: guild_vs5 50,50. Existing map obstacles are preserved.
+//   Active: 106 Hat Effect statues + 20 Footprint choices after full file audit.
+//   Removed: 61 statues and 6 footprints with missing resources/undefined IDs.
+//   Paused: 99 statue blocks below are retained inside block comments.
+//   Never auto-enable paused blocks until their dependencies are verified.
+//   Exclusions and unverified native effects: doc/hat_effect_missing_resources.txt
 //   Deprecated aliases and MIN/MAX sentinels are not additional statues.
 //   Positions use walkable cells in the currently configured mapcache.
 //   Each statue OnInit sets one effect on its own NPC GID (not the player).
 //   No timer, periodic loop, SQL or item is created.
 //   Click a statue to read its constant and numeric ID.
-//   Footprint Preview at (50,50) tests one footprint on the attached player.
+//   Footprint Preview at prontera (208,181) tests the attached player.
 //   Footprint preview ends on Stop, selecting another, or logout.
 //   Temporary ownership flags are per player; existing equipment effects are restored.
 //   Rendering depends on the Client effect definitions/resources.
@@ -23,10 +30,10 @@
 //============================================================
 
 // Effect ID 1
-guild_vs5,47,76,4	script	HAT_EF_BLOSSOM_FLUTTERING	4_F_08_STATUE,{
+guild_vs5,46,73,4	script	HAT_EF_BLOSSOM_FLUTTERING	4_F_08_STATUE,{
 	mes "[HAT_EF_BLOSSOM_FLUTTERING]";
 	mes "Hat Effect ID: " + HAT_EF_BLOSSOM_FLUTTERING;
-	mes "Map: guild_vs5 (47,76)";
+	mes "Map: guild_vs5 (46,73)";
 	close;
 
 OnInit:
@@ -34,23 +41,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 2
-guild_vs5,50,76,4	script	HAT_EF_MERMAID_LONGING	4_F_08_STATUE,{
-	mes "[HAT_EF_MERMAID_LONGING]";
-	mes "Hat Effect ID: " + HAT_EF_MERMAID_LONGING;
-	mes "Map: guild_vs5 (50,76)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_MERMAID_LONGING, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 3
-guild_vs5,44,74,4	script	HAT_EF_RL_BANISHING_BUSTER	4_F_08_STATUE,{
+guild_vs5,38,70,4	script	HAT_EF_RL_BANISHING_BUSTER	4_F_08_STATUE,{
 	mes "[HAT_EF_RL_BANISHING_BUSTER]";
 	mes "Hat Effect ID: " + HAT_EF_RL_BANISHING_BUSTER;
-	mes "Map: guild_vs5 (44,74)";
+	mes "Map: guild_vs5 (38,70)";
 	close;
 
 OnInit:
@@ -59,10 +54,10 @@ OnInit:
 }
 
 // Effect ID 4
-guild_vs5,47,74,4	script	HAT_EF_LJOSALFAR	4_F_08_STATUE,{
+guild_vs5,42,70,4	script	HAT_EF_LJOSALFAR	4_F_08_STATUE,{
 	mes "[HAT_EF_LJOSALFAR]";
 	mes "Hat Effect ID: " + HAT_EF_LJOSALFAR;
-	mes "Map: guild_vs5 (47,74)";
+	mes "Map: guild_vs5 (42,70)";
 	close;
 
 OnInit:
@@ -70,6 +65,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 5
 guild_vs5,50,74,4	script	HAT_EF_CLOCKING	4_F_08_STATUE,{
 	mes "[HAT_EF_CLOCKING]";
@@ -81,7 +77,9 @@ OnInit:
 	hateffect HAT_EF_CLOCKING, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 6
 guild_vs5,56,74,4	script	HAT_EF_SNOW	4_F_08_STATUE,{
 	mes "[HAT_EF_SNOW]";
@@ -93,7 +91,9 @@ OnInit:
 	hateffect HAT_EF_SNOW, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 7
 guild_vs5,38,72,4	script	HAT_EF_MAKEBLUR	4_F_08_STATUE,{
 	mes "[HAT_EF_MAKEBLUR]";
@@ -105,12 +105,13 @@ OnInit:
 	hateffect HAT_EF_MAKEBLUR, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 8
-guild_vs5,41,72,4	script	HAT_EF_SLEEPATTACK	4_F_08_STATUE,{
+guild_vs5,46,70,4	script	HAT_EF_SLEEPATTACK	4_F_08_STATUE,{
 	mes "[HAT_EF_SLEEPATTACK]";
 	mes "Hat Effect ID: " + HAT_EF_SLEEPATTACK;
-	mes "Map: guild_vs5 (41,72)";
+	mes "Map: guild_vs5 (46,70)";
 	close;
 
 OnInit:
@@ -118,6 +119,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 9
 guild_vs5,44,72,4	script	HAT_EF_GUMGANG	4_F_08_STATUE,{
 	mes "[HAT_EF_GUMGANG]";
@@ -129,7 +131,9 @@ OnInit:
 	hateffect HAT_EF_GUMGANG, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 10
 guild_vs5,47,72,4	script	HAT_EF_TALK_FROSTJOKE	4_F_08_STATUE,{
 	mes "[HAT_EF_TALK_FROSTJOKE]";
@@ -141,7 +145,9 @@ OnInit:
 	hateffect HAT_EF_TALK_FROSTJOKE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 11
 guild_vs5,50,72,4	script	HAT_EF_DEMONSTRATION	4_F_08_STATUE,{
 	mes "[HAT_EF_DEMONSTRATION]";
@@ -153,12 +159,13 @@ OnInit:
 	hateffect HAT_EF_DEMONSTRATION, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 12
-guild_vs5,53,72,4	script	HAT_EF_FLUTTER_BUTTERFLY	4_F_08_STATUE,{
+guild_vs5,34,67,4	script	HAT_EF_FLUTTER_BUTTERFLY	4_F_08_STATUE,{
 	mes "[HAT_EF_FLUTTER_BUTTERFLY]";
 	mes "Hat Effect ID: " + HAT_EF_FLUTTER_BUTTERFLY;
-	mes "Map: guild_vs5 (53,72)";
+	mes "Map: guild_vs5 (34,67)";
 	close;
 
 OnInit:
@@ -167,10 +174,10 @@ OnInit:
 }
 
 // Effect ID 13
-guild_vs5,56,72,4	script	HAT_EF_ANGEL_FLUTTERING	4_F_08_STATUE,{
+guild_vs5,38,67,4	script	HAT_EF_ANGEL_FLUTTERING	4_F_08_STATUE,{
 	mes "[HAT_EF_ANGEL_FLUTTERING]";
 	mes "Hat Effect ID: " + HAT_EF_ANGEL_FLUTTERING;
-	mes "Map: guild_vs5 (56,72)";
+	mes "Map: guild_vs5 (38,67)";
 	close;
 
 OnInit:
@@ -179,10 +186,10 @@ OnInit:
 }
 
 // Effect ID 14
-guild_vs5,59,72,4	script	HAT_EF_BLESSING_OF_ANGELS	4_F_08_STATUE,{
+guild_vs5,42,67,4	script	HAT_EF_BLESSING_OF_ANGELS	4_F_08_STATUE,{
 	mes "[HAT_EF_BLESSING_OF_ANGELS]";
 	mes "Hat Effect ID: " + HAT_EF_BLESSING_OF_ANGELS;
-	mes "Map: guild_vs5 (59,72)";
+	mes "Map: guild_vs5 (42,67)";
 	close;
 
 OnInit:
@@ -190,6 +197,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 15
 guild_vs5,62,72,4	script	HAT_EF_ELECTRIC	4_F_08_STATUE,{
 	mes "[HAT_EF_ELECTRIC]";
@@ -201,7 +209,9 @@ OnInit:
 	hateffect HAT_EF_ELECTRIC, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 16
 guild_vs5,35,70,4	script	HAT_EF_GREEN_FLOOR	4_F_08_STATUE,{
 	mes "[HAT_EF_GREEN_FLOOR]";
@@ -213,7 +223,9 @@ OnInit:
 	hateffect HAT_EF_GREEN_FLOOR, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 17
 guild_vs5,38,70,4	script	HAT_EF_SHRINK	4_F_08_STATUE,{
 	mes "[HAT_EF_SHRINK]";
@@ -225,12 +237,13 @@ OnInit:
 	hateffect HAT_EF_SHRINK, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 18
-guild_vs5,41,70,4	script	HAT_EF_VALHALLA_IDOL	4_F_08_STATUE,{
+guild_vs5,46,67,4	script	HAT_EF_VALHALLA_IDOL	4_F_08_STATUE,{
 	mes "[HAT_EF_VALHALLA_IDOL]";
 	mes "Hat Effect ID: " + HAT_EF_VALHALLA_IDOL;
-	mes "Map: guild_vs5 (41,70)";
+	mes "Map: guild_vs5 (46,67)";
 	close;
 
 OnInit:
@@ -239,10 +252,10 @@ OnInit:
 }
 
 // Effect ID 19
-guild_vs5,44,70,4	script	HAT_EF_ANGEL_STAIRS	4_F_08_STATUE,{
+guild_vs5,30,64,4	script	HAT_EF_ANGEL_STAIRS	4_F_08_STATUE,{
 	mes "[HAT_EF_ANGEL_STAIRS]";
 	mes "Hat Effect ID: " + HAT_EF_ANGEL_STAIRS;
-	mes "Map: guild_vs5 (44,70)";
+	mes "Map: guild_vs5 (30,64)";
 	close;
 
 OnInit:
@@ -251,10 +264,10 @@ OnInit:
 }
 
 // Effect ID 20
-guild_vs5,47,70,4	script	HAT_EF_GLOW_OF_NEW_YEAR	4_F_08_STATUE,{
+guild_vs5,34,64,4	script	HAT_EF_GLOW_OF_NEW_YEAR	4_F_08_STATUE,{
 	mes "[HAT_EF_GLOW_OF_NEW_YEAR]";
 	mes "Hat Effect ID: " + HAT_EF_GLOW_OF_NEW_YEAR;
-	mes "Map: guild_vs5 (47,70)";
+	mes "Map: guild_vs5 (34,64)";
 	close;
 
 OnInit:
@@ -262,6 +275,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 21
 guild_vs5,50,70,4	script	HAT_EF_BOTTOM_FORTUNEKISS	4_F_08_STATUE,{
 	mes "[HAT_EF_BOTTOM_FORTUNEKISS]";
@@ -273,7 +287,9 @@ OnInit:
 	hateffect HAT_EF_BOTTOM_FORTUNEKISS, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 22
 guild_vs5,53,70,4	script	HAT_EF_PINKBODY	4_F_08_STATUE,{
 	mes "[HAT_EF_PINKBODY]";
@@ -285,7 +301,9 @@ OnInit:
 	hateffect HAT_EF_PINKBODY, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 23
 guild_vs5,56,70,4	script	HAT_EF_DOUBLEGUMGANG	4_F_08_STATUE,{
 	mes "[HAT_EF_DOUBLEGUMGANG]";
@@ -297,7 +315,9 @@ OnInit:
 	hateffect HAT_EF_DOUBLEGUMGANG, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 24
 guild_vs5,59,70,4	script	HAT_EF_GIANTBODY	4_F_08_STATUE,{
 	mes "[HAT_EF_GIANTBODY]";
@@ -309,7 +329,9 @@ OnInit:
 	hateffect HAT_EF_GIANTBODY, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 25
 guild_vs5,62,70,4	script	HAT_EF_GREEN99_6	4_F_08_STATUE,{
 	mes "[HAT_EF_GREEN99_6]";
@@ -321,7 +343,9 @@ OnInit:
 	hateffect HAT_EF_GREEN99_6, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 26
 guild_vs5,65,70,4	script	HAT_EF_CIRCLEPOWER	4_F_08_STATUE,{
 	mes "[HAT_EF_CIRCLEPOWER]";
@@ -333,7 +357,9 @@ OnInit:
 	hateffect HAT_EF_CIRCLEPOWER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 27
 guild_vs5,32,68,4	script	HAT_EF_BOTTOM_BLOODYLUST	4_F_08_STATUE,{
 	mes "[HAT_EF_BOTTOM_BLOODYLUST]";
@@ -345,7 +371,9 @@ OnInit:
 	hateffect HAT_EF_BOTTOM_BLOODYLUST, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 28
 guild_vs5,35,68,4	script	HAT_EF_WATER_BELOW	4_F_08_STATUE,{
 	mes "[HAT_EF_WATER_BELOW]";
@@ -357,7 +385,9 @@ OnInit:
 	hateffect HAT_EF_WATER_BELOW, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 29
 guild_vs5,38,68,4	script	HAT_EF_LEVEL99_150	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_150]";
@@ -369,7 +399,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_150, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 30
 guild_vs5,41,68,4	script	HAT_EF_YELLOWFLY3	4_F_08_STATUE,{
 	mes "[HAT_EF_YELLOWFLY3]";
@@ -381,7 +413,9 @@ OnInit:
 	hateffect HAT_EF_YELLOWFLY3, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 31
 guild_vs5,44,68,4	script	HAT_EF_KAGEMUSYA	4_F_08_STATUE,{
 	mes "[HAT_EF_KAGEMUSYA]";
@@ -393,7 +427,9 @@ OnInit:
 	hateffect HAT_EF_KAGEMUSYA, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 32
 guild_vs5,47,68,4	script	HAT_EF_CHERRYBLOSSOM	4_F_08_STATUE,{
 	mes "[HAT_EF_CHERRYBLOSSOM]";
@@ -405,24 +441,13 @@ OnInit:
 	hateffect HAT_EF_CHERRYBLOSSOM, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 33
-guild_vs5,50,68,4	script	HAT_EF_STRANGELIGHTS	4_F_08_STATUE,{
-	mes "[HAT_EF_STRANGELIGHTS]";
-	mes "Hat Effect ID: " + HAT_EF_STRANGELIGHTS;
-	mes "Map: guild_vs5 (50,68)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_STRANGELIGHTS, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 34
-guild_vs5,53,68,4	script	HAT_EF_WL_TELEKINESIS_INTENSE	4_F_08_STATUE,{
+guild_vs5,38,64,4	script	HAT_EF_WL_TELEKINESIS_INTENSE	4_F_08_STATUE,{
 	mes "[HAT_EF_WL_TELEKINESIS_INTENSE]";
 	mes "Hat Effect ID: " + HAT_EF_WL_TELEKINESIS_INTENSE;
-	mes "Map: guild_vs5 (53,68)";
+	mes "Map: guild_vs5 (38,64)";
 	close;
 
 OnInit:
@@ -431,10 +456,10 @@ OnInit:
 }
 
 // Effect ID 35
-guild_vs5,56,68,4	script	HAT_EF_AB_OFFERTORIUM_RING	4_F_08_STATUE,{
+guild_vs5,42,64,4	script	HAT_EF_AB_OFFERTORIUM_RING	4_F_08_STATUE,{
 	mes "[HAT_EF_AB_OFFERTORIUM_RING]";
 	mes "Hat Effect ID: " + HAT_EF_AB_OFFERTORIUM_RING;
-	mes "Map: guild_vs5 (56,68)";
+	mes "Map: guild_vs5 (42,64)";
 	close;
 
 OnInit:
@@ -442,6 +467,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 36
 guild_vs5,59,68,4	script	HAT_EF_WHITEBODY2	4_F_08_STATUE,{
 	mes "[HAT_EF_WHITEBODY2]";
@@ -453,7 +479,9 @@ OnInit:
 	hateffect HAT_EF_WHITEBODY2, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 37
 guild_vs5,62,68,4	script	HAT_EF_SAKURA	4_F_08_STATUE,{
 	mes "[HAT_EF_SAKURA]";
@@ -465,7 +493,9 @@ OnInit:
 	hateffect HAT_EF_SAKURA, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 38
 guild_vs5,65,68,4	script	HAT_EF_CLOUD2	4_F_08_STATUE,{
 	mes "[HAT_EF_CLOUD2]";
@@ -477,12 +507,13 @@ OnInit:
 	hateffect HAT_EF_CLOUD2, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 39
-guild_vs5,32,66,4	script	HAT_EF_FEATHER_FLUTTERING	4_F_08_STATUE,{
+guild_vs5,46,64,4	script	HAT_EF_FEATHER_FLUTTERING	4_F_08_STATUE,{
 	mes "[HAT_EF_FEATHER_FLUTTERING]";
 	mes "Hat Effect ID: " + HAT_EF_FEATHER_FLUTTERING;
-	mes "Map: guild_vs5 (32,66)";
+	mes "Map: guild_vs5 (46,64)";
 	close;
 
 OnInit:
@@ -490,18 +521,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 40
-guild_vs5,35,66,4	script	HAT_EF_CAMELLIA_HAIR_PIN	4_F_08_STATUE,{
-	mes "[HAT_EF_CAMELLIA_HAIR_PIN]";
-	mes "Hat Effect ID: " + HAT_EF_CAMELLIA_HAIR_PIN;
-	mes "Map: guild_vs5 (35,66)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_CAMELLIA_HAIR_PIN, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 41
 guild_vs5,38,66,4	script	HAT_EF_JP_EV_EFFECT01	4_F_08_STATUE,{
 	mes "[HAT_EF_JP_EV_EFFECT01]";
@@ -513,7 +533,9 @@ OnInit:
 	hateffect HAT_EF_JP_EV_EFFECT01, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 42
 guild_vs5,41,66,4	script	HAT_EF_JP_EV_EFFECT02	4_F_08_STATUE,{
 	mes "[HAT_EF_JP_EV_EFFECT02]";
@@ -525,7 +547,9 @@ OnInit:
 	hateffect HAT_EF_JP_EV_EFFECT02, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 43
 guild_vs5,44,66,4	script	HAT_EF_JP_EV_EFFECT03	4_F_08_STATUE,{
 	mes "[HAT_EF_JP_EV_EFFECT03]";
@@ -537,12 +561,13 @@ OnInit:
 	hateffect HAT_EF_JP_EV_EFFECT03, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 44
-guild_vs5,47,66,4	script	HAT_EF_FLORAL_WALTZ	4_F_08_STATUE,{
+guild_vs5,30,61,4	script	HAT_EF_FLORAL_WALTZ	4_F_08_STATUE,{
 	mes "[HAT_EF_FLORAL_WALTZ]";
 	mes "Hat Effect ID: " + HAT_EF_FLORAL_WALTZ;
-	mes "Map: guild_vs5 (47,66)";
+	mes "Map: guild_vs5 (30,61)";
 	close;
 
 OnInit:
@@ -551,10 +576,10 @@ OnInit:
 }
 
 // Effect ID 45
-guild_vs5,50,66,4	script	HAT_EF_MAGICAL_FEATHER	4_F_08_STATUE,{
+guild_vs5,34,61,4	script	HAT_EF_MAGICAL_FEATHER	4_F_08_STATUE,{
 	mes "[HAT_EF_MAGICAL_FEATHER]";
 	mes "Hat Effect ID: " + HAT_EF_MAGICAL_FEATHER;
-	mes "Map: guild_vs5 (50,66)";
+	mes "Map: guild_vs5 (34,61)";
 	close;
 
 OnInit:
@@ -563,10 +588,10 @@ OnInit:
 }
 
 // Effect ID 46
-guild_vs5,53,66,4	script	HAT_EF_HAT_EFFECT	4_F_08_STATUE,{
+guild_vs5,38,61,4	script	HAT_EF_HAT_EFFECT	4_F_08_STATUE,{
 	mes "[HAT_EF_HAT_EFFECT]";
 	mes "Hat Effect ID: " + HAT_EF_HAT_EFFECT;
-	mes "Map: guild_vs5 (53,66)";
+	mes "Map: guild_vs5 (38,61)";
 	close;
 
 OnInit:
@@ -574,30 +599,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 47
-guild_vs5,56,66,4	script	HAT_EF_BAKURETSU_HADOU	4_F_08_STATUE,{
-	mes "[HAT_EF_BAKURETSU_HADOU]";
-	mes "Hat Effect ID: " + HAT_EF_BAKURETSU_HADOU;
-	mes "Map: guild_vs5 (56,66)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_BAKURETSU_HADOU, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 48
-guild_vs5,59,66,4	script	HAT_EF_GOLD_SHOWER	4_F_08_STATUE,{
-	mes "[HAT_EF_GOLD_SHOWER]";
-	mes "Hat Effect ID: " + HAT_EF_GOLD_SHOWER;
-	mes "Map: guild_vs5 (59,66)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_GOLD_SHOWER, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 49
 guild_vs5,62,66,4	script	HAT_EF_WHITEBODY	4_F_08_STATUE,{
 	mes "[HAT_EF_WHITEBODY]";
@@ -609,7 +611,9 @@ OnInit:
 	hateffect HAT_EF_WHITEBODY, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 50
 guild_vs5,65,66,4	script	HAT_EF_WATER_BELOW2	4_F_08_STATUE,{
 	mes "[HAT_EF_WATER_BELOW2]";
@@ -621,12 +625,13 @@ OnInit:
 	hateffect HAT_EF_WATER_BELOW2, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 51
-guild_vs5,68,66,4	script	HAT_EF_FIREWORK	4_F_08_STATUE,{
+guild_vs5,42,61,4	script	HAT_EF_FIREWORK	4_F_08_STATUE,{
 	mes "[HAT_EF_FIREWORK]";
 	mes "Hat Effect ID: " + HAT_EF_FIREWORK;
-	mes "Map: guild_vs5 (68,66)";
+	mes "Map: guild_vs5 (42,61)";
 	close;
 
 OnInit:
@@ -634,23 +639,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 52
-guild_vs5,29,64,4	script	HAT_EF_RETURN_TW_1ST_HAT	4_F_08_STATUE,{
-	mes "[HAT_EF_RETURN_TW_1ST_HAT]";
-	mes "Hat Effect ID: " + HAT_EF_RETURN_TW_1ST_HAT;
-	mes "Map: guild_vs5 (29,64)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_RETURN_TW_1ST_HAT, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 53
-guild_vs5,32,64,4	script	HAT_EF_C_FLUTTERBUTTERFLY_BL	4_F_08_STATUE,{
+guild_vs5,46,61,4	script	HAT_EF_C_FLUTTERBUTTERFLY_BL	4_F_08_STATUE,{
 	mes "[HAT_EF_C_FLUTTERBUTTERFLY_BL]";
 	mes "Hat Effect ID: " + HAT_EF_C_FLUTTERBUTTERFLY_BL;
-	mes "Map: guild_vs5 (32,64)";
+	mes "Map: guild_vs5 (46,61)";
 	close;
 
 OnInit:
@@ -659,10 +652,10 @@ OnInit:
 }
 
 // Effect ID 54
-guild_vs5,35,64,4	script	HAT_EF_QSCARABA	4_F_08_STATUE,{
+guild_vs5,26,58,4	script	HAT_EF_QSCARABA	4_F_08_STATUE,{
 	mes "[HAT_EF_QSCARABA]";
 	mes "Hat Effect ID: " + HAT_EF_QSCARABA;
-	mes "Map: guild_vs5 (35,64)";
+	mes "Map: guild_vs5 (26,58)";
 	close;
 
 OnInit:
@@ -670,23 +663,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 55
-guild_vs5,38,64,4	script	HAT_EF_FSTONE	4_F_08_STATUE,{
-	mes "[HAT_EF_FSTONE]";
-	mes "Hat Effect ID: " + HAT_EF_FSTONE;
-	mes "Map: guild_vs5 (38,64)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_FSTONE, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 56
-guild_vs5,41,64,4	script	HAT_EF_MAGICCIRCLE	4_F_08_STATUE,{
+guild_vs5,30,58,4	script	HAT_EF_MAGICCIRCLE	4_F_08_STATUE,{
 	mes "[HAT_EF_MAGICCIRCLE]";
 	mes "Hat Effect ID: " + HAT_EF_MAGICCIRCLE;
-	mes "Map: guild_vs5 (41,64)";
+	mes "Map: guild_vs5 (30,58)";
 	close;
 
 OnInit:
@@ -694,6 +675,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 57
 guild_vs5,44,64,4	script	HAT_EF_BRYSINGGAMEN	4_F_08_STATUE,{
 	mes "[HAT_EF_BRYSINGGAMEN]";
@@ -705,7 +687,9 @@ OnInit:
 	hateffect HAT_EF_BRYSINGGAMEN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 58
 guild_vs5,47,64,4	script	HAT_EF_MAGINGIORDE	4_F_08_STATUE,{
 	mes "[HAT_EF_MAGINGIORDE]";
@@ -717,7 +701,9 @@ OnInit:
 	hateffect HAT_EF_MAGINGIORDE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 59
 guild_vs5,59,64,4	script	HAT_EF_LEVEL99_RED	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_RED]";
@@ -729,7 +715,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_RED, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 60
 guild_vs5,62,64,4	script	HAT_EF_LEVEL99_ULTRAMARINE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_ULTRAMARINE]";
@@ -741,7 +729,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_ULTRAMARINE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 61
 guild_vs5,65,64,4	script	HAT_EF_LEVEL99_CYAN	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_CYAN]";
@@ -753,7 +743,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_CYAN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 62
 guild_vs5,68,64,4	script	HAT_EF_LEVEL99_LIME	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_LIME]";
@@ -765,7 +757,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_LIME, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 63
 guild_vs5,71,64,4	script	HAT_EF_LEVEL99_VIOLET	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_VIOLET]";
@@ -777,7 +771,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_VIOLET, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 64
 guild_vs5,26,62,4	script	HAT_EF_LEVEL99_LILAC	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_LILAC]";
@@ -789,7 +785,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_LILAC, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 65
 guild_vs5,29,62,4	script	HAT_EF_LEVEL99_SUN_ORANGE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_SUN_ORANGE]";
@@ -801,7 +799,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_SUN_ORANGE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 66
 guild_vs5,32,62,4	script	HAT_EF_LEVEL99_DEEP_PINK	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_DEEP_PINK]";
@@ -813,7 +813,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_DEEP_PINK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 67
 guild_vs5,35,62,4	script	HAT_EF_LEVEL99_BLACK	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_BLACK]";
@@ -825,7 +827,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_BLACK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 68
 guild_vs5,38,62,4	script	HAT_EF_LEVEL99_WHITE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_WHITE]";
@@ -837,7 +841,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_WHITE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 69
 guild_vs5,41,62,4	script	HAT_EF_LEVEL160_RED	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_RED]";
@@ -849,7 +855,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_RED, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 70
 guild_vs5,44,62,4	script	HAT_EF_LEVEL160_ULTRAMARINE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_ULTRAMARINE]";
@@ -861,7 +869,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_ULTRAMARINE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 71
 guild_vs5,47,62,4	script	HAT_EF_LEVEL160_CYAN	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_CYAN]";
@@ -873,7 +883,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_CYAN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 72
 guild_vs5,50,62,4	script	HAT_EF_LEVEL160_LIME	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_LIME]";
@@ -885,7 +897,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_LIME, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 73
 guild_vs5,53,62,4	script	HAT_EF_LEVEL160_VIOLET	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_VIOLET]";
@@ -897,7 +911,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_VIOLET, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 74
 guild_vs5,59,62,4	script	HAT_EF_LEVEL160_LILAC	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_LILAC]";
@@ -909,7 +925,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_LILAC, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 75
 guild_vs5,68,62,4	script	HAT_EF_LEVEL160_SUN_ORANGE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_SUN_ORANGE]";
@@ -921,7 +939,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_SUN_ORANGE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 76
 guild_vs5,71,62,4	script	HAT_EF_LEVEL160_DEEP_PINK	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_DEEP_PINK]";
@@ -933,7 +953,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_DEEP_PINK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 77
 guild_vs5,26,60,4	script	HAT_EF_LEVEL160_BLACK	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_BLACK]";
@@ -945,7 +967,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_BLACK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 78
 guild_vs5,29,60,4	script	HAT_EF_LEVEL160_WHITE	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_WHITE]";
@@ -957,12 +981,13 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_WHITE, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 79
-guild_vs5,32,60,4	script	HAT_EF_FULL_BLOOMCHERRY_TREE	4_F_08_STATUE,{
+guild_vs5,42,58,4	script	HAT_EF_FULL_BLOOMCHERRY_TREE	4_F_08_STATUE,{
 	mes "[HAT_EF_FULL_BLOOMCHERRY_TREE]";
 	mes "Hat Effect ID: " + HAT_EF_FULL_BLOOMCHERRY_TREE;
-	mes "Map: guild_vs5 (32,60)";
+	mes "Map: guild_vs5 (42,58)";
 	close;
 
 OnInit:
@@ -971,10 +996,10 @@ OnInit:
 }
 
 // Effect ID 80
-guild_vs5,35,60,4	script	HAT_EF_C_BLESSINGS_OF_SOUL	4_F_08_STATUE,{
+guild_vs5,46,58,4	script	HAT_EF_C_BLESSINGS_OF_SOUL	4_F_08_STATUE,{
 	mes "[HAT_EF_C_BLESSINGS_OF_SOUL]";
 	mes "Hat Effect ID: " + HAT_EF_C_BLESSINGS_OF_SOUL;
-	mes "Map: guild_vs5 (35,60)";
+	mes "Map: guild_vs5 (46,58)";
 	close;
 
 OnInit:
@@ -983,10 +1008,10 @@ OnInit:
 }
 
 // Effect ID 81
-guild_vs5,38,60,4	script	HAT_EF_MANYSTARS	4_F_08_STATUE,{
+guild_vs5,26,55,4	script	HAT_EF_MANYSTARS	4_F_08_STATUE,{
 	mes "[HAT_EF_MANYSTARS]";
 	mes "Hat Effect ID: " + HAT_EF_MANYSTARS;
-	mes "Map: guild_vs5 (38,60)";
+	mes "Map: guild_vs5 (26,55)";
 	close;
 
 OnInit:
@@ -994,66 +1019,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 82
-guild_vs5,41,60,4	script	HAT_EF_SUBJECT_AURA_GOLD	4_F_08_STATUE,{
-	mes "[HAT_EF_SUBJECT_AURA_GOLD]";
-	mes "Hat Effect ID: " + HAT_EF_SUBJECT_AURA_GOLD;
-	mes "Map: guild_vs5 (41,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_SUBJECT_AURA_GOLD, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 83
-guild_vs5,44,60,4	script	HAT_EF_SUBJECT_AURA_WHITE	4_F_08_STATUE,{
-	mes "[HAT_EF_SUBJECT_AURA_WHITE]";
-	mes "Hat Effect ID: " + HAT_EF_SUBJECT_AURA_WHITE;
-	mes "Map: guild_vs5 (44,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_SUBJECT_AURA_WHITE, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 84
-guild_vs5,47,60,4	script	HAT_EF_SUBJECT_AURA_RED	4_F_08_STATUE,{
-	mes "[HAT_EF_SUBJECT_AURA_RED]";
-	mes "Hat Effect ID: " + HAT_EF_SUBJECT_AURA_RED;
-	mes "Map: guild_vs5 (47,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_SUBJECT_AURA_RED, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 85
-guild_vs5,50,60,4	script	HAT_EF_C_SHINING_ANGEL_WING	4_F_08_STATUE,{
-	mes "[HAT_EF_C_SHINING_ANGEL_WING]";
-	mes "Hat Effect ID: " + HAT_EF_C_SHINING_ANGEL_WING;
-	mes "Map: guild_vs5 (50,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_SHINING_ANGEL_WING, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 86
-guild_vs5,53,60,4	script	HAT_EF_MAGIC_STAR_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_MAGIC_STAR_TW]";
-	mes "Hat Effect ID: " + HAT_EF_MAGIC_STAR_TW;
-	mes "Map: guild_vs5 (53,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_MAGIC_STAR_TW, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 87
 guild_vs5,59,60,4	script	HAT_EF_DIGITAL_SPACE	4_F_08_STATUE,{
 	mes "[HAT_EF_DIGITAL_SPACE]";
@@ -1065,7 +1031,9 @@ OnInit:
 	hateffect HAT_EF_DIGITAL_SPACE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 88
 guild_vs5,62,60,4	script	HAT_EF_SLEIPNIR	4_F_08_STATUE,{
 	mes "[HAT_EF_SLEIPNIR]";
@@ -1077,24 +1045,13 @@ OnInit:
 	hateffect HAT_EF_SLEIPNIR, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 89
-guild_vs5,65,60,4	script	HAT_EF_C_MAPLE_WHICH_FALLS_RD	4_F_08_STATUE,{
-	mes "[HAT_EF_C_MAPLE_WHICH_FALLS_RD]";
-	mes "Hat Effect ID: " + HAT_EF_C_MAPLE_WHICH_FALLS_RD;
-	mes "Map: guild_vs5 (65,60)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_MAPLE_WHICH_FALLS_RD, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 90
-guild_vs5,68,60,4	script	HAT_EF_MAGICCIRCLERAINBOW	4_F_08_STATUE,{
+guild_vs5,30,55,4	script	HAT_EF_MAGICCIRCLERAINBOW	4_F_08_STATUE,{
 	mes "[HAT_EF_MAGICCIRCLERAINBOW]";
 	mes "Hat Effect ID: " + HAT_EF_MAGICCIRCLERAINBOW;
-	mes "Map: guild_vs5 (68,60)";
+	mes "Map: guild_vs5 (30,55)";
 	close;
 
 OnInit:
@@ -1103,10 +1060,10 @@ OnInit:
 }
 
 // Effect ID 91
-guild_vs5,71,60,4	script	HAT_EF_SNOWFLAKE_TIARA	4_F_08_STATUE,{
+guild_vs5,34,55,4	script	HAT_EF_SNOWFLAKE_TIARA	4_F_08_STATUE,{
 	mes "[HAT_EF_SNOWFLAKE_TIARA]";
 	mes "Hat Effect ID: " + HAT_EF_SNOWFLAKE_TIARA;
-	mes "Map: guild_vs5 (71,60)";
+	mes "Map: guild_vs5 (34,55)";
 	close;
 
 OnInit:
@@ -1115,10 +1072,10 @@ OnInit:
 }
 
 // Effect ID 92
-guild_vs5,23,58,4	script	HAT_EF_MIDGARTS_GLORY	4_F_08_STATUE,{
+guild_vs5,38,55,4	script	HAT_EF_MIDGARTS_GLORY	4_F_08_STATUE,{
 	mes "[HAT_EF_MIDGARTS_GLORY]";
 	mes "Hat Effect ID: " + HAT_EF_MIDGARTS_GLORY;
-	mes "Map: guild_vs5 (23,58)";
+	mes "Map: guild_vs5 (38,55)";
 	close;
 
 OnInit:
@@ -1126,6 +1083,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 93
 guild_vs5,26,58,4	script	HAT_EF_LEVEL99_TIGER	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL99_TIGER]";
@@ -1137,7 +1095,9 @@ OnInit:
 	hateffect HAT_EF_LEVEL99_TIGER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 94
 guild_vs5,29,58,4	script	HAT_EF_LEVEL160_TIGER	4_F_08_STATUE,{
 	mes "[HAT_EF_LEVEL160_TIGER]";
@@ -1149,12 +1109,13 @@ OnInit:
 	hateffect HAT_EF_LEVEL160_TIGER, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 95
-guild_vs5,32,58,4	script	HAT_EF_FLUFFYWING	4_F_08_STATUE,{
+guild_vs5,42,55,4	script	HAT_EF_FLUFFYWING	4_F_08_STATUE,{
 	mes "[HAT_EF_FLUFFYWING]";
 	mes "Hat Effect ID: " + HAT_EF_FLUFFYWING;
-	mes "Map: guild_vs5 (32,58)";
+	mes "Map: guild_vs5 (42,55)";
 	close;
 
 OnInit:
@@ -1162,23 +1123,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 96
-guild_vs5,38,58,4	script	HAT_EF_C_GHOST_EFFECT	4_F_08_STATUE,{
-	mes "[HAT_EF_C_GHOST_EFFECT]";
-	mes "Hat Effect ID: " + HAT_EF_C_GHOST_EFFECT;
-	mes "Map: guild_vs5 (38,58)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_GHOST_EFFECT, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 97
-guild_vs5,41,58,4	script	HAT_EF_C_POPPING_PORING_AURA	4_F_08_STATUE,{
+guild_vs5,46,55,4	script	HAT_EF_C_POPPING_PORING_AURA	4_F_08_STATUE,{
 	mes "[HAT_EF_C_POPPING_PORING_AURA]";
 	mes "Hat Effect ID: " + HAT_EF_C_POPPING_PORING_AURA;
-	mes "Map: guild_vs5 (41,58)";
+	mes "Map: guild_vs5 (46,55)";
 	close;
 
 OnInit:
@@ -1187,10 +1136,10 @@ OnInit:
 }
 
 // Effect ID 98
-guild_vs5,44,58,4	script	HAT_EF_RESONATETAEGO	4_F_08_STATUE,{
+guild_vs5,62,70,4	script	HAT_EF_RESONATETAEGO	4_F_08_STATUE,{
 	mes "[HAT_EF_RESONATETAEGO]";
 	mes "Hat Effect ID: " + HAT_EF_RESONATETAEGO;
-	mes "Map: guild_vs5 (44,58)";
+	mes "Map: guild_vs5 (62,70)";
 	close;
 
 OnInit:
@@ -1198,6 +1147,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 99
 guild_vs5,47,58,4	script	HAT_EF_99LV_RUNE_RED	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_RUNE_RED]";
@@ -1209,7 +1159,9 @@ OnInit:
 	hateffect HAT_EF_99LV_RUNE_RED, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 100
 guild_vs5,50,58,4	script	HAT_EF_99LV_ROYAL_GUARD_BLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_ROYAL_GUARD_BLUE]";
@@ -1221,7 +1173,9 @@ OnInit:
 	hateffect HAT_EF_99LV_ROYAL_GUARD_BLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 101
 guild_vs5,53,58,4	script	HAT_EF_99LV_WARLOCK_VIOLET	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_WARLOCK_VIOLET]";
@@ -1233,7 +1187,9 @@ OnInit:
 	hateffect HAT_EF_99LV_WARLOCK_VIOLET, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 102
 guild_vs5,56,58,4	script	HAT_EF_99LV_SORCERER_LBLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_SORCERER_LBLUE]";
@@ -1245,7 +1201,9 @@ OnInit:
 	hateffect HAT_EF_99LV_SORCERER_LBLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 103
 guild_vs5,59,58,4	script	HAT_EF_99LV_RANGER_GREEN	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_RANGER_GREEN]";
@@ -1257,7 +1215,9 @@ OnInit:
 	hateffect HAT_EF_99LV_RANGER_GREEN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 104
 guild_vs5,62,58,4	script	HAT_EF_99LV_MINSTREL_PINK	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_MINSTREL_PINK]";
@@ -1269,7 +1229,9 @@ OnInit:
 	hateffect HAT_EF_99LV_MINSTREL_PINK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 105
 guild_vs5,65,58,4	script	HAT_EF_99LV_ARCHBISHOP_WHITE	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_ARCHBISHOP_WHITE]";
@@ -1281,7 +1243,9 @@ OnInit:
 	hateffect HAT_EF_99LV_ARCHBISHOP_WHITE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 106
 guild_vs5,68,58,4	script	HAT_EF_99LV_GUILL_SILVER	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_GUILL_SILVER]";
@@ -1293,7 +1257,9 @@ OnInit:
 	hateffect HAT_EF_99LV_GUILL_SILVER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 107
 guild_vs5,71,58,4	script	HAT_EF_99LV_SHADOWC_BLACK	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_SHADOWC_BLACK]";
@@ -1305,7 +1271,9 @@ OnInit:
 	hateffect HAT_EF_99LV_SHADOWC_BLACK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 108
 guild_vs5,74,58,4	script	HAT_EF_99LV_MECHANIC_GOLD	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_MECHANIC_GOLD]";
@@ -1317,7 +1285,9 @@ OnInit:
 	hateffect HAT_EF_99LV_MECHANIC_GOLD, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 109
 guild_vs5,77,58,4	script	HAT_EF_99LV_GENETIC_YGREEN	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_GENETIC_YGREEN]";
@@ -1329,7 +1299,9 @@ OnInit:
 	hateffect HAT_EF_99LV_GENETIC_YGREEN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 110
 guild_vs5,23,56,4	script	HAT_EF_160LV_RUNE_RED	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_RUNE_RED]";
@@ -1341,7 +1313,9 @@ OnInit:
 	hateffect HAT_EF_160LV_RUNE_RED, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 111
 guild_vs5,26,56,4	script	HAT_EF_160LV_ROYAL_G_BLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_ROYAL_G_BLUE]";
@@ -1353,7 +1327,9 @@ OnInit:
 	hateffect HAT_EF_160LV_ROYAL_G_BLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 112
 guild_vs5,29,56,4	script	HAT_EF_160LV_WARLOCK_VIOLET	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_WARLOCK_VIOLET]";
@@ -1365,7 +1341,9 @@ OnInit:
 	hateffect HAT_EF_160LV_WARLOCK_VIOLET, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 113
 guild_vs5,32,56,4	script	HAT_EF_160LV_SORCERER_LBLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_SORCERER_LBLUE]";
@@ -1377,7 +1355,9 @@ OnInit:
 	hateffect HAT_EF_160LV_SORCERER_LBLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 114
 guild_vs5,38,56,4	script	HAT_EF_160LV_RANGER_GREEN	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_RANGER_GREEN]";
@@ -1389,7 +1369,9 @@ OnInit:
 	hateffect HAT_EF_160LV_RANGER_GREEN, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 115
 guild_vs5,41,56,4	script	HAT_EF_160LV_MINSTREL_PINK	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_MINSTREL_PINK]";
@@ -1401,7 +1383,9 @@ OnInit:
 	hateffect HAT_EF_160LV_MINSTREL_PINK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 116
 guild_vs5,44,56,4	script	HAT_EF_160LV_ARCHB_WHITE	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_ARCHB_WHITE]";
@@ -1413,7 +1397,9 @@ OnInit:
 	hateffect HAT_EF_160LV_ARCHB_WHITE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 117
 guild_vs5,47,56,4	script	HAT_EF_160LV_GUILL_SILVER	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_GUILL_SILVER]";
@@ -1425,7 +1411,9 @@ OnInit:
 	hateffect HAT_EF_160LV_GUILL_SILVER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 118
 guild_vs5,50,56,4	script	HAT_EF_160LV_SHADOWC_BLACK	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_SHADOWC_BLACK]";
@@ -1437,7 +1425,9 @@ OnInit:
 	hateffect HAT_EF_160LV_SHADOWC_BLACK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 119
 guild_vs5,53,56,4	script	HAT_EF_160LV_MECHANIC_GOLD	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_MECHANIC_GOLD]";
@@ -1449,7 +1439,9 @@ OnInit:
 	hateffect HAT_EF_160LV_MECHANIC_GOLD, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 120
 guild_vs5,56,56,4	script	HAT_EF_160LV_GENETIC_YGREEN	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_GENETIC_YGREEN]";
@@ -1461,24 +1453,13 @@ OnInit:
 	hateffect HAT_EF_160LV_GENETIC_YGREEN, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 121
-guild_vs5,59,56,4	script	HAT_EF_WATER_BELOW3	4_F_08_STATUE,{
-	mes "[HAT_EF_WATER_BELOW3]";
-	mes "Hat Effect ID: " + HAT_EF_WATER_BELOW3;
-	mes "Map: guild_vs5 (59,56)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_WATER_BELOW3, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 122
-guild_vs5,62,56,4	script	HAT_EF_WATER_BELOW4	4_F_08_STATUE,{
+guild_vs5,58,70,4	script	HAT_EF_WATER_BELOW4	4_F_08_STATUE,{
 	mes "[HAT_EF_WATER_BELOW4]";
 	mes "Hat Effect ID: " + HAT_EF_WATER_BELOW4;
-	mes "Map: guild_vs5 (62,56)";
+	mes "Map: guild_vs5 (58,70)";
 	close;
 
 OnInit:
@@ -1487,10 +1468,10 @@ OnInit:
 }
 
 // Effect ID 123
-guild_vs5,65,56,4	script	HAT_EF_C_VALKYRIE_WING	4_F_08_STATUE,{
+guild_vs5,54,70,4	script	HAT_EF_C_VALKYRIE_WING	4_F_08_STATUE,{
 	mes "[HAT_EF_C_VALKYRIE_WING]";
 	mes "Hat Effect ID: " + HAT_EF_C_VALKYRIE_WING;
-	mes "Map: guild_vs5 (65,56)";
+	mes "Map: guild_vs5 (54,70)";
 	close;
 
 OnInit:
@@ -1498,54 +1479,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 124
-guild_vs5,68,56,4	script	HAT_EF_2019RTC_CELEAURA_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_2019RTC_CELEAURA_TW]";
-	mes "Hat Effect ID: " + HAT_EF_2019RTC_CELEAURA_TW;
-	mes "Map: guild_vs5 (68,56)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2019RTC_CELEAURA_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 125
-guild_vs5,71,56,4	script	HAT_EF_2019RTC1ST_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_2019RTC1ST_TW]";
-	mes "Hat Effect ID: " + HAT_EF_2019RTC1ST_TW;
-	mes "Map: guild_vs5 (71,56)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2019RTC1ST_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 126
-guild_vs5,74,56,4	script	HAT_EF_2019RTC2ST_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_2019RTC2ST_TW]";
-	mes "Hat Effect ID: " + HAT_EF_2019RTC2ST_TW;
-	mes "Map: guild_vs5 (74,56)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2019RTC2ST_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 127
-guild_vs5,77,56,4	script	HAT_EF_2019RTC3ST_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_2019RTC3ST_TW]";
-	mes "Hat Effect ID: " + HAT_EF_2019RTC3ST_TW;
-	mes "Map: guild_vs5 (77,56)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2019RTC3ST_TW, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 128
 guild_vs5,23,54,4	script	HAT_EF_CONS_OF_WIND	4_F_08_STATUE,{
 	mes "[HAT_EF_CONS_OF_WIND]";
@@ -1557,12 +1491,13 @@ OnInit:
 	hateffect HAT_EF_CONS_OF_WIND, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 129
-guild_vs5,26,54,4	script	HAT_EF_MAPLE_FALLS	4_F_08_STATUE,{
+guild_vs5,66,67,4	script	HAT_EF_MAPLE_FALLS	4_F_08_STATUE,{
 	mes "[HAT_EF_MAPLE_FALLS]";
 	mes "Hat Effect ID: " + HAT_EF_MAPLE_FALLS;
-	mes "Map: guild_vs5 (26,54)";
+	mes "Map: guild_vs5 (66,67)";
 	close;
 
 OnInit:
@@ -1571,10 +1506,10 @@ OnInit:
 }
 
 // Effect ID 130
-guild_vs5,29,54,4	script	HAT_EF_BJ_HEADSETB	4_F_08_STATUE,{
+guild_vs5,62,67,4	script	HAT_EF_BJ_HEADSETB	4_F_08_STATUE,{
 	mes "[HAT_EF_BJ_HEADSETB]";
 	mes "Hat Effect ID: " + HAT_EF_BJ_HEADSETB;
-	mes "Map: guild_vs5 (29,54)";
+	mes "Map: guild_vs5 (62,67)";
 	close;
 
 OnInit:
@@ -1583,10 +1518,10 @@ OnInit:
 }
 
 // Effect ID 131
-guild_vs5,32,54,4	script	HAT_EF_VIP_HAIR	4_F_08_STATUE,{
+guild_vs5,58,67,4	script	HAT_EF_VIP_HAIR	4_F_08_STATUE,{
 	mes "[HAT_EF_VIP_HAIR]";
 	mes "Hat Effect ID: " + HAT_EF_VIP_HAIR;
-	mes "Map: guild_vs5 (32,54)";
+	mes "Map: guild_vs5 (58,67)";
 	close;
 
 OnInit:
@@ -1595,10 +1530,10 @@ OnInit:
 }
 
 // Effect ID 132
-guild_vs5,35,54,4	script	HAT_EF_C_MAGIC_HEIR_TW	4_F_08_STATUE,{
+guild_vs5,54,67,4	script	HAT_EF_C_MAGIC_HEIR_TW	4_F_08_STATUE,{
 	mes "[HAT_EF_C_MAGIC_HEIR_TW]";
 	mes "Hat Effect ID: " + HAT_EF_C_MAGIC_HEIR_TW;
-	mes "Map: guild_vs5 (35,54)";
+	mes "Map: guild_vs5 (54,67)";
 	close;
 
 OnInit:
@@ -1606,23 +1541,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 133
-guild_vs5,38,54,4	script	HAT_EF_C_SUDDEN_WEALTH_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_SUDDEN_WEALTH_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_SUDDEN_WEALTH_TW;
-	mes "Map: guild_vs5 (38,54)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_SUDDEN_WEALTH_TW, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 134
-guild_vs5,41,54,4	script	HAT_EF_C_ROMANCE_ROSE_TW	4_F_08_STATUE,{
+guild_vs5,70,64,4	script	HAT_EF_C_ROMANCE_ROSE_TW	4_F_08_STATUE,{
 	mes "[HAT_EF_C_ROMANCE_ROSE_TW]";
 	mes "Hat Effect ID: " + HAT_EF_C_ROMANCE_ROSE_TW;
-	mes "Map: guild_vs5 (41,54)";
+	mes "Map: guild_vs5 (70,64)";
 	close;
 
 OnInit:
@@ -1631,10 +1554,10 @@ OnInit:
 }
 
 // Effect ID 135
-guild_vs5,44,54,4	script	HAT_EF_C_DISAPEAR_TIME_TW	4_F_08_STATUE,{
+guild_vs5,62,64,4	script	HAT_EF_C_DISAPEAR_TIME_TW	4_F_08_STATUE,{
 	mes "[HAT_EF_C_DISAPEAR_TIME_TW]";
 	mes "Hat Effect ID: " + HAT_EF_C_DISAPEAR_TIME_TW;
-	mes "Map: guild_vs5 (44,54)";
+	mes "Map: guild_vs5 (62,64)";
 	close;
 
 OnInit:
@@ -1642,54 +1565,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 136
-guild_vs5,47,54,4	script	HAT_EF_2020RTC_01	4_F_08_STATUE,{
-	mes "[HAT_EF_2020RTC_01]";
-	mes "Hat Effect ID: " + HAT_EF_2020RTC_01;
-	mes "Map: guild_vs5 (47,54)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2020RTC_01, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 137
-guild_vs5,50,54,4	script	HAT_EF_2020RTC_02	4_F_08_STATUE,{
-	mes "[HAT_EF_2020RTC_02]";
-	mes "Hat Effect ID: " + HAT_EF_2020RTC_02;
-	mes "Map: guild_vs5 (50,54)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2020RTC_02, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 138
-guild_vs5,53,54,4	script	HAT_EF_2020RTC_03	4_F_08_STATUE,{
-	mes "[HAT_EF_2020RTC_03]";
-	mes "Hat Effect ID: " + HAT_EF_2020RTC_03;
-	mes "Map: guild_vs5 (53,54)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2020RTC_03, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 139
-guild_vs5,56,54,4	script	HAT_EF_C_2020RTC_IMP_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_2020RTC_IMP_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_2020RTC_IMP_TW;
-	mes "Map: guild_vs5 (56,54)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_2020RTC_IMP_TW, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 140
 guild_vs5,59,54,4	script	HAT_EF_SUBJECT_AURA_BLACK	4_F_08_STATUE,{
 	mes "[HAT_EF_SUBJECT_AURA_BLACK]";
@@ -1701,7 +1577,9 @@ OnInit:
 	hateffect HAT_EF_SUBJECT_AURA_BLACK, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 141
 guild_vs5,62,54,4	script	HAT_EF_2020RTC_EFFECT_01	4_F_08_STATUE,{
 	mes "[HAT_EF_2020RTC_EFFECT_01]";
@@ -1713,7 +1591,9 @@ OnInit:
 	hateffect HAT_EF_2020RTC_EFFECT_01, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 142
 guild_vs5,65,54,4	script	HAT_EF_2020RTC_EFFECT_02	4_F_08_STATUE,{
 	mes "[HAT_EF_2020RTC_EFFECT_02]";
@@ -1725,7 +1605,9 @@ OnInit:
 	hateffect HAT_EF_2020RTC_EFFECT_02, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 143
 guild_vs5,68,54,4	script	HAT_EF_2020RTC_EFFECT_03	4_F_08_STATUE,{
 	mes "[HAT_EF_2020RTC_EFFECT_03]";
@@ -1737,7 +1619,9 @@ OnInit:
 	hateffect HAT_EF_2020RTC_EFFECT_03, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 144
 guild_vs5,71,54,4	script	HAT_EF_99LV_STAR_E_MBLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_STAR_E_MBLUE]";
@@ -1749,7 +1633,9 @@ OnInit:
 	hateffect HAT_EF_99LV_STAR_E_MBLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 145
 guild_vs5,74,54,4	script	HAT_EF_160LV_STAR_E_MBLUE	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_STAR_E_MBLUE]";
@@ -1761,7 +1647,9 @@ OnInit:
 	hateffect HAT_EF_160LV_STAR_E_MBLUE, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 146
 guild_vs5,77,54,4	script	HAT_EF_99LV_SOUL_R_GRAY	4_F_08_STATUE,{
 	mes "[HAT_EF_99LV_SOUL_R_GRAY]";
@@ -1773,7 +1661,9 @@ OnInit:
 	hateffect HAT_EF_99LV_SOUL_R_GRAY, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 147
 guild_vs5,20,52,4	script	HAT_EF_160LV_SOUL_R_GRAY	4_F_08_STATUE,{
 	mes "[HAT_EF_160LV_SOUL_R_GRAY]";
@@ -1785,12 +1675,13 @@ OnInit:
 	hateffect HAT_EF_160LV_SOUL_R_GRAY, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 148
-guild_vs5,23,52,4	script	HAT_EF_GEARWHEEL	4_F_08_STATUE,{
+guild_vs5,58,64,4	script	HAT_EF_GEARWHEEL	4_F_08_STATUE,{
 	mes "[HAT_EF_GEARWHEEL]";
 	mes "Hat Effect ID: " + HAT_EF_GEARWHEEL;
-	mes "Map: guild_vs5 (23,52)";
+	mes "Map: guild_vs5 (58,64)";
 	close;
 
 OnInit:
@@ -1799,10 +1690,10 @@ OnInit:
 }
 
 // Effect ID 149
-guild_vs5,26,52,4	script	HAT_EF_GIFT_OF_SNOW	4_F_08_STATUE,{
+guild_vs5,70,61,4	script	HAT_EF_GIFT_OF_SNOW	4_F_08_STATUE,{
 	mes "[HAT_EF_GIFT_OF_SNOW]";
 	mes "Hat Effect ID: " + HAT_EF_GIFT_OF_SNOW;
-	mes "Map: guild_vs5 (26,52)";
+	mes "Map: guild_vs5 (70,61)";
 	close;
 
 OnInit:
@@ -1811,10 +1702,10 @@ OnInit:
 }
 
 // Effect ID 150
-guild_vs5,29,52,4	script	HAT_EF_SNOW_POWDER	4_F_08_STATUE,{
+guild_vs5,58,61,4	script	HAT_EF_SNOW_POWDER	4_F_08_STATUE,{
 	mes "[HAT_EF_SNOW_POWDER]";
 	mes "Hat Effect ID: " + HAT_EF_SNOW_POWDER;
-	mes "Map: guild_vs5 (29,52)";
+	mes "Map: guild_vs5 (58,61)";
 	close;
 
 OnInit:
@@ -1822,59 +1713,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 151
-guild_vs5,32,52,4	script	HAT_EF_FALLING_SNOW	4_F_08_STATUE,{
-	mes "[HAT_EF_FALLING_SNOW]";
-	mes "Hat Effect ID: " + HAT_EF_FALLING_SNOW;
-	mes "Map: guild_vs5 (32,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_FALLING_SNOW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 152
-guild_vs5,35,52,4	script	HAT_EF_C_PHIGASIA_SCARF_EXE	4_F_08_STATUE,{
-	mes "[HAT_EF_C_PHIGASIA_SCARF_EXE]";
-	mes "Hat Effect ID: " + HAT_EF_C_PHIGASIA_SCARF_EXE;
-	mes "Map: guild_vs5 (35,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_PHIGASIA_SCARF_EXE, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 153
-guild_vs5,38,52,4	script	HAT_EF_C_KYEL_HYRE_ULTI_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_KYEL_HYRE_ULTI_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_KYEL_HYRE_ULTI_TW;
-	mes "Map: guild_vs5 (38,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_KYEL_HYRE_ULTI_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 154
-guild_vs5,41,52,4	script	HAT_EF_C_MASTER	4_F_08_STATUE,{
-	mes "[HAT_EF_C_MASTER]";
-	mes "Hat Effect ID: " + HAT_EF_C_MASTER;
-	mes "Map: guild_vs5 (41,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_MASTER, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 155
-guild_vs5,44,52,4	script	HAT_EF_C_TIME_ACCESSORY	4_F_08_STATUE,{
+guild_vs5,70,58,4	script	HAT_EF_C_TIME_ACCESSORY	4_F_08_STATUE,{
 	mes "[HAT_EF_C_TIME_ACCESSORY]";
 	mes "Hat Effect ID: " + HAT_EF_C_TIME_ACCESSORY;
-	mes "Map: guild_vs5 (44,52)";
+	mes "Map: guild_vs5 (70,58)";
 	close;
 
 OnInit:
@@ -1883,10 +1726,10 @@ OnInit:
 }
 
 // Effect ID 156
-guild_vs5,47,52,4	script	HAT_EF_C_HELM_OF_RA	4_F_08_STATUE,{
+guild_vs5,66,58,4	script	HAT_EF_C_HELM_OF_RA	4_F_08_STATUE,{
 	mes "[HAT_EF_C_HELM_OF_RA]";
 	mes "Hat Effect ID: " + HAT_EF_C_HELM_OF_RA;
-	mes "Map: guild_vs5 (47,52)";
+	mes "Map: guild_vs5 (66,58)";
 	close;
 
 OnInit:
@@ -1894,23 +1737,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 157
-guild_vs5,56,52,4	script	HAT_EF_C_2021RTC_HEADSET_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_2021RTC_HEADSET_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_2021RTC_HEADSET_TW;
-	mes "Map: guild_vs5 (56,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_2021RTC_HEADSET_TW, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 158
-guild_vs5,59,52,4	script	HAT_EF_C_MOONSTAR_ACCESSORY	4_F_08_STATUE,{
+guild_vs5,62,58,4	script	HAT_EF_C_MOONSTAR_ACCESSORY	4_F_08_STATUE,{
 	mes "[HAT_EF_C_MOONSTAR_ACCESSORY]";
 	mes "Hat Effect ID: " + HAT_EF_C_MOONSTAR_ACCESSORY;
-	mes "Map: guild_vs5 (59,52)";
+	mes "Map: guild_vs5 (62,58)";
 	close;
 
 OnInit:
@@ -1918,6 +1749,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 159
 guild_vs5,62,52,4	script	HAT_EF_BLACK_THUNDER	4_F_08_STATUE,{
 	mes "[HAT_EF_BLACK_THUNDER]";
@@ -1929,7 +1761,9 @@ OnInit:
 	hateffect HAT_EF_BLACK_THUNDER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 160
 guild_vs5,65,52,4	script	HAT_EF_BLACK_THUNDER_DARK	4_F_08_STATUE,{
 	mes "[HAT_EF_BLACK_THUNDER_DARK]";
@@ -1941,12 +1775,13 @@ OnInit:
 	hateffect HAT_EF_BLACK_THUNDER_DARK, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 161
-guild_vs5,68,52,4	script	HAT_EF_C_RELEASED_GROUND	4_F_08_STATUE,{
+guild_vs5,58,58,4	script	HAT_EF_C_RELEASED_GROUND	4_F_08_STATUE,{
 	mes "[HAT_EF_C_RELEASED_GROUND]";
 	mes "Hat Effect ID: " + HAT_EF_C_RELEASED_GROUND;
-	mes "Map: guild_vs5 (68,52)";
+	mes "Map: guild_vs5 (58,58)";
 	close;
 
 OnInit:
@@ -1955,10 +1790,10 @@ OnInit:
 }
 
 // Effect ID 162
-guild_vs5,71,52,4	script	HAT_EF_C_SAMBA_CARNIVAL	4_F_08_STATUE,{
+guild_vs5,54,58,4	script	HAT_EF_C_SAMBA_CARNIVAL	4_F_08_STATUE,{
 	mes "[HAT_EF_C_SAMBA_CARNIVAL]";
 	mes "Hat Effect ID: " + HAT_EF_C_SAMBA_CARNIVAL;
-	mes "Map: guild_vs5 (71,52)";
+	mes "Map: guild_vs5 (54,58)";
 	close;
 
 OnInit:
@@ -1966,6 +1801,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 163
 guild_vs5,74,52,4	script	HAT_EF_POISON_MASTER	4_F_08_STATUE,{
 	mes "[HAT_EF_POISON_MASTER]";
@@ -1977,12 +1813,13 @@ OnInit:
 	hateffect HAT_EF_POISON_MASTER, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 164
-guild_vs5,77,52,4	script	HAT_EF_C_SWIRLING_FLAME	4_F_08_STATUE,{
+guild_vs5,74,55,4	script	HAT_EF_C_SWIRLING_FLAME	4_F_08_STATUE,{
 	mes "[HAT_EF_C_SWIRLING_FLAME]";
 	mes "Hat Effect ID: " + HAT_EF_C_SWIRLING_FLAME;
-	mes "Map: guild_vs5 (77,52)";
+	mes "Map: guild_vs5 (74,55)";
 	close;
 
 OnInit:
@@ -1990,42 +1827,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 165
-guild_vs5,80,52,4	script	HAT_EF_C_2021RTC_HEADSET_1_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_2021RTC_HEADSET_1_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_2021RTC_HEADSET_1_TW;
-	mes "Map: guild_vs5 (80,52)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_2021RTC_HEADSET_1_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 166
-guild_vs5,20,50,4	script	HAT_EF_C_2021RTC_HEADSET_2_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_2021RTC_HEADSET_2_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_2021RTC_HEADSET_2_TW;
-	mes "Map: guild_vs5 (20,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_2021RTC_HEADSET_2_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 167
-guild_vs5,23,50,4	script	HAT_EF_C_2021RTC_HEADSET_3_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_C_2021RTC_HEADSET_3_TW]";
-	mes "Hat Effect ID: " + HAT_EF_C_2021RTC_HEADSET_3_TW;
-	mes "Map: guild_vs5 (23,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_2021RTC_HEADSET_3_TW, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 168
 guild_vs5,26,50,4	script	HAT_EF_SUBJECT_AURA_WHITE_ALPHA	4_F_08_STATUE,{
 	mes "[HAT_EF_SUBJECT_AURA_WHITE_ALPHA]";
@@ -2037,7 +1839,9 @@ OnInit:
 	hateffect HAT_EF_SUBJECT_AURA_WHITE_ALPHA, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 169
 guild_vs5,29,50,4	script	HAT_EF_GC_DARKCROW	4_F_08_STATUE,{
 	mes "[HAT_EF_GC_DARKCROW]";
@@ -2049,7 +1853,9 @@ OnInit:
 	hateffect HAT_EF_GC_DARKCROW, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 170
 guild_vs5,32,50,4	script	HAT_EF_DIABOLUS_RING	4_F_08_STATUE,{
 	mes "[HAT_EF_DIABOLUS_RING]";
@@ -2061,12 +1867,13 @@ OnInit:
 	hateffect HAT_EF_DIABOLUS_RING, true, getnpcid(0);
 	end;
 }
+*/
 
 // Effect ID 171
-guild_vs5,35,50,4	script	HAT_EF_MAGICCIRCLE_BLUE_TW	4_F_08_STATUE,{
+guild_vs5,70,55,4	script	HAT_EF_MAGICCIRCLE_BLUE_TW	4_F_08_STATUE,{
 	mes "[HAT_EF_MAGICCIRCLE_BLUE_TW]";
 	mes "Hat Effect ID: " + HAT_EF_MAGICCIRCLE_BLUE_TW;
-	mes "Map: guild_vs5 (35,50)";
+	mes "Map: guild_vs5 (70,55)";
 	close;
 
 OnInit:
@@ -2075,10 +1882,10 @@ OnInit:
 }
 
 // Effect ID 172
-guild_vs5,38,50,4	script	HAT_EF_C_DISAPEAR_TIME_TW_2	4_F_08_STATUE,{
+guild_vs5,66,55,4	script	HAT_EF_C_DISAPEAR_TIME_TW_2	4_F_08_STATUE,{
 	mes "[HAT_EF_C_DISAPEAR_TIME_TW_2]";
 	mes "Hat Effect ID: " + HAT_EF_C_DISAPEAR_TIME_TW_2;
-	mes "Map: guild_vs5 (38,50)";
+	mes "Map: guild_vs5 (66,55)";
 	close;
 
 OnInit:
@@ -2087,10 +1894,10 @@ OnInit:
 }
 
 // Effect ID 173
-guild_vs5,41,50,4	script	HAT_EF_C_MELODY_WING	4_F_08_STATUE,{
+guild_vs5,62,55,4	script	HAT_EF_C_MELODY_WING	4_F_08_STATUE,{
 	mes "[HAT_EF_C_MELODY_WING]";
 	mes "Hat Effect ID: " + HAT_EF_C_MELODY_WING;
-	mes "Map: guild_vs5 (41,50)";
+	mes "Map: guild_vs5 (62,55)";
 	close;
 
 OnInit:
@@ -2098,23 +1905,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 174
-guild_vs5,44,50,4	script	HAT_EF_C_SPOT_LIGHT	4_F_08_STATUE,{
-	mes "[HAT_EF_C_SPOT_LIGHT]";
-	mes "Hat Effect ID: " + HAT_EF_C_SPOT_LIGHT;
-	mes "Map: guild_vs5 (44,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_SPOT_LIGHT, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 175
-guild_vs5,47,50,4	script	HAT_EF_C_ASTRA_BLESSING	4_F_08_STATUE,{
+guild_vs5,58,55,4	script	HAT_EF_C_ASTRA_BLESSING	4_F_08_STATUE,{
 	mes "[HAT_EF_C_ASTRA_BLESSING]";
 	mes "Hat Effect ID: " + HAT_EF_C_ASTRA_BLESSING;
-	mes "Map: guild_vs5 (47,50)";
+	mes "Map: guild_vs5 (58,55)";
 	close;
 
 OnInit:
@@ -2123,10 +1918,10 @@ OnInit:
 }
 
 // Effect ID 176
-guild_vs5,56,50,4	script	HAT_EF_EFST_C_20TH_ANNIVERSARY_HAT	4_F_08_STATUE,{
+guild_vs5,54,55,4	script	HAT_EF_EFST_C_20TH_ANNIVERSARY_HAT	4_F_08_STATUE,{
 	mes "[HAT_EF_EFST_C_20TH_ANNIVERSARY_HAT]";
 	mes "Hat Effect ID: " + HAT_EF_EFST_C_20TH_ANNIVERSARY_HAT;
-	mes "Map: guild_vs5 (56,50)";
+	mes "Map: guild_vs5 (54,55)";
 	close;
 
 OnInit:
@@ -2134,6 +1929,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 177
 guild_vs5,59,50,4	script	HAT_EF_SUBJECT_AURA_NAVY	4_F_08_STATUE,{
 	mes "[HAT_EF_SUBJECT_AURA_NAVY]";
@@ -2145,31 +1941,9 @@ OnInit:
 	hateffect HAT_EF_SUBJECT_AURA_NAVY, true, getnpcid(0);
 	end;
 }
+*/
 
-// Effect ID 178
-guild_vs5,62,50,4	script	HAT_EF_20TH_SCARF_J	4_F_08_STATUE,{
-	mes "[HAT_EF_20TH_SCARF_J]";
-	mes "Hat Effect ID: " + HAT_EF_20TH_SCARF_J;
-	mes "Map: guild_vs5 (62,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_20TH_SCARF_J, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 179
-guild_vs5,65,50,4	script	HAT_EF_GHOST_FIRE	4_F_08_STATUE,{
-	mes "[HAT_EF_GHOST_FIRE]";
-	mes "Hat Effect ID: " + HAT_EF_GHOST_FIRE;
-	mes "Map: guild_vs5 (65,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_GHOST_FIRE, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 180
 guild_vs5,68,50,4	script	HAT_EF_SERPENT_SHADOW	4_F_08_STATUE,{
 	mes "[HAT_EF_SERPENT_SHADOW]";
@@ -2181,36 +1955,13 @@ OnInit:
 	hateffect HAT_EF_SERPENT_SHADOW, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 181
-guild_vs5,71,50,4	script	HAT_EF_C_1ST_EVT_HAT_MSP	4_F_08_STATUE,{
-	mes "[HAT_EF_C_1ST_EVT_HAT_MSP]";
-	mes "Hat Effect ID: " + HAT_EF_C_1ST_EVT_HAT_MSP;
-	mes "Map: guild_vs5 (71,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_1ST_EVT_HAT_MSP, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 182
-guild_vs5,74,50,4	script	HAT_EF_C_1ST_EVT_BALLOON_MSP	4_F_08_STATUE,{
-	mes "[HAT_EF_C_1ST_EVT_BALLOON_MSP]";
-	mes "Hat Effect ID: " + HAT_EF_C_1ST_EVT_BALLOON_MSP;
-	mes "Map: guild_vs5 (74,50)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_1ST_EVT_BALLOON_MSP, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 183
-guild_vs5,77,50,4	script	HAT_EF_RABBIT_AURA	4_F_08_STATUE,{
+guild_vs5,74,46,0	script	HAT_EF_RABBIT_AURA	4_F_08_STATUE,{
 	mes "[HAT_EF_RABBIT_AURA]";
 	mes "Hat Effect ID: " + HAT_EF_RABBIT_AURA;
-	mes "Map: guild_vs5 (77,50)";
+	mes "Map: guild_vs5 (74,46)";
 	close;
 
 OnInit:
@@ -2219,10 +1970,10 @@ OnInit:
 }
 
 // Effect ID 184
-guild_vs5,80,50,4	script	HAT_EF_ALICE_TEA	4_F_08_STATUE,{
+guild_vs5,70,46,0	script	HAT_EF_ALICE_TEA	4_F_08_STATUE,{
 	mes "[HAT_EF_ALICE_TEA]";
 	mes "Hat Effect ID: " + HAT_EF_ALICE_TEA;
-	mes "Map: guild_vs5 (80,50)";
+	mes "Map: guild_vs5 (70,46)";
 	close;
 
 OnInit:
@@ -2231,10 +1982,10 @@ OnInit:
 }
 
 // Effect ID 185
-guild_vs5,20,48,4	script	HAT_EF_C_DARK_LORD_CLOAK	4_F_08_STATUE,{
+guild_vs5,66,46,0	script	HAT_EF_C_DARK_LORD_CLOAK	4_F_08_STATUE,{
 	mes "[HAT_EF_C_DARK_LORD_CLOAK]";
 	mes "Hat Effect ID: " + HAT_EF_C_DARK_LORD_CLOAK;
-	mes "Map: guild_vs5 (20,48)";
+	mes "Map: guild_vs5 (66,46)";
 	close;
 
 OnInit:
@@ -2243,10 +1994,10 @@ OnInit:
 }
 
 // Effect ID 186
-guild_vs5,23,48,4	script	HAT_EF_C_SAKURA_FUBUKI	4_F_08_STATUE,{
+guild_vs5,62,46,0	script	HAT_EF_C_SAKURA_FUBUKI	4_F_08_STATUE,{
 	mes "[HAT_EF_C_SAKURA_FUBUKI]";
 	mes "Hat Effect ID: " + HAT_EF_C_SAKURA_FUBUKI;
-	mes "Map: guild_vs5 (23,48)";
+	mes "Map: guild_vs5 (62,46)";
 	close;
 
 OnInit:
@@ -2254,23 +2005,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 187
-guild_vs5,29,48,4	script	HAT_EF_C_DARK_LORD_MANTEAU	4_F_08_STATUE,{
-	mes "[HAT_EF_C_DARK_LORD_MANTEAU]";
-	mes "Hat Effect ID: " + HAT_EF_C_DARK_LORD_MANTEAU;
-	mes "Map: guild_vs5 (29,48)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_DARK_LORD_MANTEAU, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 188
-guild_vs5,32,48,4	script	HAT_EF_DECORATION_OF_MUSIC	4_F_08_STATUE,{
+guild_vs5,58,46,0	script	HAT_EF_DECORATION_OF_MUSIC	4_F_08_STATUE,{
 	mes "[HAT_EF_DECORATION_OF_MUSIC]";
 	mes "Hat Effect ID: " + HAT_EF_DECORATION_OF_MUSIC;
-	mes "Map: guild_vs5 (32,48)";
+	mes "Map: guild_vs5 (58,46)";
 	close;
 
 OnInit:
@@ -2278,59 +2017,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 189
-guild_vs5,35,48,4	script	HAT_EF_2023RTC_S_ROBE1	4_F_08_STATUE,{
-	mes "[HAT_EF_2023RTC_S_ROBE1]";
-	mes "Hat Effect ID: " + HAT_EF_2023RTC_S_ROBE1;
-	mes "Map: guild_vs5 (35,48)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2023RTC_S_ROBE1, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 190
-guild_vs5,38,48,4	script	HAT_EF_2023RTC_S_ROBE2	4_F_08_STATUE,{
-	mes "[HAT_EF_2023RTC_S_ROBE2]";
-	mes "Hat Effect ID: " + HAT_EF_2023RTC_S_ROBE2;
-	mes "Map: guild_vs5 (38,48)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2023RTC_S_ROBE2, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 191
-guild_vs5,41,48,4	script	HAT_EF_2023RTC_S_ROBE3	4_F_08_STATUE,{
-	mes "[HAT_EF_2023RTC_S_ROBE3]";
-	mes "Hat Effect ID: " + HAT_EF_2023RTC_S_ROBE3;
-	mes "Map: guild_vs5 (41,48)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_2023RTC_S_ROBE3, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 192
-guild_vs5,56,48,4	script	HAT_EF_C_CONSECRATE_F_AUREOLA	4_F_08_STATUE,{
-	mes "[HAT_EF_C_CONSECRATE_F_AUREOLA]";
-	mes "Hat Effect ID: " + HAT_EF_C_CONSECRATE_F_AUREOLA;
-	mes "Map: guild_vs5 (56,48)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_CONSECRATE_F_AUREOLA, true, getnpcid(0);
-	end;
-}
-
 // Effect ID 193
-guild_vs5,59,48,4	script	HAT_EF_C_BULB_WREATH	4_F_08_STATUE,{
+guild_vs5,74,43,0	script	HAT_EF_C_BULB_WREATH	4_F_08_STATUE,{
 	mes "[HAT_EF_C_BULB_WREATH]";
 	mes "Hat Effect ID: " + HAT_EF_C_BULB_WREATH;
-	mes "Map: guild_vs5 (59,48)";
+	mes "Map: guild_vs5 (74,43)";
 	close;
 
 OnInit:
@@ -2339,10 +2030,10 @@ OnInit:
 }
 
 // Effect ID 194
-guild_vs5,62,48,4	script	HAT_EF_MD_HOL_BARRIER1	4_F_08_STATUE,{
+guild_vs5,70,43,0	script	HAT_EF_MD_HOL_BARRIER1	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER1]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER1;
-	mes "Map: guild_vs5 (62,48)";
+	mes "Map: guild_vs5 (70,43)";
 	close;
 
 OnInit:
@@ -2351,10 +2042,10 @@ OnInit:
 }
 
 // Effect ID 195
-guild_vs5,65,48,4	script	HAT_EF_MD_HOL_BARRIER2	4_F_08_STATUE,{
+guild_vs5,66,43,0	script	HAT_EF_MD_HOL_BARRIER2	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER2]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER2;
-	mes "Map: guild_vs5 (65,48)";
+	mes "Map: guild_vs5 (66,43)";
 	close;
 
 OnInit:
@@ -2363,10 +2054,10 @@ OnInit:
 }
 
 // Effect ID 196
-guild_vs5,68,48,4	script	HAT_EF_MD_HOL_BARRIER3	4_F_08_STATUE,{
+guild_vs5,62,43,0	script	HAT_EF_MD_HOL_BARRIER3	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER3]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER3;
-	mes "Map: guild_vs5 (68,48)";
+	mes "Map: guild_vs5 (62,43)";
 	close;
 
 OnInit:
@@ -2375,10 +2066,10 @@ OnInit:
 }
 
 // Effect ID 197
-guild_vs5,71,48,4	script	HAT_EF_MD_HOL_BARRIER4	4_F_08_STATUE,{
+guild_vs5,58,43,0	script	HAT_EF_MD_HOL_BARRIER4	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER4]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER4;
-	mes "Map: guild_vs5 (71,48)";
+	mes "Map: guild_vs5 (58,43)";
 	close;
 
 OnInit:
@@ -2387,10 +2078,10 @@ OnInit:
 }
 
 // Effect ID 198
-guild_vs5,74,48,4	script	HAT_EF_MD_HOL_BARRIER5	4_F_08_STATUE,{
+guild_vs5,54,43,0	script	HAT_EF_MD_HOL_BARRIER5	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER5]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER5;
-	mes "Map: guild_vs5 (74,48)";
+	mes "Map: guild_vs5 (54,43)";
 	close;
 
 OnInit:
@@ -2399,10 +2090,10 @@ OnInit:
 }
 
 // Effect ID 199
-guild_vs5,77,48,4	script	HAT_EF_MD_HOL_BARRIER6	4_F_08_STATUE,{
+guild_vs5,74,40,0	script	HAT_EF_MD_HOL_BARRIER6	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER6]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER6;
-	mes "Map: guild_vs5 (77,48)";
+	mes "Map: guild_vs5 (74,40)";
 	close;
 
 OnInit:
@@ -2411,10 +2102,10 @@ OnInit:
 }
 
 // Effect ID 200
-guild_vs5,80,48,4	script	HAT_EF_MD_HOL_BARRIER7	4_F_08_STATUE,{
+guild_vs5,70,40,0	script	HAT_EF_MD_HOL_BARRIER7	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER7]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER7;
-	mes "Map: guild_vs5 (80,48)";
+	mes "Map: guild_vs5 (70,40)";
 	close;
 
 OnInit:
@@ -2423,10 +2114,10 @@ OnInit:
 }
 
 // Effect ID 201
-guild_vs5,23,46,4	script	HAT_EF_MD_HOL_BARRIER8	4_F_08_STATUE,{
+guild_vs5,66,40,0	script	HAT_EF_MD_HOL_BARRIER8	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER8]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER8;
-	mes "Map: guild_vs5 (23,46)";
+	mes "Map: guild_vs5 (66,40)";
 	close;
 
 OnInit:
@@ -2435,10 +2126,10 @@ OnInit:
 }
 
 // Effect ID 202
-guild_vs5,29,46,4	script	HAT_EF_MD_HOL_BARRIER9	4_F_08_STATUE,{
+guild_vs5,62,40,0	script	HAT_EF_MD_HOL_BARRIER9	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER9]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER9;
-	mes "Map: guild_vs5 (29,46)";
+	mes "Map: guild_vs5 (62,40)";
 	close;
 
 OnInit:
@@ -2447,10 +2138,10 @@ OnInit:
 }
 
 // Effect ID 203
-guild_vs5,32,46,4	script	HAT_EF_MD_HOL_BARRIER10	4_F_08_STATUE,{
+guild_vs5,54,40,0	script	HAT_EF_MD_HOL_BARRIER10	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER10]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER10;
-	mes "Map: guild_vs5 (32,46)";
+	mes "Map: guild_vs5 (54,40)";
 	close;
 
 OnInit:
@@ -2459,10 +2150,10 @@ OnInit:
 }
 
 // Effect ID 204
-guild_vs5,35,46,4	script	HAT_EF_MD_HOL_BARRIER11	4_F_08_STATUE,{
+guild_vs5,70,37,0	script	HAT_EF_MD_HOL_BARRIER11	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER11]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER11;
-	mes "Map: guild_vs5 (35,46)";
+	mes "Map: guild_vs5 (70,37)";
 	close;
 
 OnInit:
@@ -2471,10 +2162,10 @@ OnInit:
 }
 
 // Effect ID 205
-guild_vs5,38,46,4	script	HAT_EF_MD_HOL_BARRIER12	4_F_08_STATUE,{
+guild_vs5,66,37,0	script	HAT_EF_MD_HOL_BARRIER12	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER12]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER12;
-	mes "Map: guild_vs5 (38,46)";
+	mes "Map: guild_vs5 (66,37)";
 	close;
 
 OnInit:
@@ -2483,10 +2174,10 @@ OnInit:
 }
 
 // Effect ID 206
-guild_vs5,41,46,4	script	HAT_EF_MD_HOL_BARRIER13	4_F_08_STATUE,{
+guild_vs5,62,37,0	script	HAT_EF_MD_HOL_BARRIER13	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER13]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER13;
-	mes "Map: guild_vs5 (41,46)";
+	mes "Map: guild_vs5 (62,37)";
 	close;
 
 OnInit:
@@ -2495,10 +2186,10 @@ OnInit:
 }
 
 // Effect ID 207
-guild_vs5,44,46,4	script	HAT_EF_MD_HOL_BARRIER14	4_F_08_STATUE,{
+guild_vs5,58,37,0	script	HAT_EF_MD_HOL_BARRIER14	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER14]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER14;
-	mes "Map: guild_vs5 (44,46)";
+	mes "Map: guild_vs5 (58,37)";
 	close;
 
 OnInit:
@@ -2507,10 +2198,10 @@ OnInit:
 }
 
 // Effect ID 208
-guild_vs5,50,46,4	script	HAT_EF_MD_HOL_BARRIER15	4_F_08_STATUE,{
+guild_vs5,54,37,0	script	HAT_EF_MD_HOL_BARRIER15	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER15]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER15;
-	mes "Map: guild_vs5 (50,46)";
+	mes "Map: guild_vs5 (54,37)";
 	close;
 
 OnInit:
@@ -2519,10 +2210,10 @@ OnInit:
 }
 
 // Effect ID 209
-guild_vs5,53,46,4	script	HAT_EF_MD_HOL_BARRIER16	4_F_08_STATUE,{
+guild_vs5,66,34,0	script	HAT_EF_MD_HOL_BARRIER16	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER16]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER16;
-	mes "Map: guild_vs5 (53,46)";
+	mes "Map: guild_vs5 (66,34)";
 	close;
 
 OnInit:
@@ -2531,10 +2222,10 @@ OnInit:
 }
 
 // Effect ID 210
-guild_vs5,56,46,4	script	HAT_EF_MD_HOL_BARRIER17	4_F_08_STATUE,{
+guild_vs5,62,34,0	script	HAT_EF_MD_HOL_BARRIER17	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER17]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER17;
-	mes "Map: guild_vs5 (56,46)";
+	mes "Map: guild_vs5 (62,34)";
 	close;
 
 OnInit:
@@ -2543,10 +2234,10 @@ OnInit:
 }
 
 // Effect ID 211
-guild_vs5,59,46,4	script	HAT_EF_MD_HOL_BARRIER18	4_F_08_STATUE,{
+guild_vs5,58,31,0	script	HAT_EF_MD_HOL_BARRIER18	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER18]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER18;
-	mes "Map: guild_vs5 (59,46)";
+	mes "Map: guild_vs5 (58,31)";
 	close;
 
 OnInit:
@@ -2555,10 +2246,10 @@ OnInit:
 }
 
 // Effect ID 212
-guild_vs5,62,46,4	script	HAT_EF_MD_HOL_BARRIER19	4_F_08_STATUE,{
+guild_vs5,54,31,0	script	HAT_EF_MD_HOL_BARRIER19	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER19]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER19;
-	mes "Map: guild_vs5 (62,46)";
+	mes "Map: guild_vs5 (54,31)";
 	close;
 
 OnInit:
@@ -2567,10 +2258,10 @@ OnInit:
 }
 
 // Effect ID 213
-guild_vs5,65,46,4	script	HAT_EF_MD_HOL_BARRIER20	4_F_08_STATUE,{
+guild_vs5,58,28,0	script	HAT_EF_MD_HOL_BARRIER20	4_F_08_STATUE,{
 	mes "[HAT_EF_MD_HOL_BARRIER20]";
 	mes "Hat Effect ID: " + HAT_EF_MD_HOL_BARRIER20;
-	mes "Map: guild_vs5 (65,46)";
+	mes "Map: guild_vs5 (58,28)";
 	close;
 
 OnInit:
@@ -2579,10 +2270,10 @@ OnInit:
 }
 
 // Effect ID 214
-guild_vs5,68,46,4	script	HAT_EF_C_FLUTTERING_HAZE	4_F_08_STATUE,{
+guild_vs5,54,28,0	script	HAT_EF_C_FLUTTERING_HAZE	4_F_08_STATUE,{
 	mes "[HAT_EF_C_FLUTTERING_HAZE]";
 	mes "Hat Effect ID: " + HAT_EF_C_FLUTTERING_HAZE;
-	mes "Map: guild_vs5 (68,46)";
+	mes "Map: guild_vs5 (54,28)";
 	close;
 
 OnInit:
@@ -2591,10 +2282,10 @@ OnInit:
 }
 
 // Effect ID 215
-guild_vs5,71,46,4	script	HAT_EF_EFST_CINNAMON	4_F_08_STATUE,{
+guild_vs5,22,46,0	script	HAT_EF_EFST_CINNAMON	4_F_08_STATUE,{
 	mes "[HAT_EF_EFST_CINNAMON]";
 	mes "Hat Effect ID: " + HAT_EF_EFST_CINNAMON;
-	mes "Map: guild_vs5 (71,46)";
+	mes "Map: guild_vs5 (22,46)";
 	close;
 
 OnInit:
@@ -2603,10 +2294,10 @@ OnInit:
 }
 
 // Effect ID 216
-guild_vs5,74,46,4	script	HAT_EF_AUTUMN_FULL_MOON	4_F_08_STATUE,{
+guild_vs5,30,46,0	script	HAT_EF_AUTUMN_FULL_MOON	4_F_08_STATUE,{
 	mes "[HAT_EF_AUTUMN_FULL_MOON]";
 	mes "Hat Effect ID: " + HAT_EF_AUTUMN_FULL_MOON;
-	mes "Map: guild_vs5 (74,46)";
+	mes "Map: guild_vs5 (30,46)";
 	close;
 
 OnInit:
@@ -2615,10 +2306,10 @@ OnInit:
 }
 
 // Effect ID 217
-guild_vs5,77,46,4	script	HAT_EF_NIFLHEIM_NIGHT_SKY	4_F_08_STATUE,{
+guild_vs5,34,46,0	script	HAT_EF_NIFLHEIM_NIGHT_SKY	4_F_08_STATUE,{
 	mes "[HAT_EF_NIFLHEIM_NIGHT_SKY]";
 	mes "Hat Effect ID: " + HAT_EF_NIFLHEIM_NIGHT_SKY;
-	mes "Map: guild_vs5 (77,46)";
+	mes "Map: guild_vs5 (34,46)";
 	close;
 
 OnInit:
@@ -2626,30 +2317,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 218
-guild_vs5,23,44,4	script	HAT_EF_C_ROS2023_CAPE_1	4_F_08_STATUE,{
-	mes "[HAT_EF_C_ROS2023_CAPE_1]";
-	mes "Hat Effect ID: " + HAT_EF_C_ROS2023_CAPE_1;
-	mes "Map: guild_vs5 (23,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_ROS2023_CAPE_1, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 219
-guild_vs5,29,44,4	script	HAT_EF_BLACK_THUNDER_	4_F_08_STATUE,{
-	mes "[HAT_EF_BLACK_THUNDER_]";
-	mes "Hat Effect ID: " + HAT_EF_BLACK_THUNDER_;
-	mes "Map: guild_vs5 (29,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_BLACK_THUNDER_, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: texture path/fallback unverified
 // Effect ID 220
 guild_vs5,32,44,4	script	HAT_EF_C_ROS2023_CAPE_2	4_F_08_STATUE,{
 	mes "[HAT_EF_C_ROS2023_CAPE_2]";
@@ -2661,24 +2329,13 @@ OnInit:
 	hateffect HAT_EF_C_ROS2023_CAPE_2, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 221
-guild_vs5,35,44,4	script	HAT_EF_C_15TH_NOV_HELMET	4_F_08_STATUE,{
-	mes "[HAT_EF_C_15TH_NOV_HELMET]";
-	mes "Hat Effect ID: " + HAT_EF_C_15TH_NOV_HELMET;
-	mes "Map: guild_vs5 (35,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_15TH_NOV_HELMET, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 222
-guild_vs5,38,44,4	script	HAT_EF_COSMIC_CONNECTION	4_F_08_STATUE,{
+guild_vs5,38,46,0	script	HAT_EF_COSMIC_CONNECTION	4_F_08_STATUE,{
 	mes "[HAT_EF_COSMIC_CONNECTION]";
 	mes "Hat Effect ID: " + HAT_EF_COSMIC_CONNECTION;
-	mes "Map: guild_vs5 (38,44)";
+	mes "Map: guild_vs5 (38,46)";
 	close;
 
 OnInit:
@@ -2687,10 +2344,10 @@ OnInit:
 }
 
 // Effect ID 223
-guild_vs5,41,44,4	script	HAT_EF_C_BABY_GLOOM	4_F_08_STATUE,{
+guild_vs5,42,46,0	script	HAT_EF_C_BABY_GLOOM	4_F_08_STATUE,{
 	mes "[HAT_EF_C_BABY_GLOOM]";
 	mes "Hat Effect ID: " + HAT_EF_C_BABY_GLOOM;
-	mes "Map: guild_vs5 (41,44)";
+	mes "Map: guild_vs5 (42,46)";
 	close;
 
 OnInit:
@@ -2699,10 +2356,10 @@ OnInit:
 }
 
 // Effect ID 224
-guild_vs5,44,44,4	script	HAT_EF_WINTERNIGHTBELLS	4_F_08_STATUE,{
+guild_vs5,30,43,0	script	HAT_EF_WINTERNIGHTBELLS	4_F_08_STATUE,{
 	mes "[HAT_EF_WINTERNIGHTBELLS]";
 	mes "Hat Effect ID: " + HAT_EF_WINTERNIGHTBELLS;
-	mes "Map: guild_vs5 (44,44)";
+	mes "Map: guild_vs5 (30,43)";
 	close;
 
 OnInit:
@@ -2711,10 +2368,10 @@ OnInit:
 }
 
 // Effect ID 225
-guild_vs5,47,44,4	script	HAT_EF_NIGHTSKYOFRUTIE	4_F_08_STATUE,{
+guild_vs5,34,43,0	script	HAT_EF_NIGHTSKYOFRUTIE	4_F_08_STATUE,{
 	mes "[HAT_EF_NIGHTSKYOFRUTIE]";
 	mes "Hat Effect ID: " + HAT_EF_NIGHTSKYOFRUTIE;
-	mes "Map: guild_vs5 (47,44)";
+	mes "Map: guild_vs5 (34,43)";
 	close;
 
 OnInit:
@@ -2722,11 +2379,7 @@ OnInit:
 	end;
 }
 
-
-
-
-
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 231
 guild_vs5,65,44,4	script	HAT_EF_RAINBOW_POISON_MASTER	4_F_08_STATUE,{
 	mes "[HAT_EF_RAINBOW_POISON_MASTER]";
@@ -2738,72 +2391,13 @@ OnInit:
 	hateffect HAT_EF_RAINBOW_POISON_MASTER, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 232
-guild_vs5,68,44,4	script	HAT_EF_C_ANCIENT_RUNE	4_F_08_STATUE,{
-	mes "[HAT_EF_C_ANCIENT_RUNE]";
-	mes "Hat Effect ID: " + HAT_EF_C_ANCIENT_RUNE;
-	mes "Map: guild_vs5 (68,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_ANCIENT_RUNE, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 233
-guild_vs5,71,44,4	script	HAT_EF_C_DRAGON_GREEN_AURA	4_F_08_STATUE,{
-	mes "[HAT_EF_C_DRAGON_GREEN_AURA]";
-	mes "Hat Effect ID: " + HAT_EF_C_DRAGON_GREEN_AURA;
-	mes "Map: guild_vs5 (71,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_DRAGON_GREEN_AURA, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 234
-guild_vs5,74,44,4	script	HAT_EF_C_DRAGON_RED_AURA	4_F_08_STATUE,{
-	mes "[HAT_EF_C_DRAGON_RED_AURA]";
-	mes "Hat Effect ID: " + HAT_EF_C_DRAGON_RED_AURA;
-	mes "Map: guild_vs5 (74,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_DRAGON_RED_AURA, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 235
-guild_vs5,77,44,4	script	HAT_EF_C_DRAGON_YELLOW_AURA	4_F_08_STATUE,{
-	mes "[HAT_EF_C_DRAGON_YELLOW_AURA]";
-	mes "Hat Effect ID: " + HAT_EF_C_DRAGON_YELLOW_AURA;
-	mes "Map: guild_vs5 (77,44)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_DRAGON_YELLOW_AURA, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 236
-guild_vs5,23,42,4	script	HAT_EF_INTERDIMENSIONAL_RIFT	4_F_08_STATUE,{
-	mes "[HAT_EF_INTERDIMENSIONAL_RIFT]";
-	mes "Hat Effect ID: " + HAT_EF_INTERDIMENSIONAL_RIFT;
-	mes "Map: guild_vs5 (23,42)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_INTERDIMENSIONAL_RIFT, true, getnpcid(0);
-	end;
-}
+*/
 
 // Effect ID 237
-guild_vs5,26,42,4	script	HAT_EF_C_CLB_SS_LL	4_F_08_STATUE,{
+guild_vs5,38,43,0	script	HAT_EF_C_CLB_SS_LL	4_F_08_STATUE,{
 	mes "[HAT_EF_C_CLB_SS_LL]";
 	mes "Hat Effect ID: " + HAT_EF_C_CLB_SS_LL;
-	mes "Map: guild_vs5 (26,42)";
+	mes "Map: guild_vs5 (38,43)";
 	close;
 
 OnInit:
@@ -2812,10 +2406,10 @@ OnInit:
 }
 
 // Effect ID 238
-guild_vs5,29,42,4	script	HAT_EF_VACATION	4_F_08_STATUE,{
+guild_vs5,42,43,0	script	HAT_EF_VACATION	4_F_08_STATUE,{
 	mes "[HAT_EF_VACATION]";
 	mes "Hat Effect ID: " + HAT_EF_VACATION;
-	mes "Map: guild_vs5 (29,42)";
+	mes "Map: guild_vs5 (42,43)";
 	close;
 
 OnInit:
@@ -2823,24 +2417,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 239
-guild_vs5,32,42,4	script	HAT_EF_C_FH_LOSTWING	4_F_08_STATUE,{
-	mes "[HAT_EF_C_FH_LOSTWING]";
-	mes "Hat Effect ID: " + HAT_EF_C_FH_LOSTWING;
-	mes "Map: guild_vs5 (32,42)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_FH_LOSTWING, true, getnpcid(0);
-	end;
-}
-
-
 // Effect ID 241
-guild_vs5,38,42,4	script	HAT_EF_C_AUSPICLOUD	4_F_08_STATUE,{
+guild_vs5,46,43,0	script	HAT_EF_C_AUSPICLOUD	4_F_08_STATUE,{
 	mes "[HAT_EF_C_AUSPICLOUD]";
 	mes "Hat Effect ID: " + HAT_EF_C_AUSPICLOUD;
-	mes "Map: guild_vs5 (38,42)";
+	mes "Map: guild_vs5 (46,43)";
 	close;
 
 OnInit:
@@ -2849,10 +2430,10 @@ OnInit:
 }
 
 // Effect ID 242
-guild_vs5,41,42,4	script	HAT_EF_AURA_OF_GHOST_S	4_F_08_STATUE,{
+guild_vs5,26,40,0	script	HAT_EF_AURA_OF_GHOST_S	4_F_08_STATUE,{
 	mes "[HAT_EF_AURA_OF_GHOST_S]";
 	mes "Hat Effect ID: " + HAT_EF_AURA_OF_GHOST_S;
-	mes "Map: guild_vs5 (41,42)";
+	mes "Map: guild_vs5 (26,40)";
 	close;
 
 OnInit:
@@ -2861,10 +2442,10 @@ OnInit:
 }
 
 // Effect ID 243
-guild_vs5,44,42,4	script	HAT_EF_C_ROS2024_WING_1	4_F_08_STATUE,{
+guild_vs5,30,40,0	script	HAT_EF_C_ROS2024_WING_1	4_F_08_STATUE,{
 	mes "[HAT_EF_C_ROS2024_WING_1]";
 	mes "Hat Effect ID: " + HAT_EF_C_ROS2024_WING_1;
-	mes "Map: guild_vs5 (44,42)";
+	mes "Map: guild_vs5 (30,40)";
 	close;
 
 OnInit:
@@ -2872,14 +2453,11 @@ OnInit:
 	end;
 }
 
-
-
-
 // Effect ID 247
-guild_vs5,56,42,4	script	HAT_EF_ATQUE_POENITENTIA	4_F_08_STATUE,{
+guild_vs5,34,40,0	script	HAT_EF_ATQUE_POENITENTIA	4_F_08_STATUE,{
 	mes "[HAT_EF_ATQUE_POENITENTIA]";
 	mes "Hat Effect ID: " + HAT_EF_ATQUE_POENITENTIA;
-	mes "Map: guild_vs5 (56,42)";
+	mes "Map: guild_vs5 (34,40)";
 	close;
 
 OnInit:
@@ -2888,10 +2466,10 @@ OnInit:
 }
 
 // Effect ID 248
-guild_vs5,59,42,4	script	HAT_EF_PERM_FROST_OBLIVION	4_F_08_STATUE,{
+guild_vs5,42,40,0	script	HAT_EF_PERM_FROST_OBLIVION	4_F_08_STATUE,{
 	mes "[HAT_EF_PERM_FROST_OBLIVION]";
 	mes "Hat Effect ID: " + HAT_EF_PERM_FROST_OBLIVION;
-	mes "Map: guild_vs5 (59,42)";
+	mes "Map: guild_vs5 (42,40)";
 	close;
 
 OnInit:
@@ -2900,10 +2478,10 @@ OnInit:
 }
 
 // Effect ID 249
-guild_vs5,62,42,4	script	HAT_EF_ATQUE_POENITENTIA2	4_F_08_STATUE,{
+guild_vs5,46,40,0	script	HAT_EF_ATQUE_POENITENTIA2	4_F_08_STATUE,{
 	mes "[HAT_EF_ATQUE_POENITENTIA2]";
 	mes "Hat Effect ID: " + HAT_EF_ATQUE_POENITENTIA2;
-	mes "Map: guild_vs5 (62,42)";
+	mes "Map: guild_vs5 (46,40)";
 	close;
 
 OnInit:
@@ -2912,10 +2490,10 @@ OnInit:
 }
 
 // Effect ID 250
-guild_vs5,65,42,4	script	HAT_EF_GUIDE_OF_DEAD_TEXT	4_F_08_STATUE,{
+guild_vs5,30,37,0	script	HAT_EF_GUIDE_OF_DEAD_TEXT	4_F_08_STATUE,{
 	mes "[HAT_EF_GUIDE_OF_DEAD_TEXT]";
 	mes "Hat Effect ID: " + HAT_EF_GUIDE_OF_DEAD_TEXT;
-	mes "Map: guild_vs5 (65,42)";
+	mes "Map: guild_vs5 (30,37)";
 	close;
 
 OnInit:
@@ -2924,10 +2502,10 @@ OnInit:
 }
 
 // Effect ID 251
-guild_vs5,68,42,4	script	HAT_EF_MEDJED_TEXT	4_F_08_STATUE,{
+guild_vs5,34,37,0	script	HAT_EF_MEDJED_TEXT	4_F_08_STATUE,{
 	mes "[HAT_EF_MEDJED_TEXT]";
 	mes "Hat Effect ID: " + HAT_EF_MEDJED_TEXT;
-	mes "Map: guild_vs5 (68,42)";
+	mes "Map: guild_vs5 (34,37)";
 	close;
 
 OnInit:
@@ -2936,10 +2514,10 @@ OnInit:
 }
 
 // Effect ID 252
-guild_vs5,71,42,4	script	HAT_EF_INKPAINTING_DAY	4_F_08_STATUE,{
+guild_vs5,46,37,0	script	HAT_EF_INKPAINTING_DAY	4_F_08_STATUE,{
 	mes "[HAT_EF_INKPAINTING_DAY]";
 	mes "Hat Effect ID: " + HAT_EF_INKPAINTING_DAY;
-	mes "Map: guild_vs5 (71,42)";
+	mes "Map: guild_vs5 (46,37)";
 	close;
 
 OnInit:
@@ -2948,10 +2526,10 @@ OnInit:
 }
 
 // Effect ID 253
-guild_vs5,74,42,4	script	HAT_EF_INKPAINTING_NIGHT	4_F_08_STATUE,{
+guild_vs5,34,34,0	script	HAT_EF_INKPAINTING_NIGHT	4_F_08_STATUE,{
 	mes "[HAT_EF_INKPAINTING_NIGHT]";
 	mes "Hat Effect ID: " + HAT_EF_INKPAINTING_NIGHT;
-	mes "Map: guild_vs5 (74,42)";
+	mes "Map: guild_vs5 (34,34)";
 	close;
 
 OnInit:
@@ -2960,10 +2538,10 @@ OnInit:
 }
 
 // Effect ID 254
-guild_vs5,77,42,4	script	HAT_EF_KUNG_FU_PANDA	4_F_08_STATUE,{
+guild_vs5,38,34,0	script	HAT_EF_KUNG_FU_PANDA	4_F_08_STATUE,{
 	mes "[HAT_EF_KUNG_FU_PANDA]";
 	mes "Hat Effect ID: " + HAT_EF_KUNG_FU_PANDA;
-	mes "Map: guild_vs5 (77,42)";
+	mes "Map: guild_vs5 (38,34)";
 	close;
 
 OnInit:
@@ -2971,40 +2549,11 @@ OnInit:
 	end;
 }
 
-// Effect ID 255
-guild_vs5,23,40,4	script	HAT_EF_C_MGSGPH_POTARL	4_F_08_STATUE,{
-	mes "[HAT_EF_C_MGSGPH_POTARL]";
-	mes "Hat Effect ID: " + HAT_EF_C_MGSGPH_POTARL;
-	mes "Map: guild_vs5 (23,40)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_MGSGPH_POTARL, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 256
-guild_vs5,26,40,4	script	HAT_EF_C_IGUAZU_FALLS	4_F_08_STATUE,{
-	mes "[HAT_EF_C_IGUAZU_FALLS]";
-	mes "Hat Effect ID: " + HAT_EF_C_IGUAZU_FALLS;
-	mes "Map: guild_vs5 (26,40)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_IGUAZU_FALLS, true, getnpcid(0);
-	end;
-}
-
-
-
-
-
-
 // Effect ID 262
-guild_vs5,44,40,4	script	HAT_EF_HANMAC_MUNCH	4_F_08_STATUE,{
+guild_vs5,46,34,0	script	HAT_EF_HANMAC_MUNCH	4_F_08_STATUE,{
 	mes "[HAT_EF_HANMAC_MUNCH]";
 	mes "Hat Effect ID: " + HAT_EF_HANMAC_MUNCH;
-	mes "Map: guild_vs5 (44,40)";
+	mes "Map: guild_vs5 (46,34)";
 	close;
 
 OnInit:
@@ -3012,14 +2561,11 @@ OnInit:
 	end;
 }
 
-
-
-
 // Effect ID 266
-guild_vs5,56,40,4	script	HAT_EF_C_OVER_CLOUD	4_F_08_STATUE,{
+guild_vs5,34,31,0	script	HAT_EF_C_OVER_CLOUD	4_F_08_STATUE,{
 	mes "[HAT_EF_C_OVER_CLOUD]";
 	mes "Hat Effect ID: " + HAT_EF_C_OVER_CLOUD;
-	mes "Map: guild_vs5 (56,40)";
+	mes "Map: guild_vs5 (34,31)";
 	close;
 
 OnInit:
@@ -3028,10 +2574,10 @@ OnInit:
 }
 
 // Effect ID 267
-guild_vs5,62,40,4	script	HAT_EF_C_AURORA_ON_CLOUDS	4_F_08_STATUE,{
+guild_vs5,46,31,0	script	HAT_EF_C_AURORA_ON_CLOUDS	4_F_08_STATUE,{
 	mes "[HAT_EF_C_AURORA_ON_CLOUDS]";
 	mes "Hat Effect ID: " + HAT_EF_C_AURORA_ON_CLOUDS;
-	mes "Map: guild_vs5 (62,40)";
+	mes "Map: guild_vs5 (46,31)";
 	close;
 
 OnInit:
@@ -3040,10 +2586,10 @@ OnInit:
 }
 
 // Effect ID 268
-guild_vs5,65,40,4	script	HAT_EF_ROS_REDSPIRIT	4_F_08_STATUE,{
+guild_vs5,38,28,0	script	HAT_EF_ROS_REDSPIRIT	4_F_08_STATUE,{
 	mes "[HAT_EF_ROS_REDSPIRIT]";
 	mes "Hat Effect ID: " + HAT_EF_ROS_REDSPIRIT;
-	mes "Map: guild_vs5 (65,40)";
+	mes "Map: guild_vs5 (38,28)";
 	close;
 
 OnInit:
@@ -3052,10 +2598,10 @@ OnInit:
 }
 
 // Effect ID 269
-guild_vs5,68,40,4	script	HAT_EF_ROS_BLUESPIRIT	4_F_08_STATUE,{
+guild_vs5,42,28,0	script	HAT_EF_ROS_BLUESPIRIT	4_F_08_STATUE,{
 	mes "[HAT_EF_ROS_BLUESPIRIT]";
 	mes "Hat Effect ID: " + HAT_EF_ROS_BLUESPIRIT;
-	mes "Map: guild_vs5 (68,40)";
+	mes "Map: guild_vs5 (42,28)";
 	close;
 
 OnInit:
@@ -3064,10 +2610,10 @@ OnInit:
 }
 
 // Effect ID 270
-guild_vs5,71,40,4	script	HAT_EF_DIVINE_SKY_INVITE	4_F_08_STATUE,{
+guild_vs5,46,28,0	script	HAT_EF_DIVINE_SKY_INVITE	4_F_08_STATUE,{
 	mes "[HAT_EF_DIVINE_SKY_INVITE]";
 	mes "Hat Effect ID: " + HAT_EF_DIVINE_SKY_INVITE;
-	mes "Map: guild_vs5 (71,40)";
+	mes "Map: guild_vs5 (46,28)";
 	close;
 
 OnInit:
@@ -3075,14 +2621,11 @@ OnInit:
 	end;
 }
 
-
-
-
 // Effect ID 274
-guild_vs5,29,38,4	script	HAT_EF_C_NIGHTMARE_CHAIN	4_F_08_STATUE,{
+guild_vs5,42,25,0	script	HAT_EF_C_NIGHTMARE_CHAIN	4_F_08_STATUE,{
 	mes "[HAT_EF_C_NIGHTMARE_CHAIN]";
 	mes "Hat Effect ID: " + HAT_EF_C_NIGHTMARE_CHAIN;
-	mes "Map: guild_vs5 (29,38)";
+	mes "Map: guild_vs5 (42,25)";
 	close;
 
 OnInit:
@@ -3090,30 +2633,7 @@ OnInit:
 	end;
 }
 
-// Effect ID 275
-guild_vs5,32,38,4	script	HAT_EF_C_SPOT_MIKE	4_F_08_STATUE,{
-	mes "[HAT_EF_C_SPOT_MIKE]";
-	mes "Hat Effect ID: " + HAT_EF_C_SPOT_MIKE;
-	mes "Map: guild_vs5 (32,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_SPOT_MIKE, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 276
-guild_vs5,35,38,4	script	HAT_EF_C_SPOT_FLOWER	4_F_08_STATUE,{
-	mes "[HAT_EF_C_SPOT_FLOWER]";
-	mes "Hat Effect ID: " + HAT_EF_C_SPOT_FLOWER;
-	mes "Map: guild_vs5 (35,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_SPOT_FLOWER, true, getnpcid(0);
-	end;
-}
-
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 277
 guild_vs5,44,38,4	script	HAT_EF_C_2025ROSFESTA	4_F_08_STATUE,{
 	mes "[HAT_EF_C_2025ROSFESTA]";
@@ -3125,77 +2645,13 @@ OnInit:
 	hateffect HAT_EF_C_2025ROSFESTA, true, getnpcid(0);
 	end;
 }
-
-// Effect ID 278
-guild_vs5,47,38,4	script	HAT_EF_GOLDEN_AURA_TW	4_F_08_STATUE,{
-	mes "[HAT_EF_GOLDEN_AURA_TW]";
-	mes "Hat Effect ID: " + HAT_EF_GOLDEN_AURA_TW;
-	mes "Map: guild_vs5 (47,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_GOLDEN_AURA_TW, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 279
-guild_vs5,50,38,4	script	HAT_EF_C_S_BEELZEBUB_WING	4_F_08_STATUE,{
-	mes "[HAT_EF_C_S_BEELZEBUB_WING]";
-	mes "Hat Effect ID: " + HAT_EF_C_S_BEELZEBUB_WING;
-	mes "Map: guild_vs5 (50,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_S_BEELZEBUB_WING, true, getnpcid(0);
-	end;
-}
-
-
-// Effect ID 281
-guild_vs5,56,38,4	script	HAT_EF_SOLID_STATE_RECOGNITION	4_F_08_STATUE,{
-	mes "[HAT_EF_SOLID_STATE_RECOGNITION]";
-	mes "Hat Effect ID: " + HAT_EF_SOLID_STATE_RECOGNITION;
-	mes "Map: guild_vs5 (56,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_SOLID_STATE_RECOGNITION, true, getnpcid(0);
-	end;
-}
-
-// Effect ID 282
-guild_vs5,59,38,4	script	HAT_EF_C_CURSED_SERPENT	4_F_08_STATUE,{
-	mes "[HAT_EF_C_CURSED_SERPENT]";
-	mes "Hat Effect ID: " + HAT_EF_C_CURSED_SERPENT;
-	mes "Map: guild_vs5 (59,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_CURSED_SERPENT, true, getnpcid(0);
-	end;
-}
-
-
-// Effect ID 284
-guild_vs5,65,38,4	script	HAT_EF_C_GGH_ANNIVERSARY	4_F_08_STATUE,{
-	mes "[HAT_EF_C_GGH_ANNIVERSARY]";
-	mes "Hat Effect ID: " + HAT_EF_C_GGH_ANNIVERSARY;
-	mes "Map: guild_vs5 (65,38)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_GGH_ANNIVERSARY, true, getnpcid(0);
-	end;
-}
-
-
-
+*/
 
 // Effect ID 288
-guild_vs5,26,36,4	script	HAT_EF_C_CLB_GAT_DOC	4_F_08_STATUE,{
+guild_vs5,46,25,0	script	HAT_EF_C_CLB_GAT_DOC	4_F_08_STATUE,{
 	mes "[HAT_EF_C_CLB_GAT_DOC]";
 	mes "Hat Effect ID: " + HAT_EF_C_CLB_GAT_DOC;
-	mes "Map: guild_vs5 (26,36)";
+	mes "Map: guild_vs5 (46,25)";
 	close;
 
 OnInit:
@@ -3203,6 +2659,7 @@ OnInit:
 	end;
 }
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 289
 guild_vs5,29,36,4	script	HAT_EF_C_EYE_OF_NECROMANCER	4_F_08_STATUE,{
 	mes "[HAT_EF_C_EYE_OF_NECROMANCER]";
@@ -3214,7 +2671,9 @@ OnInit:
 	hateffect HAT_EF_C_EYE_OF_NECROMANCER, true, getnpcid(0);
 	end;
 }
+*/
 
+/* RESOURCE_PREVIEW_PAUSED: Paused: native dependencies unverified
 // Effect ID 290
 guild_vs5,32,36,4	script	HAT_EF_C_JAOW_PIRUN	4_F_08_STATUE,{
 	mes "[HAT_EF_C_JAOW_PIRUN]";
@@ -3226,20 +2685,7 @@ OnInit:
 	hateffect HAT_EF_C_JAOW_PIRUN, true, getnpcid(0);
 	end;
 }
-
-
-// Effect ID 292
-guild_vs5,38,36,4	script	HAT_EF_C_ANGEL_GIFT	4_F_08_STATUE,{
-	mes "[HAT_EF_C_ANGEL_GIFT]";
-	mes "Hat Effect ID: " + HAT_EF_C_ANGEL_GIFT;
-	mes "Map: guild_vs5 (38,36)";
-	close;
-
-OnInit:
-	hateffect HAT_EF_C_ANGEL_GIFT, true, getnpcid(0);
-	end;
-}
-
+*/
 
 // Footprints require movement, so these are previewed on the player instead of statues.
 prontera,208,181,4	script	Footprint Preview::HAT_FOOTPRINT_PREVIEW	4_M_SAGE_C,{
@@ -3286,7 +2732,6 @@ L_ClearPreview:
 
 OnInit:
 	setarray .effects[0],
-		FOOTPRINT_EF_BASE,
 		FOOTPRINT_EF_STR_BASE,
 		FOOTPRINT_EF_PURPLESTAR,
 		FOOTPRINT_EF_YELLOWSTAR,
@@ -3295,8 +2740,6 @@ OnInit:
 		FOOTPRINT_EF_DUMPLING,
 		FOOTPRINT_EF_PANDA_BASIC,
 		FOOTPRINT_EF_PANDA_COLOR,
-		FOOTPRINT_EF_BLOSSOM,
-		FOOTPRINT_EF_BUD,
 		FOOTPRINT_EF_BUTTERFLY_BLUE,
 		FOOTPRINT_EF_BUTTERFLY_PURPLE,
 		FOOTPRINT_EF_BUTTERFLY_YELLOW,
@@ -3306,14 +2749,10 @@ OnInit:
 		FOOTPRINT_EF_DIVINE,
 		FOOTPRINT_EF_NYAR_BLUE,
 		FOOTPRINT_EF_NYAR_PURPLE,
-		FOOTPRINT_EF_FEATHER,
-		FOOTPRINT_EF_BASIC,
 		FOOTPRINT_EF_DIVINE_BLUE,
 		FOOTPRINT_EF_BLUESTAR,
-		FOOTPRINT_EF_PHOENIX,
-		FOOTPRINT_EF_FLOWER_GARDEN;
+		FOOTPRINT_EF_PHOENIX;
 	setarray .names$[0],
-		"FOOTPRINT_EF_BASE",
 		"FOOTPRINT_EF_STR_BASE",
 		"FOOTPRINT_EF_PURPLESTAR",
 		"FOOTPRINT_EF_YELLOWSTAR",
@@ -3322,8 +2761,6 @@ OnInit:
 		"FOOTPRINT_EF_DUMPLING",
 		"FOOTPRINT_EF_PANDA_BASIC",
 		"FOOTPRINT_EF_PANDA_COLOR",
-		"FOOTPRINT_EF_BLOSSOM",
-		"FOOTPRINT_EF_BUD",
 		"FOOTPRINT_EF_BUTTERFLY_BLUE",
 		"FOOTPRINT_EF_BUTTERFLY_PURPLE",
 		"FOOTPRINT_EF_BUTTERFLY_YELLOW",
@@ -3333,12 +2770,9 @@ OnInit:
 		"FOOTPRINT_EF_DIVINE",
 		"FOOTPRINT_EF_NYAR_BLUE",
 		"FOOTPRINT_EF_NYAR_PURPLE",
-		"FOOTPRINT_EF_FEATHER",
-		"FOOTPRINT_EF_BASIC",
 		"FOOTPRINT_EF_DIVINE_BLUE",
 		"FOOTPRINT_EF_BLUESTAR",
-		"FOOTPRINT_EF_PHOENIX",
-		"FOOTPRINT_EF_FLOWER_GARDEN";
+		"FOOTPRINT_EF_PHOENIX";
 	.count = getarraysize(.effects);
 	.menu$ = "Stop preview";
 	for (.@i = 0; .@i < .count; ++.@i)
